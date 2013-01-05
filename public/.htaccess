@@ -1,0 +1,16 @@
+
+ExpiresActive On
+ExpiresByType application/x-javascript A86400
+ExpiresByType text/css A86400
+ExpiresByType image/gif A2419200  
+ExpiresByType image/png A2419200  
+ExpiresByType image/jpeg A2419200  
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ index.php [NC,L]
+
+SetEnv APPLICATION_ENV development

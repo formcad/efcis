@@ -1,0 +1,42 @@
+<!-- Nadpis -->
+<?php $this->title = "Kontrolní tabulka ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('.zmenaButton').button();
+});
+//]]>    
+</script> 
+
+<table id="vyroba-time-tableKontrolaRezie"
+           class="standardni">
+    <tr>
+        <th>Typ</th>
+        <th>Trvání</th>
+        <th>Zapsal</th>
+        <th>Poznámka</th>
+        <th></th>
+    </tr>       
+
+    <?php if (!empty($this->poleZaznamu)): ?>
+    <?php foreach ($this->poleZaznamu as $zaznam): ?>
+    <tr>
+        <td><?php echo $zaznam['technologie']; ?></td>
+        <td><?php echo $zaznam['trvani']; ?></td>
+        <td><?php echo $zaznam['zdrojDat']; ?></td>
+        <td><?php echo $zaznam['poznamka']; ?></td>
+        <td>
+            <a class="zmenaButton"
+               href ="<?php echo $this->url(array('module' => 'vyroba',
+                                                  'controller' => 'zapis',
+                                                  'action' => 'edit-rezie',
+                                                  'zmena' => $zaznam['id'],
+                                                  'navrat' => 'show-kontrola-rezie'),null,true); ?>">
+                Změnit
+            </a>                                     
+        </td>
+    </tr>
+    <?php endforeach; ?>
+    <?php endif; ?>    
+</table>

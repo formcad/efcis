@@ -1,0 +1,55 @@
+<?php $this->title = "Seznam přítomných zaměstnanců"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+
+    
+    $("#dochazka-button-terminalNavrat").button({
+        icons: {
+            primary: "ui-icon-circle-arrow-w"
+        }
+    });
+    
+
+});
+//]]>    
+</script>
+
+<div class="dochazka-terminal-infoDiv ui-widget ui-state-highlight ui-corner-all">
+    
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Zobrazeni jsou pouze lidé, kteří příchod zaznamenali na terminálu.
+        Ručně doplněné příchody zde nejsou!
+    </p>    
+    
+</div>
+
+<?php if (empty($this->pritomniLide)):?>
+
+<div class="dochazka-terminal-infoDiv ui-widget ui-state-highlight ui-corner-all">
+    
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Nikdo není přítomný!
+    </p>    
+    
+</div>
+
+<?php else: ?>
+
+<table class="standardni odsazene-bunky">
+    <tr>
+        <th>Zaměstnanec</th>
+        <th>Čas příchodu</th>
+    </tr>
+<?php foreach ($this->pritomniLide as $zaznam): ?>
+    <tr>
+        <td><?php echo $zaznam['jmeno'].' '.$zaznam['prijmeni']; ?></td>
+        <td><?php echo date('d. m. Y, H.i',strtotime($zaznam['casPrichodu'])); ?></td>
+    </tr>
+<?php endforeach; ?>    
+</table>
+
+<?php endif; ?>

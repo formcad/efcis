@@ -1,0 +1,49 @@
+<?php $this->title = "Přehled oficiálních výkazů docházky ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('input:submit').button();
+});
+//]]>    
+</script>
+
+<?php if (count($this->poleDochazky) > 0): ?>
+    <h3>Dostupné výkazy</h3>
+    <table class="standardni odsazene-bunky">
+        <tr>
+            <th>Rok</th>
+            <th>Výkazy</th>
+        </tr>
+    <?php foreach ($this->poleDochazky as $rok => $rokDochazky):?>
+        <tr>
+            <td><?php echo $rok; ?></td>
+            <td>
+                <?php if (count($rokDochazky)>0): ?>
+                <table>
+                    <tr>
+                    <?php foreach ($rokDochazky as $i => $mesic): ?>                        
+                        <td style="text-align: right;">
+                            <a href="<?php echo $this->url(array(
+                                'module' => 'dochazka',
+                                'controller' => 'official',
+                                'action' => 'zmena-vykazu',
+                                'id' => $mesic['id']),null,true); ?>">
+                                <?php echo $mesic['mesic']; ?>
+                            </a>
+                        </td>
+                        <?php if ($i == 2 or $i == 5 or $i == 8): ?>
+                        </tr><tr>
+                        <?php endif; ?>                                
+                    <?php endforeach; ?>
+                    </tr>
+                </table>                                
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </table>
+
+<?php else: ?>
+    <p>Nejseou vytvořené žádné oficiální výkazy</p>
+<?php endif; ?>    

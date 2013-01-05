@@ -1,0 +1,25 @@
+<?php $this->title = "Smazání přerušení ($this->uzivatel)"; ?>
+
+<p>
+    Jste si jistí, že chcete smazat následující záznam?
+</p>
+<table id="table-dochazka-editDelete">
+    <tr>
+        <td>Zaměstnanec</td>
+        <td><?php echo $this->uzivatel; ?></td>
+    </tr>
+    <tr>
+        <td>Přerušení</td>
+        <td><?php echo $this->zaznam['typPreruseni']; ?></td>
+    </tr>
+    <tr>
+        <td>Den směny</td>
+        <td><?php echo $this->zaznam['datumSmeny']; ?></td>
+    </tr>
+    <tr>
+        <td>Délka</td>
+        <td><?php echo $this->zaznam['delka']; ?></td>
+    </tr>
+</table>
+
+<?php echo $this->deleteForm; ?>

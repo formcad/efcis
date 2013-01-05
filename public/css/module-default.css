@@ -1,0 +1,66 @@
+
+/**** OBECNÉ ******************************************************************/
+
+/**** DIV *********************************************************************/
+
+#default-employee-infoDiv {
+    padding: 0px 5px;
+    width: 704px;
+}
+
+#default-employee-infoDiv span {
+    float: left; 
+    margin-right: 0.3em;
+}
+
+#default-employee-infoDiv table {  
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+#default-employee-infoDiv table tr td:first-child {  
+    padding-right: 5px;
+}
+
+#default-employee-moznostiVyberu {
+    margin-top: 10px; 
+    width: 710px;
+}
+
+/**** FORMULÁŘE ***************************************************************/
+
+#form-timeLimits {
+    height: 5em;
+}
+
+#form-login dt {
+    width: 130px;
+    text-align: right;
+}
+
+#form-passwordChange dt {
+    width: 130px;
+    text-align: right;
+}
+
+/**** TABULKY *****************************************************************/
+
+#default-employee-tablePoznamka {
+    margin-top: 20px;
+}
+
+#default-employee-tablePoznamka td {
+    padding: 3px 10px;
+}
+
+/**** OSTATNÍ *****************************************************************/
+
+.default-employee-button {    
+    margin: 7px 0;
+    width: 250px;
+    display: block;
+}
+
+.default-employee-zmenaButton {
+    margin-left: 10px;
+}

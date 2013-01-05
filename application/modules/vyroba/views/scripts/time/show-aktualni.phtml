@@ -1,0 +1,262 @@
+<!-- Nadpis -->
+<?php $this->title = "Dnešní záznamy ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('.plusButton').button({
+        icons: {primary: 'ui-icon-circle-plus'}
+    });
+    $('.zmenaButton').button();
+});
+//]]>    
+</script>    
+
+<?php if (   !empty($this->poleZaznamu)
+          or !empty($this->poleAktualni)
+          or !empty($this->poleChybneVyroby)
+          or !empty($this->poleChybneRezie)): ?>
+
+<h4>Celkový přehled aktuální směny</h4>
+
+<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        V následující tabulce není započítaný čas pauzy, který se do databáze
+        ukládá až při odchodu.
+    </p>
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Časy jsou v hodinách, celkem práce = čistá výroba + čistá režie
+    </p>
+</div>
+<table id="vyroba-time-tableSumarCasu">
+    <tr>
+        <td>Celkem docházka</td>
+        <td><?php echo $this->poleZaznamu[0]['sumaDochazky']; ?></td>
+    </tr>
+    <tr>
+        <td>Celkem práce</td>
+        <td><?php echo $this->poleZaznamu[0]['sumaPrace']; ?></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="seda">Výroba</td>
+        <td class="seda"><?php echo $this->poleZaznamu[0]['sumaStandardni']; ?></td>
+    </tr>
+    <tr>
+        <td class="seda">Druhý stroj</td>
+        <td class="seda"><?php echo $this->poleZaznamu[0]['sumaDvoustroj']; ?></td>
+    </tr>    
+    <tr>
+        <td class="seda">Čistá režie</td>
+        <td class="seda"><?php echo $this->poleZaznamu[0]['sumaRezie']; ?></td>
+    </tr>
+</table>
+
+<h4>Časy docházky</h4>
+
+<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Čas odchodu zapsaný kurzívou není uložený v databázi - jde o aktuální 
+        čas.
+    </p>
+</div>
+
+<table id="vyroba-time-tableSumarDochazky"
+       class="standardni">
+    <tr>
+        <th>Příchod</th>
+        <th>Odchod</th>
+    </tr>
+    
+<!-- Záznamy z ukončených bloků docházky -------------------------------------->
+    
+<?php if (!empty($this->poleZaznamu)): ?>
+<?php foreach ($this->poleZaznamu as $den): ?>
+    <?php if (!empty($den['pruchody'])): ?>
+    <?php $i = 0; ?>
+    <?php for ($i == 0; $i <= count($den['pruchody']); $i = $i+2): ?>
+    <tr>
+        <td><?php echo $den['pruchody'][$i]['casAkce']; ?></td>
+        <td><?php echo $den['pruchody'][$i+1]['casAkce']; ?></td>
+    </tr>
+    <?php endfor; ?>
+    <?php endif; ?>
+<?php endforeach; ?>
+<?php endif; ?>
+    
+<!-- Záznam z aktuálního bloku docházky --------------------------------------->
+    
+    <tr>
+        <td><?php echo $this->casPrichodu; ?></td>
+        <td><i><?php echo $this->casNyni; ?></i></td>
+    </tr>
+</table>
+
+<?php // řádek vypíšeme jenom když v něm bude nějaký obsah
+      if (   !empty($this->poleZaznamu[0]['poleCipovanePrace']) 
+          or !empty($this->poleZaznamu[0]['poleDopsanePrace'])
+          or !empty($this->poleZaznamu[0]['poleRezie'])
+          or !empty($this->poleAktualni)): ?>
+
+        <h4>Výrobní záznamy</h4>
+        
+        <div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
+            <p>
+                <span class="ui-icon ui-icon-info"></span>
+                V tabulce jsou jenom ukončené časy práce. Záznam o rozpracované 
+                práci je na úvodní stránce.
+            </p>    
+        </div>          
+
+        <table id="vyroba-time-tableSumarPrace"
+               class="standardni">
+            <tr>
+                <th>Zakázka</th>
+                <th>Díl</th>
+                <th>Trvání</th>
+                <th>Začátek</th>
+                <th>Operace</th>
+                <th>Zdroj dat</th>
+                <th>Karta</th>
+                <th></th>
+            </tr>      
+            
+            <!-- Dřívější záznamy vložené pomocí terminálů -------------------->
+            
+            <?php if (!empty($this->poleZaznamu[0]['poleCipovanePrace'])): ?>
+            <?php foreach ($this->poleZaznamu[0]['poleCipovanePrace'] as $zaznam): ?>
+            <tr>
+                <td><?php echo $zaznam['cisloZakazky']; ?></td>
+                <td><?php echo $zaznam['nazevPozcie']; ?></td>
+                <td><?php echo $zaznam['trvani']; ?></td>
+                <td><?php echo $zaznam['tinyCasStart']; ?></td>
+                <td><?php echo $zaznam['technologie']; ?></td>
+                <td><?php echo $zaznam['zdrojDat']; ?></td>
+                <td><?php echo $zaznam['typPrace']; ?></td>
+                <td>
+                    <a class="zmenaButton"
+                       href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=vyroba">
+                        Změna
+                    </a>                           
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            <?php endif; ?>
+
+            <!-- Aktuální záznamy vložené pomocí terminálů -------------------->
+            
+            <?php if (!empty($this->poleAktualni)): ?>
+            <?php foreach ($this->poleAktualni as $zaznam): ?>
+            <tr>
+                <td><?php echo $zaznam['cisloZakazky']; ?></td>
+                <td><?php echo $zaznam['nazevPozcie']; ?></td>
+                <td><?php echo $zaznam['trvani']; ?></td>
+                <td><?php echo $zaznam['tinyCasStart']; ?></td>
+                <td><?php echo $zaznam['technologie']; ?></td>
+                <td><?php echo $zaznam['zdrojDat']; ?></td>
+                <td><?php echo $zaznam['typPrace']; ?></td>
+                <td>
+                    <a class="zmenaButton"
+                       href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=vyroba">
+                        Změna
+                    </a>                           
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            <?php endif; ?>                
+            
+            <!-- Ručně doplněné nebo změněné záznamy ---------------------->
+
+            <?php if (!empty($this->poleZaznamu[0]['poleDopsanePrace'])): ?>
+            <?php foreach ($this->poleZaznamu[0]['poleDopsanePrace'] as $zaznam): ?>
+            <tr>
+                <td><?php echo $zaznam['cisloZakazky']; ?></td>
+                <td><?php echo $zaznam['nazevPozcie']; ?></td>
+                <td><?php echo $zaznam['trvani']; ?></td>
+                <td><?php echo $zaznam['tinyCasStart']; ?></td>
+                <td><?php echo $zaznam['technologie']; ?></td>
+                <td><?php echo $zaznam['zdrojDat']; ?></td>
+                <td><?php echo $zaznam['typPrace']; ?></td>
+                <td>
+                    <a class="zmenaButton"
+                       href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=vyroba">
+                        Změna
+                    </a>                         
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            <?php endif; ?>
+        </table>
+
+
+<?php endif; ?>
+
+<?php // režijní tabulku vypíšeme jenom když v ní bude obsah
+      if (   !empty($this->poleZaznamu[0]['poleRezie'])): ?>           
+
+    <h4>Režijní záznamy</h4>
+    <table id="vyroba-time-tableSumarRezie"
+           class="standardni">
+        <tr>
+            <th>Typ</th>
+            <th>Trvání</th>
+            <th>Zapsal</th>
+            <th></th>
+        </tr>            
+
+        <?php foreach ($this->poleZaznamu[0]['poleRezie'] as $zaznam): ?>
+        <tr>
+            <td><?php echo $zaznam['technologie']; ?></td>
+            <td><?php echo $zaznam['trvani']; ?></td>
+            <td><?php echo $zaznam['zdrojDat']; ?></td>
+            <td>
+                <a class="zmenaButton"
+                   href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=rezie">
+                    Změna
+                </a>                      
+            </td>
+        </tr>                          
+        <?php endforeach; ?>   
+    </table>
+<?php endif; ?>    
+
+
+<h4>Dopsat časy</h4>    
+
+<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Při zápisu časů si dejte pozor na den směny, zvlášť pokud pracujete přes
+        půlnoc - den směny je den, kdy jste přišli do práce.
+    </p>    
+</div>    
+
+<a class="plusButton"
+   href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>">
+    Zápis času
+</a>
+
+<?php else: ?>
+
+<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Pravděpodobně chybí záznam příchodu z docházky. Než bude do databáze 
+        doplněn, své časy si můžete zkontrolovat následujícími způsoby:
+        <ul>
+            <li>Tabulkou kontrolních záznamů</li>
+            <li>Přehledem uzavřených směn</li>
+        </ul>
+    </p>
+</div>
+<p>
+
+</p>
+
+<?php endif; ?>

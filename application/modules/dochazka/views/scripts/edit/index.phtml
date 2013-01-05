@@ -1,0 +1,333 @@
+<!-- Nadpis -->
+<?php $this->title = "Změna docházky ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('.plusButton').button({
+        icons: {primary: 'ui-icon-circle-plus'}
+    });
+    
+    $('.editButton').button({
+        icons: {primary: 'ui-icon-pencil'},
+        text: false
+    });
+    
+    $('.deleteButton').button({
+        icons: {primary: 'ui-icon-trash'},
+        text: false
+    });  
+    
+    $('.deleteTextButton').button({
+        icons: {primary: 'ui-icon-trash'}
+    });      
+});
+//]]>    
+</script>
+
+
+<!-- Informace o přítomnosti v práci ------------------------------------------>
+
+<?php if (count($this->temp)>0): ?>
+  
+<div id="dochazka-terminalovaAkce"
+     class="ui-state-highlight ui-corner-all">
+
+    <strong>Terminál:</strong><br />
+    <?php echo $this->temp['akce']; ?>
+    <?php echo $this->temp['casAkce']; ?>
+    <a class="deleteButton"
+       href ="<?php echo $this->url(array('module' => 'dochazka',
+                                          'controller' => 'edit',
+                                          'action' => 'delete-temp')); ?>">
+        &nbsp;
+    </a> 
+</div>    
+
+<?php endif; ?>
+
+
+<?php if ($this->errors): ?>
+
+<!-- Tabulka chyb v docházce -------------------------------------------------->
+
+<table id="table-dochazka-editErrorIndex"
+       class="standardni">
+    <tr>
+        <th colspan="3">Zaznamenané chyby v docházce</th>
+    </tr>
+    <?php foreach ($this->errors as $error): ?>
+    <tr>
+        <td class="horizontal"><?php echo $error['casAkce']; ?></td>
+        <td><?php echo $error['akce']; ?></td>
+        <td><a class="deleteButton"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'delete-error',
+                                                 'id' => $error['id'])); ?>">
+                &nbsp;
+            </a>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+    <tr>
+        <td colspan="3"
+            class="horizontal vertical">
+            <a class="deleteTextButton"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'delete-user-errors')); ?>">
+                Odstranit všechny zaznamenané chyby
+            </a>
+</table>
+
+
+<?php endif; ?>
+
+<!-- Tlačítka akcí ------------------------------------------------------------>
+
+<table id="table-dochazka-addAction">
+    <tr>
+        <td>
+            <a class="plusButton dochazka-addAction"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'add-hromadne-pruchody')); ?>">
+                Hromadné přidání průchodů
+            </a>             
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a class="plusButton dochazka-addAction"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'add-hromadne-preruseni')); ?>">
+                Hromadné přidání přerušení
+            </a>             
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a class="plusButton dochazka-addAction"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'add-hromadne-priplatky')); ?>">
+                Hromadné přidání příplatků
+            </a>             
+        </td>
+    </tr>    
+</table>
+
+<!-- Výpis docházky ----------------------------------------------------------->
+
+<table id="table-dochazka-editIndex"
+       class="standardni">
+    <tr>
+        <th>Den</th>
+        <th>Datum</th>
+        <th>Průchody</th>
+        <th>Přerušení</th>
+        <th>Příplatky</th>
+    </tr>
+
+<?php
+/**
+ *  Logika výpisu je následující: pro každý záznam ze souboru podrobností (tzn.
+ *  pro každé datum) je vypsán minimálně jeden řádek zobrazující datum a možnost
+ *  přidat pro toto datum záznam.
+ *  Pokud jsou i nějaké záznamy pro konkrétní datum, vypíší se v druhém řádku.
+ */
+?>
+<?php foreach ($this->zaznamy as $den): ?>
+    
+    <tr>
+        <td class="horizontal background">
+            <?php echo $den['zkratkaDne'].$den['svatekText']; ?>
+        </td>
+        <td class="horizontal background">
+            <?php echo $den['strDate']; ?>
+        </td>
+        <td class="horizontal background">            
+            <a class="plusButton"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'add-pruchod',
+                                                 'type' => 'prichod',
+                                                 'day' => $den['datum'])); ?>">
+                Příchod
+            </a>                     
+            <a class="plusButton"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'add-pruchod',
+                                                 'type' => 'odchod',
+                                                 'day' => $den['datum'])); ?>">
+                Odchod
+            </a>     
+        </td>
+        <td class="horizontal background ">
+            <a class="plusButton"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'add-preruseni',
+                                                 'day' => $den['datum'])); ?>">
+                Přerušení
+            </a>        
+        </td>
+        <td class="horizontal background ">
+            <a class="plusButton"
+               href="<?php echo $this->url(array('module' => 'dochazka',
+                                                 'controller' => 'edit',
+                                                 'action' => 'add-priplatek',
+                                                 'day' => $den['datum'])); ?>">
+                Příplatek
+            </a>        
+        </td>        
+    </tr>
+    
+    <?php if (!empty($den['pruchody']) or
+              !empty($den['priplatky']) or
+              !empty($den['preruseni'])): ?>
+    <tr>
+        <td class="<?php echo $den['integrityClass']; ?>"></td>
+        <td class="<?php echo $den['integrityClass']; ?>"></td>
+        <td class="vertical-top <?php echo $den['integrityClass']; ?>">
+            <?php if (!empty($den['pruchody'])): ?>
+            <table>
+            <?php foreach ($den['pruchody'] as $zaznam): ?>
+                <tr>        
+                    <td class="horizontal-left">  
+                        <a class="editButton"
+                           href =" 
+                        <?php echo $this->url(
+                                            array('module' => 'dochazka',
+                                                  'controller' => 'edit',
+                                                  'action' => 'edit-pruchod',
+                                                  'id' => $zaznam['id'])); ?>">
+                            &nbsp;
+                        </a>
+                    </td>
+                    <td>
+                        <a class="deleteButton"
+                           href =" 
+                        <?php echo $this->url(
+                                            array('module' => 'dochazka',
+                                                  'controller' => 'edit',
+                                                  'action' => 'delete-pruchod',
+                                                  'id' => $zaznam['id'])); ?>">
+                            &nbsp;
+                        </a> 
+                    </td>                       
+                    <td class="horizontal"><?php echo $zaznam['casAkce']; ?></td>
+                    <td><?php echo $zaznam['nazev']; ?></td>                   
+                </tr>
+            <?php endforeach; ?>
+            </table>                        
+            <?php endif; ?>
+        </td>
+        <td class="vertical-top <?php echo $den['integrityClass']; ?>">
+            <?php if (!empty($den['preruseni'])): ?>
+            <table>
+            <?php foreach ($den['preruseni'] as $zaznam): ?>
+                <tr>
+                    <td class="horizontal-left">                     
+                        <a class="editButton"
+                           href =" 
+                        <?php echo $this->url(
+                                            array('module' => 'dochazka',
+                                                  'controller' => 'edit',
+                                                  'action' => 'edit-preruseni',
+                                                  'id' => $zaznam['id'])); ?>">
+                            &nbsp;
+                        </a>   
+                    </td>
+                    <td>
+                        <a class="deleteButton"
+                           href =" 
+                        <?php echo $this->url(
+                                            array('module' => 'dochazka',
+                                                  'controller' => 'edit',
+                                                  'action' => 'delete-preruseni',
+                                                  'id' => $zaznam['id'])); ?>">
+                            &nbsp;
+                        </a> 
+                    </td>                    
+                    <td class="horizontal"><?php echo $zaznam['delka']; ?></td>
+                    <td><?php echo $zaznam['nazev']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </table>                           
+            <?php endif; ?>        
+        </td>
+        <td class="vertical-top <?php echo $den['integrityClass']; ?>">
+            <?php if (!empty($den['priplatky'])): ?>
+            <table>
+            <?php foreach ($den['priplatky'] as $zaznam): ?>
+                <tr>
+                    <td class="horizontal-left">                     
+                        <a class="editButton"
+                           href =" 
+                        <?php echo $this->url(
+                                            array('module' => 'dochazka',
+                                                  'controller' => 'edit',
+                                                  'action' => 'edit-priplatek',
+                                                  'id' => $zaznam['id'])); ?>">
+                            &nbsp;
+                        </a>   
+                    </td>
+                    <td>
+                        <a class="deleteButton"
+                           href =" 
+                        <?php echo $this->url(
+                                            array('module' => 'dochazka',
+                                                  'controller' => 'edit',
+                                                  'action' => 'delete-priplatek',
+                                                  'id' => $zaznam['id'])); ?>">
+                            &nbsp;
+                        </a> 
+                    </td>                    
+                    <td class="horizontal"><?php echo $zaznam['delka']; ?></td>
+                    <td class="padding-right-10"><?php echo $zaznam['nazev']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </table>                           
+            <?php endif; ?>              
+        </td>
+    </tr>           
+    <?php endif; ?>
+ 
+<?php endforeach; ?>    
+  <!--  <tr> -->
+        
+        
+  <!--  </tr> -->
+    
+</table>
+
+
+
+<!-- Dočasná tabulka -->
+
+<?php foreach ($this->zaznamy as $index => $den): ?>
+
+    <?php if (!empty($den['pruchody'])): ?>
+   
+    <?php foreach ($den['pruchody'] as $index => $zaznam): ?>
+                          
+            
+    <?php echo str_replace('.',':',substr($zaznam['casAkce'],-5)); ?>
+        <?php if ($index % 2): ?>
+            <?php echo '<br />'; ?>
+
+        <?php else: ?>
+            <?php echo ','; ?>
+
+        <?php endif; ?>
+
+    <?php endforeach; ?>
+                           
+    <?php endif; ?>                        
+
+<?php  endforeach; ?>    
+

@@ -1,0 +1,96 @@
+<!-- Nadpis ------------------------------------------------------------------->
+
+<?php $this->title = "Změna časového záznamu"; ?>
+
+<!-- Obsah stránky ------------------------------------------------------------>
+
+<script type="text/javascript">
+//<![CDATA[  
+
+$(function() {
+
+    $( "#div-vyroba-addZapis" ).accordion();
+    $( "#div-vyroba-zaznamovyDiv").tabs();
+  
+});
+
+
+
+$(document).ready(function() {
+    
+    $('a.odkaz').button();
+    $('input:submit').button();  
+
+    $("#vyroba-div-zapisReziePrace").tabs();
+    $("#vyroba-div-zapisRezieUkony").tabs()    
+    
+    /**
+     * Odeslání režijního formuláře - provedeme validaci předem, synchronně,
+     * aby bylo monžno zabránit návratu
+     */
+    $("#form-vyroba-rezieForm").submit(function(){
+        
+        var navrat = true;
+        
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "<?php echo $this->url(array('action' => 'ajax-form-rezie-check'));?>",
+            data: ($(this).serialize()),
+            success: function(chyboveHlaseni) {
+                if (chyboveHlaseni.length > 0) {
+                    
+                    $("#div-vyroba-messageDiv").html(chyboveHlaseni);
+                    $("#div-vyroba-messageDiv").fadeIn(500);
+                    navrat = false;
+                }       
+            }
+        });
+        
+        return navrat;
+    });
+});
+
+//]]>    
+</script>
+
+<div id="div-vyroba-addZapis">
+    <h3><a href="#">Změna režijních časů</a></h3>
+    <div id="div-vyroba-addZapisRezie">
+        <form action="<?php echo $this->rezieFormAction; ?>"
+              method="<?php echo $this->rezieFormMethod; ?>"
+              id="<?php echo $this->rezieFormId; ?>">
+            
+        
+        <div id="vyroba-div-zapisReziePrace"
+             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
+            <ul>
+                <li><a href="">Určení činnosti</a></li>
+            </ul>                
+            <?php echo $this->rezieFormPrace; ?>       
+        </div>
+        <div id="vyroba-div-zapisRezieUkony"
+             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
+            <ul>
+                <li><a href="">Režijní operace</a></li>
+            </ul>  
+            <?php echo $this->rezieFormUkony; ?>    
+        </div>
+        </form>        
+    </div>
+</div>
+
+<div id="div-vyroba-messageDiv"
+     class="ui-state-error ui-corner-all">
+
+    
+
+</div>
+
+<div id="div-vyroba-hiddenIdNaseptavac"
+     title="Vyhledání ID dílu">
+    
+    <p>Vyberte zakázku a následně díl</p>
+    <?php echo $this->naseptavacPozice; ?>
+    
+</di

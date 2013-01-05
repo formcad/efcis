@@ -1,0 +1,84 @@
+<?php
+$this->headTitle('eFCIS')->setSeparator(' - ');
+$this->headTitle()->append($this->title);
+
+$this->headLink()->appendStylesheet($this->baseUrl('/css/layout.css'))."\n"; 
+$this->headLink()->appendStylesheet($this->baseUrl('/css/general.css'))."\n"; 
+$this->headLink()->appendStylesheet($this->baseUrl('/css/module-'.
+    Zend_Controller_Front::getInstance()->getRequest()->getModuleName().'.css'))."\n"; 
+
+echo $this->doctype()."\n";
+?>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <?php echo $this->headMeta()->appendHttpEquiv('Content-Type', 'text/html;charset=utf-8')."\n"; ?>
+    <?php echo $this->headTitle()."\n"; ?>
+    <?php echo $this->jQuery(); ?>    
+    <?php echo $this->headScript() // funguje pro JS přidávané v controllerech ?>
+    <?php echo $this->headLink()."\n"; ?>     
+</head>
+<body>
+
+<div id="lista">
+    
+    <div id="lista-menu" class="nostyle">
+    
+    </div>
+    
+    <div id="lista-logout" class="nostyle">
+        <?php echo $this->logoutUrl(); ?>
+    </div>
+    
+    <div id="lista-login" class="nostyle">        
+        <?php echo $this->loggedInAs(); ?> 
+    </div>
+     
+</div>    
+    
+<div id="horni">
+
+    <div id="horni-img-levy">
+        <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekLevy); ?>" alt="" />
+    </div>
+    <div id="horni-img-stredni">
+        <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekStredni); ?>" alt="" />
+    </div>
+    <div id="horni-img-pravy">
+        <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekPravy); ?>" alt="" />
+    </div>
+    <div id="horni-text"><h1><?php echo $this->escape($this->title); ?></h1></div>
+</div>    
+
+<div id="levy">
+    
+    <div id="levy-menu">
+        <!-- Pole s obrázky a odkazy generováno v action příslušného controlleru -->
+        <?php if (!empty($this->leftNavigation)):?>
+            
+            <h4>navigace</h4>
+            <table>
+                <?php foreach ($this->leftNavigation as $link):?>
+                <tr>
+                    <td>
+                        <img src="<?php echo $this->baseUrl('images/ico48/'.$link['img']); ?>" alt="" />
+                    </td>
+                    <td>                    
+                        <a href="<?php echo $link['url']; ?>">
+                            <?php echo $link['text']; ?>
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php endif; ?>     
+    </div>    
+</div>
+    
+<div id="pravy">    
+    <?php echo $this->layout()->content; ?>
+    <p></p>
+</div>    
+    
+</body>
+</html>

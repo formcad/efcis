@@ -1,0 +1,12 @@
+<?php $this->title = "Přihlášení"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('input:submit').button();  
+});
+//]]>    
+</script>
+
+<span class="error"><?php echo $this->error; ?></span>
+<?php echo $this->form; ?>

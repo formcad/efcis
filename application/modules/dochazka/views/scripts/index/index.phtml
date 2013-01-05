@@ -1,0 +1,71 @@
+<?php $this->title = "Docházka"; ?>
+<?php $this->obrazekStredni = "modul-dochazka.png"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('a.dochazka-calendarButton').button({
+        icons: {primary: 'ui-icon-calendar'}
+    });
+    $('a.dochazka-prehledButton').button({
+        icons: {primary: 'ui-icon-note'}
+    }); 
+    $('a.dochazka-terminalButton').button({
+        icons: {primary: 'ui-icon-transfer-e-w'}
+    });  
+    $('a.dochazka-alertButton').button({
+        icons: {primary: 'ui-icon-alert'}
+    });  
+    $('a.dochazka-personButton').button({
+        icons: {primary: 'ui-icon-person'}
+    }); 
+    
+});
+//]]>    
+</script>
+
+<h2>Výběr akcí</h2>
+<p>
+<a  class="dochazka-calendarButton"
+    href="<?php echo $this->url(array('module' => 'dochazka',
+                                     'controller' => 'show',
+                                     'action' => 'index')); ?>">
+    Docházka zaměstnanců
+</a>
+</p>
+
+<p>
+<a  class="dochazka-prehledButton"
+    href="<?php echo $this->url(array('module' => 'dochazka',
+                                     'controller' => 'summary',
+                                     'action' => 'index')); ?>">
+    Denní přehled docházky
+</a>
+</p>
+
+<p>
+<a  class="dochazka-alertButton"
+    href="<?php echo $this->url(array('module' => 'dochazka',
+                                     'controller' => 'show',
+                                     'action' => 'chyby')); ?>">
+    Chyby v docházce
+</a>
+</p>  
+
+<p>
+<a  class="dochazka-personButton"
+    href="<?php echo $this->url(array('module' => 'dochazka',
+                                     'controller' => 'show',
+                                     'action' => 'pritomni')); ?>">
+    Přítomní zaměstnanci
+</a>
+</p>
+
+<p>
+<a  class="dochazka-terminalButton"
+    href="<?php echo $this->url(array('module' => 'dochazka',
+                                     'controller' => 'terminal',
+                                     'action' => 'index')); ?>">
+    Terminál docházky
+</a>
+</p>  

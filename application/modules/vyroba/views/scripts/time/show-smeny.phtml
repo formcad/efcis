@@ -1,0 +1,51 @@
+<!-- Nadpis -->
+<?php $this->title = "Směny zaměstnance ($this->uzivatel)"; ?>
+
+<?php if (!empty($this->poleZaznamu)): ?>
+<table id="table-vyroba-timeIndex"
+       class="standardni">
+    <tr>
+        <th>Den</th>
+        <th>Datum</th>
+        <th>Celkem<br/>docházka</th>
+        <th>Celkem<br/>přerušení</th>
+        <th>Čistá<br/>docházka</th>
+        <th>Celkem<br/>práce</th>
+        <th>Standardní<br/>výroba</th>
+        <th>Druhý<br/>stroj</th>
+        <th>Celkem<br/>režie</th>
+    </tr>
+   
+    <?php foreach ($this->poleZaznamu as $den): ?>
+    <tr>
+        <td class="horizontal background">
+            <?php echo $den['zkratkaDne'].$den['svatekText']; ?>
+        </td>
+        <td class="horizontal background">
+            <?php echo $den['strDate']; ?>
+        </td>
+        <td class="horizontal-text <?php echo $den['integrityClass']; ?>">
+            <?php echo $den['sumaDochazky']; ?>
+        </td>
+        <td class="horizontal-text <?php echo $den['integrityClass']; ?>">
+            <?php echo $den['sumaPreruseni']; ?>
+        </td>
+        <td class="horizontal-text background">
+            <?php echo $den['sumaCisteDochazky']; ?>
+        </td>
+        <td class="horizontal-text background">
+            <?php echo $den['sumaPrace']; ?>
+        </td>
+        <td class="horizontal-text">
+            <?php echo $den['sumaStandardni']; ?>
+        </td>
+        <td class="horizontal-text">
+            <?php echo $den['sumaDvoustroj']; ?>
+        </td>
+        <td class="horizontal-text">
+            <?php echo $den['sumaRezie']; ?>
+        </td>        
+    </tr>    
+    <?php endforeach; ?>
+</table>
+<?php endif; ?>

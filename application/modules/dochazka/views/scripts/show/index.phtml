@@ -1,0 +1,108 @@
+<?php 
+    switch ($this->uzivatel) {
+        case null: $this->title = "Docházka zaměstnanců";        break;
+        default:   $this->title = $this->uzivatel." - docházka"; break;
+    }
+?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('a.dochazka-editButton').button({
+        icons: {primary: 'ui-icon-wrench'}
+    });  
+    $('a.dochazka-printButton').button({
+        icons: {primary: 'ui-icon-print'}
+    });  
+    $('a.dochazka-clockButton').button({
+        icons: {primary: 'ui-icon-clock'}
+    });  
+    $('a.dochazka-plusButton').button({
+        icons: {primary: 'ui-icon-plus'}
+    }); 
+    $('a.dochazka-arrowButton').button({
+        icons: {primary: 'ui-icon-circle-arrow-e'}
+    });  
+    
+    $('input:submit').button();
+});
+//]]>    
+</script>
+
+ 
+
+<div>
+    <h3>Výběr údajů</h3>  
+    <?php echo $this->form; ?>
+</div>
+    
+<?php if ($this->navigace): ?>
+<div id="dochazka-mozneAkce">
+    
+    <h3>Možnosti docházky</h3>
+    
+    <a href="<?php echo $this->url(array('module' => 'dochazka',
+                                         'controller' => 'edit',
+                                         'action' => 'index'),null,true); ?>"
+       class="dochazka-editButton">
+        Změna docházky
+    </a>
+
+    <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                         'controller' => 'time',
+                                         'action' => 'show-smeny'),null,true); ?>"
+       class="dochazka-clockButton">
+        Kontrola časů
+    </a>      
+    
+    <h3>Ověřovací záznamy</h3>
+    
+    <div class="dochazka-show-infoDiv ui-widget ui-state-highlight ui-corner-all ">
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Ověřovací záznamy nejsou závislé na zaznamenané docházce
+        </p>
+    </div>         
+    
+    <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                         'controller' => 'time',
+                                         'action' => 'show-kontrola-vyroby'),null,true); ?>"
+       class="dochazka-arrowButton">
+        Vyráběné díly
+    </a>      
+    
+    <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                         'controller' => 'time',
+                                         'action' => 'show-kontrola-rezie'),null,true); ?>"
+       class="dochazka-arrowButton">
+        Zapsané režie
+    </a>          
+
+    <h3>Oficiální docházka</h3>
+    
+    <div class="dochazka-show-infoDiv ui-widget ui-state-highlight ui-corner-all ">
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Vytvořit výkaz oficiální docházky je vhodné až po skončení daného měsíce
+            (další data by bylo nutné dopsat ručně)
+        </p>
+    </div>     
+    
+    <a href="<?php echo $this->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'novy-vykaz'),null,true); ?>"
+       class="dochazka-plusButton">
+        Vytvořit výkaz
+    </a>     
+    
+    <?php if (true): ?>
+        <a href="<?php echo $this->url(array('module' => 'dochazka',
+                                            'controller' => 'official',
+                                            'action' => 'vyber-vykazu'),null,true); ?>"
+        class="dochazka-editButton">
+            Přehled výkazů
+        </a>     
+    <?php endif; ?>
+    
+</div>
+<?php endif; ?>

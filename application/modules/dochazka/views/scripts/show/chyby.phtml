@@ -1,0 +1,48 @@
+<?php 
+    $this->title = "Přehled chyb v docházce"; 
+?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('a.dochazka-editButton').button({
+        icons: {primary: 'ui-icon-wrench'}
+    });  
+    $('a.dochazka-printButton').button({
+        icons: {primary: 'ui-icon-print'}
+    });  
+    $('a.dochazka-clockButton').button({
+        icons: {primary: 'ui-icon-clock'}
+    });  
+    $('a.dochazka-plusButton').button({
+        icons: {primary: 'ui-icon-plus'}
+    }); 
+    $('a.dochazka-arrowButton').button({
+        icons: {primary: 'ui-icon-circle-arrow-e'}
+    });  
+    
+    $('input:submit').button();
+});
+//]]>    
+</script>
+
+
+    
+<?php if (!empty($this->poleChyb)): ?>
+<table class="standardni odsazene-bunky">
+    <tr>
+        <th>Jméno</th>
+        <th>Akce</th>
+        <th>Čas chyby</th>
+        <th></th>
+    </tr>
+<?php foreach ($this->poleChyb as $chyba): ?>
+    <tr>
+        <td><?php echo $chyba['jmeno'].' '.$chyba['prijmeni'].', '.$chyba['nazevCipu']; ?></td>
+        <td><?php echo $chyba['akce']; ?></td>
+        <td><?php echo date('d. m. Y, H.i',strtotime($chyba['cas'])); ?></td>
+        <td></td>
+    </tr>
+<?php endforeach; ?>
+</table>
+<?php endif; ?>

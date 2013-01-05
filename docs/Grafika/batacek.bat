@@ -1,0 +1,1 @@
+for /R %%i in (*.svg) do "C:\Program Files (x86)\Inkscape\inkscape.exe" -f "%%~fi" -e "%%~dpni.png" -w48

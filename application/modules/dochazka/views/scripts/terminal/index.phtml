@@ -1,0 +1,99 @@
+<?php $this->title = "Terminál docházky"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+      
+    $('.dochazka-pruchodButon').button();
+    
+    // po načtení stránky se podíváme, zda nejsou uložená nějaká data pro zobrazení
+    $(function(){
+        
+        var pocetZprav=<?php echo count($this->messages); ?>
+        
+        // pokud nějaká data jsou, vypíšeme na pět vteřin informaci                   
+        if (pocetZprav > 0)
+        {
+            $("#dochazka-posledniAkce").fadeIn(500);          
+            setTimeout(function(){
+                $("#dochazka-posledniAkce").fadeOut(500);
+            },5000);   
+        }
+    });
+        
+    // kliknutí na nějakou z akcí
+    $('.dochazka-pruchodButon').click(function(){
+        
+        // pokud je ještě vidět záznam o poslední akci, zmizneme ho
+        $("#dochazka-posledniAkce").fadeOut(500);
+        
+        var idAkce = (this.name);
+        
+        // Zjistíme, o jakou akci vlastně jde 
+        $.ajax({
+            type: "POST",
+            url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'terminal','action'=>'ajax-akce')); ?>",
+            data: ({idAkce: idAkce}),       
+            success: function(data) {                
+                
+                // uložíme informaci
+                $("#zvolenaAkce").val(idAkce);
+                
+                // vypíšeme informaci                                
+                $("#dochazka-zobrazeniAkce").fadeIn(500);          
+                $("#dochazka-zobrazeniAkce").html('<p>' + data + '</p>');
+                
+                // skočíme do následujícího formulářového pole
+                $("#kodCipu").val('');
+                $("#kodCipu").focus();
+            },
+            // do erroru se dostaneme také např. ve chvíli, kdy není dostupná síť
+            error: function() {                
+                $("#dochazka-zobrazeniAkce").fadeIn(500);
+                $("#dochazka-zobrazeniAkce").html('<p>V průběhu přenosu se vyskytla chyba<p>');                
+            }
+        });
+        
+        // máme pět vteřin na přiložení čipu, potom dosavadní snahu zničíme
+        setTimeout(function(){
+            $("#intertDiv").attr('tabindex',-1).focus();   // focus kamkoliv jinam než do kódu čipu
+            $("#kodCipu").val(''); 
+            $("#zvolenaAkce").val('');                                                        
+            $("#dochazka-zobrazeniAkce").fadeOut(500);            
+        },5000);
+        
+        return false;                
+    });
+
+});
+//]]>    
+</script>
+
+<!-- wrapper obaluje element a pomocí css akorát zajišťuje správnou výšku prvku -->
+<div id="dochazka-posledniAkceWrapper">
+    
+    <div id="dochazka-posledniAkce"
+     class="ui-state-highlight ui-corner-all">
+        
+        <?php if (count($this->messages) > 0) : ?>
+            <?php foreach ($this->messages as $message) : ?>
+                <p><?php echo $this->escape($message); ?></p>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- výpis celého formuláře, jednotlivé prvky stylovány pomocí CSS -->
+<?php echo $this->form; ?>
+
+<!-- wrapper obaluje element a pomocí css akorát zajišťuje správnou výšku prvku -->
+<div id="dochazka-zobrazeniAkceWrapper">
+    
+    <div id="dochazka-zobrazeniAkce"
+         class="ui-state-error ui-corner-all">
+
+    </div>
+</div>
+
+<!-- div pouze pro focus při timeoutu výběru akce -->
+<div id="intertDiv"></div>

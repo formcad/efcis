@@ -1,0 +1,136 @@
+
+/**** OBECNÉ ******************************************************************/
+
+body {
+    font-family: sans-serif;
+}
+
+h1 {
+    font-weight: normal;
+    font-size: x-large;
+    padding: 0;
+    margin: 0;    
+}
+
+h2 {
+    font-weight: bold;
+    font-size: large;
+    padding: 5px 0;
+    margin: 0;    
+}
+
+h3 {
+    font-weight: bold;
+    font-size: medium;
+    padding: 5px 0;
+    margin: 0;    
+}
+
+div {
+    display: block;
+    clear: both;
+}
+
+div .nostyle {
+    display: inline;
+    clear: none;
+}
+
+#lista {
+    color: white;
+}
+
+#lista a {
+    color: white;
+    font-style: italic;
+}
+
+#levy h4 {
+    color: #002A99;
+    font-size: medium;
+    text-align: center;
+    font-variant: small-caps;
+}
+
+#levy a {
+    color: #002A99;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 95%;
+}
+
+#levy-menu td:first-child {
+    width: 50px;
+    margin-right: 5px;
+}
+
+.error {
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.noneDisplay {
+    visibility: hidden;
+}
+
+.padding-right-10 {
+    padding-right: 10px;
+}
+
+.span-icon {
+    float: left; margin-right: .3em;
+}
+
+/**** FORMULÁŘE ***************************************************************/
+
+form dt {    
+    display: block;
+    float: left;
+    clear: left;
+    padding: 3px;
+    text-align: left;
+}
+
+form dd {
+    margin-left: 0;
+    float: left;
+    padding: 3px;
+}
+
+form ul.errors {
+    list-style-type: none;
+    padding-left: 10px;
+    float: right;
+    color: red;
+}
+
+/**** TABULKY *****************************************************************/
+
+table {
+    padding: 0;
+    margin: 0;
+    border-spacing: 0;  
+}
+
+table.standardni {
+    border: 1px solid #AAAAAA;
+    border-radius: 4px;
+}
+
+table.standardni th {
+    background: url("images/ui-bg_highlight-soft_75_cccccc_1x100.png") repeat-x scroll 50% 50% #CCCCCC;    
+    padding: 5px 10px;
+    font-weight: normal;
+}
+
+td.falseIntegrity {
+    background-color: #FFCCCC;
+}
+
+table.odsazene-bunky td {
+    padding: 5px 10px;
+}
+

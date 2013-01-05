@@ -1,0 +1,174 @@
+<!-- Nadpis ------------------------------------------------------------------->
+
+<?php $this->title = "Změna časového záznamu"; ?>
+
+<!-- Obsah stránky ------------------------------------------------------------>
+
+<script type="text/javascript">
+//<![CDATA[  
+
+/**
+ * Do prnvího prázdného ID inputu nakopírujeme získané ID
+ * 
+ * @return boolean Pokud se nepodařilo vyplnit, vrátí false
+ */
+function vyplnId() {
+            
+    var i=0;
+    for (i==0; i<20; i++) {
+        var id = $("#id-"+i).val();
+        if (typeof(id) != "undefined" && id.length == 0) {
+            $("#id-"+i).val($("#naspetavacPozice").val());
+            return true;
+            break;
+        };
+    }                   
+    return false;
+}
+
+$(function() {
+
+    $( "#div-vyroba-addZapis" ).accordion();
+    $( "#div-vyroba-zaznamovyDiv").tabs();
+  
+});
+
+
+
+$(document).ready(function() {
+    
+    $('a.odkaz').button();
+    $('input:submit').button();  
+    $('#pridejRadek').button({icons: {primary: 'ui-icon-circle-plus'}});
+    $('#zjistiID').button({icons: {primary: 'ui-icon-help'}});
+    
+    $("#vyroba-div-zapisVyrobyDily").tabs();
+    $("#vyroba-div-zapisVyrobyPrace").tabs();
+    $("#vyroba-div-zapisVyrobyUkony").tabs();     
+    
+    /**
+     * Odeslání výrobního formuláře - provedeme validaci předem, synchronně,
+     * aby bylo monžno zabránit návratu
+     */
+    $("#form-vyroba-vyrobaForm").submit(function(){
+        
+        var navrat = true;
+        
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "<?php echo $this->url(array('action' => 'ajax-form-vyroba-check'));?>",
+            data: ($(this).serialize()),
+            success: function(chyboveHlaseni) {
+                if (chyboveHlaseni.length > 0) {
+                    
+                    $("#div-vyroba-messageDiv").html(chyboveHlaseni);
+                    $("#div-vyroba-messageDiv").fadeIn(500);
+                    navrat = false;
+                }       
+            }
+        });        
+        return navrat;
+    });
+
+    
+    /**
+     * Modální dialog pro zjištění ID pozice ze zadané zakázky a názvu pozice
+     */
+    $("#zjistiID").click(function(){
+        $("#div-vyroba-hiddenIdNaseptavac").dialog({
+            modal: true,
+            width: 500,
+            height: 350,
+            buttons: {
+                "Vyplnit ID a zavřít": function() {
+                    var uspech = vyplnId();
+                    if (!uspech) {
+                        alert('Nepodařilo se vyplnit hodnotu, nejspíš není vymazaná původní hodnota ID');
+                    }
+                    $( this ).dialog( "close" );
+                },                
+                "Vyplnit ID a pokračovat": function() {
+                    var uspech = vyplnId();
+                    if (!uspech) {
+                        alert('Nepodařilo se vyplnit hodnotu, nejspíš není vymazaná původní hodnota ID');
+                    }
+                },
+                "Zrušit": function() {
+                        $( this ).dialog( "close" );
+                }
+            }
+        });     
+    });
+
+    $("#naseptavacZakazka").change(function(){
+        $.ajax({
+            type: "POST",
+            url: "<?php echo $this->url(array('action' => 'ajax-naseptavac'));?>",
+            data: ({id: $("#naseptavacZakazka").val()}),
+            success: function(element) {
+
+                // smažeme starý výběr dílů
+                $("#naspetavacPozice-element").remove();           
+                $("#naspetavacPozice-label").remove();
+
+                // přidáme nový výběr dílů
+                $("#naseptavacZakazka-element").after(element);
+            }
+        });        
+    });
+       
+});
+
+//]]>    
+</script>
+
+<div id="div-vyroba-addZapis">
+    <h3><a href="#">Změna výrobních časů</a></h3>
+    
+    
+    <div id="div-vyroba-addZapisVyroby">
+        <form action="<?php echo $this->vyrobaFormAction; ?>"
+              method="<?php echo $this->vyrobaFormMethod; ?>"
+              id="<?php echo $this->vyrobaFormId; ?>">
+            
+        
+        <div id="vyroba-div-zapisVyrobyDily"
+             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
+            
+            <ul><li><a href="">Identifiátor dílů</a></li></ul>                        
+            <?php echo $this->vyrobaFormDily; ?>       
+        </div>
+        <div id="vyroba-div-zapisVyrobyPrace"
+             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
+            <ul>
+                <li><a href="">Určení činnosti</a></li>
+            </ul>                
+            <?php echo $this->vyrobaFormPrace; ?>       
+        </div>
+        <div id="vyroba-div-zapisVyrobyUkony"
+             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
+            <ul>
+                <li><a href="">Výrobní operace</a></li>
+            </ul>  
+            <?php echo $this->vyrobaFormUkony; ?>    
+        </div>
+        </form>
+    </div>
+</div>
+
+<div id="div-vyroba-messageDiv"
+     class="ui-state-error ui-corner-all">
+
+    
+
+</div>
+
+<div id="div-vyroba-hiddenIdNaseptavac"
+     title="Vyhledání ID dílu">
+      
+    <p>Vyberte zakázku a následně díl</p>
+    
+    <?php echo $this->naseptavacPozice; ?>
+  
+</div>

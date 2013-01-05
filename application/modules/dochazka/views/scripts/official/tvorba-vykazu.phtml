@@ -1,0 +1,10 @@
+<?php $this->title = "Tvorba oficiálního výkazu docházky ($this->uzivatel)"; ?>
+
+<?php if ($this->exceptionMessage): ?>
+    <div class="ui-widget dochazka-official-errorDiv">
+        <div class="ui-state-error ui-corner-all">
+            <p><span class="ui-icon ui-icon-alert"></span>
+            <strong>Data nebyla zpracována:</strong> <?php echo $this->exceptionMessage; ?></p>
+        </div>
+    </div>
+<?php endif; ?>

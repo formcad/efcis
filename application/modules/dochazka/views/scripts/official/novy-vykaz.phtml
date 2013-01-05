@@ -1,0 +1,26 @@
+<?php $this->title = "Vytvoření oficiálního výkazu docházky ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('.monthpicker').monthpicker({
+        showOn: "focus",
+        yearRange: 'c-1:c',
+        regional: 'cs'
+    });
+    
+    $('input:submit').button();
+});
+//]]>    
+</script>
+
+<div class="dochazka-show-infoDiv ui-widget ui-state-highlight ui-corner-all ">
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Vytvořit výkaz oficiální docházky je vhodné až po skončení daného měsíce
+        (další data by bylo nutné dopsat ručně)
+    </p>
+</div>     
+
+<p>Měsíc, pro který bude tvořen výkaz</p>
+<?php echo $this->form; ?>

@@ -1,0 +1,8 @@
+<?php if (count($this->chyby) > 0):?> 
+<span>Uložení selhalo:</span>
+<ul>
+<?php foreach ($this->chyby as $message) : ?>
+    <li><?php echo $this->escape($message); ?></li>
+<?php endforeach; ?>
+</ul>
+<?php endif; ?>

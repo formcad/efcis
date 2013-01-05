@@ -1,0 +1,37 @@
+<!-- vytvoření nadpisu a definování obrázku -->
+<?php $this->title = "Uživatelé"; ?>
+<?php $this->obrazekStredni = "modul-uzivatele.png"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('a.uzivatele-addButton').button({
+        icons: {primary: 'ui-icon-circle-plus'}
+    });  
+    $('a.uzivatele-editButton').button({
+        icons: {primary: 'ui-icon-wrench'}
+    });  
+});
+//]]>    
+</script>
+
+<h2>Výběr akcí</h2>
+  
+
+   
+<p>
+<a href="<?php echo $this->url(array('module' => 'dochazka',
+                                     'controller' => 'edit',
+                                     'action' => 'index')); ?>"
+   class="uzivatele-addButton">
+    Vytvoření nového uživatelského účtu
+</a>
+</p>
+<p>
+<a href="<?php echo $this->url(array('module' => 'dochazka',
+                                     'controller' => 'edit',
+                                     'action' => 'index')); ?>"
+   class="uzivatele-editButton">
+    Změna stávajícího uživatelského účtu
+</a>   
+</p>

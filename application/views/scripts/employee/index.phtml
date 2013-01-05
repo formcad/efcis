@@ -1,0 +1,298 @@
+<!-- Nadpis ------------------------------------------------------------------->
+
+<?php $this->title = "Domovská stránka"; ?>
+<?php $this->obrazekStredni = "home.png"; ?>
+
+<!-- JavaScripty -------------------------------------------------------------->
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    
+    /**** Základní nastavení **************************************************/
+    
+    $("#default-employee-moznostiVyberu").tabs({
+        selected: <?php echo $this->tab; ?>
+    });
+    $("#default-employee-dnesniButton").button({
+        icons: {primary: 'ui-icon-circle-arrow-e'}
+    });   
+    $("#default-employee-praceButton").button({
+        icons: {primary: 'ui-icon-circle-arrow-e'}
+    });     
+    $("#default-employee-smenyButton").button({
+        icons: {primary: 'ui-icon-circle-arrow-e'}
+    });   
+    $("#default-employee-kontrolniButtonVyroby").button({
+        icons: {primary: 'ui-icon-circle-arrow-e'}
+    });  
+    $("#default-employee-kontrolniButtonRezie").button({
+        icons: {primary: 'ui-icon-circle-arrow-e'}
+    });    
+    $("#default-employee-pridejCasButton").button({
+        icons: {primary: 'ui-icon-circle-plus'}
+    });
+    $("#default-employee-pridejPoznamkuButton").button({
+        icons: {primary: 'ui-icon-circle-plus'}
+    });       
+    $("#default-employee-zmenHesloButton").button({
+        icons: {primary: 'ui-icon-wrench'}
+    });    
+    $(".default-employee-zmenaButton").button({
+        icons: {primary: 'ui-icon-wrench'}
+    });
+    
+    /**** Změna session při změně časových limitů *****************************/
+    
+    $("#limitFrom").change(function(){
+        
+        $.ajax({
+            type: "POST",
+            url: "<?php echo $this->url(array('module'=>'default','controller'=>'employee','action'=>'ajax-datum')); ?>",
+            data: ({datum: $("#limitFrom").val(),
+                    typ: 'od'}),       
+            success: function() {},            
+            error: function() {                
+                alert('V průběhu přenosu se vyskytla chyba');                
+            }
+        });
+    });
+    
+    $("#limitTo").change(function(){
+        
+        $.ajax({
+            type: "POST",
+            url: "<?php echo $this->url(array('module'=>'default','controller'=>'employee','action'=>'ajax-datum')); ?>",
+            data: ({datum: $("#limitTo").val(),
+                    typ: 'do'}),       
+            success: function() {},            
+            error: function() {                
+                alert('V průběhu přenosu se vyskytla chyba');                
+            }
+        });
+    });    
+});
+//]]>    
+</script>
+
+<!-- Záznam rozpracované práce ------------------------------------------------>
+
+<div class="ui-widget ui-state-highlight ui-corner-all" 
+     id="default-employee-infoDiv">
+
+<?php if (empty($this->pracovniZaznamy)): ?>
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Při načtení stránky nebyl v databázi nalezen záznam o rozpracované práci
+    </p>
+<?php else: ?>
+    <p>
+        <span class="ui-icon ui-icon-info"></span>
+        Při načtení stránky existoval záznam o probíhající práci:
+    </p>
+    <p>
+    <?php foreach ($this->pracovniZaznamy as $zaznam): ?>
+        <table>
+            <tr>
+                <td>Zakázka</td>
+                <td><strong><?php echo $zaznam["cisloZakazky"]; ?></strong></td>
+            </tr>
+            <tr>
+                <td>Pozice</td>
+                <td><strong><?php echo $zaznam["nazevPozice"]; ?></strong></td>
+            </tr>
+            <tr>
+                <td>ID číslo</td>
+                <td><strong><?php echo $zaznam["idPozice"]; ?></strong></td>
+            </tr>
+            <tr>
+                <td>Operace</td>
+                <td><strong><?php echo $zaznam["technologie"]; ?></strong></td>
+            </tr>
+            <tr>
+                <td>Zahájeno</td>
+                <td><strong><?php echo $zaznam["casStart"]; ?></strong></td>
+            </tr>
+        </table>        
+    <?php endforeach; ?>        
+    </p>   
+<?php endif; ?>  
+    
+</div>        
+
+<!-- Hlavní menu pro zaměstnance ---------------------------------------------->
+
+<div id="default-employee-moznostiVyberu">
+    
+    <!-- NADIPISY ------------------------------------------------------------->
+    
+    <ul>
+        <li>
+            <a href="#default-employee-vykazPrace">
+                Výroba
+            </a>
+        </li>
+        <li>
+            <a href="#default-employee-poznamky">
+                Poznámky
+            </a>
+        </li>
+        <li>
+            <a href="#default-employee-vyhledavani">
+                Hledání
+            </a>
+        </li>        
+        <li>
+            <a href="#default-employee-uzivatelskeNastaveni">
+                Nastavení
+            </a>
+        </li>
+    </ul>
+    
+    <!-- VÝROBA --------------------------------------------------------------->
+    
+    <div id="default-employee-vykazPrace">
+        
+        <h3>Dnešní záznamy</h3>
+        
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'time',
+                                                 'action' => 'show-aktualni'),null,true); ?>"
+               id="default-employee-dnesniButton"
+               class="default-employee-button">
+                Zobrazit dnešní záznamy
+            </a>        
+        </div>
+        
+        <h3>Záznamy z předešlých směn</h3>
+        
+        <?php echo $this->limitForm; ?>
+       
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'time',
+                                                 'action' => 'show-prace'),null,true); ?>"
+               id="default-employee-praceButton"
+               class="default-employee-button">
+                Zobrazit časy práce
+            </a>
+        </div>        
+        
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'time',
+                                                 'action' => 'show-smeny'),null,true); ?>"
+               id="default-employee-smenyButton"
+               class="default-employee-button">
+                Zobrazit směny
+            </a>
+        </div>
+        
+        <h3>Kontrolní záznamy</h3>
+        
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'time',
+                                                 'action' => 'show-kontrola-vyroby'),null,true); ?>"
+               id="default-employee-kontrolniButtonVyroby"
+               class="default-employee-button">
+                Vyráběné díly
+            </a>        
+        </div>
+        
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'time',
+                                                 'action' => 'show-kontrola-rezie'),null,true); ?>"
+               id="default-employee-kontrolniButtonRezie"
+               class="default-employee-button">
+                Zapsaná režie
+            </a>        
+        </div>        
+        
+        <h3>Přidání záznamu</h3>
+        
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'zapis',
+                                                 'action' => 'add'),null,true); ?>"
+               id="default-employee-pridejCasButton"
+               class="default-employee-button">
+                Zápis času
+            </a>        
+        </div>  
+        
+        
+        <div style="clear: both;"></div>
+    </div>       
+    
+    <!-- POZNÁMKY ------------------------------------------------------------->
+    
+    <div id="default-employee-poznamky">
+        
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'poznamka',
+                                                 'action' => 'add-poznamka'),null,true); ?>"
+               id="default-employee-pridejPoznamkuButton"
+               class="default-employee-button">
+                Zapsat novou poznámku
+            </a>        
+        </div>  
+                
+        <?php if (!empty($this->poznamky)): ?>
+        <table id="default-employee-tablePoznamka">
+            <tr>
+                <th>Zakázka</th>
+                <th>Díl</th>
+                <th>Poznámka</th>
+                <th></th>
+            </tr>
+        <?php foreach ($this->poznamky as $poznamka): ?>
+            <tr>
+                <td><?php echo $poznamka['zakazka']; ?></td>
+                <td><?php echo $poznamka['pozice']; ?></td>
+                <td><?php echo $poznamka['text']; ?></td>
+                <td>
+                    <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                                        'controller' => 'poznamka',
+                                                        'action' => 'edit-poznamka',
+                                                        'id' => $poznamka['id']),null,true); ?>"
+                    class="default-employee-zmenaButton">
+                        Změna
+                    </a>                    
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </table>
+        <?php endif; ?>
+    
+        <div style="clear: both;"></div>
+    </div>
+    
+    <!-- HLEDÁNÍ -------------------------------------------------------------->
+    
+    <div id="default-employee-vyhledavani">
+    
+        <div style="clear: both;"></div>
+    </div>
+    
+    <!-- NASTAVENÍ ------------------------------------------------------------>
+    
+    <div id="default-employee-uzivatelskeNastaveni">
+        
+        <div>
+            <a href="<?php echo $this->url(array('module' => 'default',
+                                                 'controller' => 'employee',
+                                                 'action' => 'zmena-hesla'),null,true); ?>"
+               id="default-employee-zmenHesloButton"
+               class="default-employee-button">
+                Změnit heslo do systému
+            </a>        
+        </div>         
+    
+        <div style="clear: both;"></div>
+    </div>
+</div>
+

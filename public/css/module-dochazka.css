@@ -1,0 +1,167 @@
+
+/**** OBECNÉ ******************************************************************/
+
+.dochazka-addAction {
+    width: 300px;
+}
+
+.dochazka-calendarButton, 
+.dochazka-terminalButton, 
+.dochazka-prehledButton,
+.dochazka-alertButton,
+.dochazka-personButton {
+    width: 230px;
+    padding: 5px;
+}
+
+.dochazka-pruchodButon {
+    display:block;
+    width: 400px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    height: 80px;
+    font-size: large;
+    text-align: left;
+}
+.dochazka-pruchodButon-image {
+    margin-right: 25px;
+    float: left;
+}
+
+#dochazka-posledniAkceWrapper,
+#dochazka-zobrazeniAkceWrapper{
+    height: 100px;
+}
+
+#dochazka-posledniAkce {
+    display: none;
+    width: 610px;    
+    clear: both;
+    font-size: x-large;
+    padding: 10px;
+}
+
+#dochazka-zobrazeniAkce {
+    display: none;
+    width: 610px;
+    clear: both;
+    font-size: x-large;
+    padding: 10px;
+}
+
+#dochazka-terminalovaAkce {
+    max-width: 280px;
+    margin-bottom: 20px;
+    padding: 0.7em;
+}
+
+.dochazka-terminal-infoDiv {
+    width: 800px;
+    padding: 0 5px;
+    margin: 20px 0;
+}
+
+
+.dochazka-terminal-infoDiv span {
+    float: left; 
+    margin-right: 0.3em;
+}
+
+.dochazka-official-errorDiv div {
+    width: 800px;
+    padding: 0 5px;
+    margin: 20px 0;    
+}
+
+.dochazka-official-errorDiv span {
+    float: left; 
+    margin-right: 0.3em;
+}
+
+#dochazka-terminalovaAkce .deleteButton {
+    margin-left: 10px;
+}
+
+#kodCipu {
+    position: absolute;
+    top: -1000px;          /* prvek není vidět */ 
+}
+
+#dochazka-mozneAkce {
+    padding-bottom: 10px;
+}
+
+#dochazka-mozneAkce a {
+    display: block;
+    margin-top: 10px;
+    width: 200px;
+}
+
+.dochazka-show-infoDiv {
+    padding: 0px 5px;
+    margin: 10px 0;
+    width: 704px;
+}
+
+.dochazka-show-infoDiv span {
+    float: left; 
+    margin-right: 0.3em;
+}
+
+#dochazka-mozneAkce h3 {
+    padding-top: 20px;
+}
+
+
+/**** FORMULÁŘE ***************************************************************/
+
+#form-dochazka-parametryDochazky dt {
+    width: 100px;
+}
+
+#form-dochazka-pruchodForm dt, #form-dochazka-pruchodForm input,
+#form-dochazka-preruseniForm dt, #form-dochazka-preruseniForm input,
+#form-dochazka-priplatekForm dt, #form-dochazka-priplatekForm input {
+    width: 130px;
+}
+
+#form-dochazka-addHromadnePruchody dt,
+#form-dochazka-addHromadnePreruseni dt,
+#form-dochazka-addHromadnePriplatky dt {
+    width: 180px;
+}
+
+/**** TABULKY *****************************************************************/
+
+#table-dochazka-addAction,
+#table-dochazka-editErrorIndex {
+    margin-bottom: 20px;
+}
+
+#table-dochazka-editIndex td.horizontal,
+#table-dochazka-editErrorIndex td.horizontal {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#table-dochazka-editErrorIndex td.vertical {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#table-dochazka-editIndex td.vertical-top {
+    vertical-align: top;
+}
+
+#table-dochazka-editIndex td.horizontal-left {
+    padding-left: 5px;
+}
+
+
+#table-dochazka-editIndex td.background {
+    background-color: #E0E0E0;
+}
+
+#table-dochazka-editDelete td:first-child {
+    padding-right: 20px;
+}

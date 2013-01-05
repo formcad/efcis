@@ -1,0 +1,208 @@
+<!-- Nadpis -->
+<?php $this->title = "Časy práce ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+$(document).ready(function() {
+    $('.plusButton').button({
+        icons: {primary: 'ui-icon-circle-plus'}
+    });
+    $('.zmenaButton').button();
+});
+//]]>    
+</script>    
+
+<?php if (!empty($this->poleZaznamu)): ?>
+<table id="table-vyroba-timePrace"
+       class="standardni">
+    <tr>
+        <th>Den</th>
+        <th>Datum</th>
+        <th></th>     
+    </tr>
+   
+    <?php foreach ($this->poleZaznamu as $den): ?>
+    <tr>
+        <td class="horizontal background">
+            <?php echo $den['zkratkaDne'].$den['svatekText']; ?>
+        </td>
+        <td class="horizontal background">
+            <?php echo $den['strDate']; ?>
+        </td>
+        <td class="horizontal background">
+            <a class="plusButton"
+               href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>">
+                Zápis času
+            </a>             
+        </td>
+    </tr>
+
+    <?php // řádek vypíšeme jenom když v něm bude nějaký obsah
+        if (   !empty($den['poleCipovanePrace']) 
+            or !empty($den['poleDopsanePrace'])
+            or !empty($den['poleRezie'])): ?>
+    <tr>
+        <td colspan="3" class="horizontal vertical">
+            
+            
+       <?php // výrobní tabulku vypíšeme jenom když v ní bude obsah
+            if (   !empty($den['poleCipovanePrace']) 
+                or !empty($den['poleDopsanePrace'])): ?>           
+            
+            <h4>Výrobní záznamy</h4>
+            <table>
+                <tr>
+                    <th>Zakázka</th>
+                    <th>Díl</th>
+                    <th>Trvání</th>
+                    <th>Začátek</th>
+                    <th>Operace</th>
+                    <th>Zdroj dat</th>
+                    <th>Karta</th>
+                    <th></th>
+                </tr>
+                
+                <!-- Záznamy vložené pomocí terminálů ------------------------->
+                
+                <?php if (!empty($den['poleCipovanePrace'])): ?>
+                <?php foreach ($den['poleCipovanePrace'] as $zaznam): ?>
+                <tr>
+                    <td><?php echo $zaznam['cisloZakazky']; ?></td>
+                    <td><?php echo $zaznam['nazevPozcie']; ?></td>
+                    <td><?php echo $zaznam['trvani']; ?></td>
+                    <td><?php echo $zaznam['tinyCasStart']; ?></td>
+                    <td><?php echo $zaznam['technologie']; ?></td>
+                    <td><?php echo $zaznam['zdrojDat']; ?></td>
+                    <td><?php echo $zaznam['typPrace']; ?></td>
+                    <td>
+                        <a class="zmenaButton"
+                           href ="<?php echo $this->url(array('module' => 'vyroba',
+                                                              'controller' => 'zapis',
+                                                              'action' => 'edit-vyroba',
+                                                              'zmena' => $zaznam['id'],
+                                                              'navrat' => 'show-prace'),null,true); ?>">
+                            Změnit
+                        </a>                                                            
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
+                
+                <!-- Ručně doplněné nebo změněné záznamy ---------------------->
+                
+                <?php if (!empty($den['poleDopsanePrace'])): ?>
+                <?php foreach ($den['poleDopsanePrace'] as $zaznam): ?>
+                <tr>
+                    <td><?php echo $zaznam['cisloZakazky']; ?></td>
+                    <td><?php echo $zaznam['nazevPozcie']; ?></td>
+                    <td><?php echo $zaznam['trvani']; ?></td>
+                    <td><?php echo $zaznam['tinyCasStart']; ?></td>
+                    <td><?php echo $zaznam['technologie']; ?></td>
+                    <td><?php echo $zaznam['zdrojDat']; ?></td>
+                    <td><?php echo $zaznam['typPrace']; ?></td>
+                    <td>
+                        <a class="zmenaButton"
+                           href ="<?php echo $this->url(array('module' => 'vyroba',
+                                                              'controller' => 'zapis',
+                                                              'action' => 'edit-vyroba',
+                                                              'zmena' => $zaznam['id'],
+                                                              'navrat' => 'show-prace'),null,true); ?>">
+                            Změnit
+                        </a>                                                                                        
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </table>
+        
+        <?php endif; ?>
+        <?php // režijní tabulku vypíšeme jenom když v ní bude obsah
+              if (   !empty($den['poleRezie'])): ?>           
+            
+            <h4>Režijní záznamy</h4>
+            <table>
+                <tr>
+                    <th>Typ</th>
+                    <th>Trvání</th>
+                    <th>Zapsal</th>
+                    <th></th>
+                </tr>            
+   
+                <?php foreach ($den['poleRezie'] as $zaznam): ?>
+                <tr>
+                    <td><?php echo $zaznam['technologie']; ?></td>
+                    <td><?php echo $zaznam['trvani']; ?></td>
+                    <td><?php echo $zaznam['zdrojDat']; ?></td>
+                    <td>
+                        <a class="zmenaButton"
+                           href ="<?php echo $this->url(array('module' => 'vyroba',
+                                                              'controller' => 'zapis',
+                                                              'action' => 'edit-rezie',
+                                                              'zmena' => $zaznam['id'],
+                                                              'navrat' => 'show-prace'),null,true); ?>">
+                            Změnit
+                        </a>                                                         
+                    </td>
+                </tr>                          
+                <?php endforeach; ?>   
+            </table>
+        <?php endif; ?>
+        
+            <h4>Součty časů</h4>
+            <table>              
+                <tr>
+                    <th>Docházka</th>
+                    <th>Výroba</th>
+                </tr>
+                <tr>
+                    <td>
+                    <table>
+                        <tr>
+                            <th>Typ práce</th>
+                            <th>Součet [h]</th>                            
+                        </tr>
+                        <tr>                      
+                            <td>Docházka - celkem</td>
+                            <td><?php echo $den['sumaDochazky']; ?></td>
+                        </tr> 
+                        <tr>
+                            <td>Docházka - přerušení</td>
+                            <td><?php echo $den['sumaPreruseni']; ?></td>
+                        </tr>   
+                        <tr>
+                            <td>Čistá docházka</td>
+                            <td><?php echo $den['sumaCisteDochazky']; ?></td>
+                        </tr>                 
+                    </table>
+                    </td>
+          
+                    <td>
+                    <table>
+                        <tr>
+                            <th>Typ práce</th>
+                            <th>Součet [h]</th> 
+                        </tr>
+                        <tr>
+                            <td>Výroba</td>
+                            <td><?php echo $den['sumaStandardni']; ?></td>
+                        </tr>
+                        <tr>
+                            <td>Druhý stroj</td>
+                            <td><?php echo $den['sumaDvoustroj']; ?></td>
+                        </tr>
+                        <tr>
+                            <td>Režie</td>
+                            <td><?php echo $den['sumaRezie']; ?></td>
+                        </tr>    
+                    </table>
+                    </td>
+                </tr>
+            </table>
+            
+        </td>
+    </tr>         
+    <?php endif; ?>
+    
+    <?php endforeach; ?>
+</table>
+<?php endif; ?>

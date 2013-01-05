@@ -1,0 +1,21 @@
+<?php $this->title = "Smazání chyby v docházce ($this->uzivatel)"; ?>
+
+<p>
+    Jste si jistí, že chcete smazat následující záznam?
+</p>
+<table id="table-dochazka-editDelete">
+    <tr>
+        <td>Zaměstnanec</td>
+        <td><?php echo $this->uzivatel; ?></td>
+    </tr>
+    <tr>
+        <td>Akce</td>
+        <td><?php echo $this->zaznam['akce']; ?></td>
+    </tr>
+    <tr>
+        <td>Datum</td>
+        <td><?php echo $this->zaznam['casAkce']; ?></td>
+    </tr>
+</table>
+
+<?php echo $this->form; ?>

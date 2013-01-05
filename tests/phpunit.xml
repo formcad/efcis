@@ -1,0 +1,33 @@
+<phpunit bootstrap="./bootstrap.php" colors="true">
+    <testsuite name="Application Test Suite">
+        <directory>./application</directory>
+    </testsuite>
+    <testsuite name="Library Test Suite">
+        <directory>./library</directory>
+    </testsuite>
+    
+    <filter>
+        <whitelist>
+                <directory suffix=".php">../application</directory>
+                <directory suffix=".php">../library</directory>
+                <exclude>
+                        <directory suffix=".phtml">../application/</directory>
+                        <directory suffix=".php">../library/Doctrine</directory>
+                        <directory suffix=".php">../library/Bisna</directory>
+                        <directory suffix=".php">../library/Symfony</directory>
+                        <file>../application/Bootstrap.php</file>
+                </exclude>
+        </whitelist>
+    </filter>
+    <logging> 
+        <log highLowerBound="80" 
+            lowUpperBound="50" 
+            highlight="true" 
+            yui="true" 
+            charset="UTF-8" 
+            target="./log/report" 
+            type="coverage-html"/> 
+        <log target="./log/testdox.html" 
+            type="testdox-html"/> 
+    </logging>
+</phpunit>
