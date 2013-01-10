@@ -67,17 +67,6 @@
     margin-right: 0.3em;
 }
 
-.dochazka-official-errorDiv div {
-    width: 800px;
-    padding: 0 5px;
-    margin: 20px 0;    
-}
-
-.dochazka-official-errorDiv span {
-    float: left; 
-    margin-right: 0.3em;
-}
-
 #dochazka-terminalovaAkce .deleteButton {
     margin-left: 10px;
 }

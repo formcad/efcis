@@ -68,6 +68,18 @@ div .nostyle {
     color: red;
 }
 
+.errorDiv div {
+    width: 800px;
+    padding: 0 5px;
+    margin: 20px 0;    
+}
+
+.errorDiv span {
+    float: left; 
+    margin-right: 0.3em;
+}
+
+
 .hidden {
     display: none;
 }

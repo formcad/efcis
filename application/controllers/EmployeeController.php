@@ -88,17 +88,45 @@ class EmployeeController extends Zend_Controller_Action
     {
         $form = new Application_Form_PasswordChange;
         $url = $this->_helper->url;
+        $identity = Zend_Auth::getInstance()->getIdentity();     
                 
         $request = $this->getRequest();
-        if ($request->isPost()) {
+        if ($request->isPost()) {         
                      
             // v případě odeslaného a zvalidovaného formuláře
-            if ($form->isValid($request->getPost())) {     
+            if ($form->isValid($request->getPost())) {
                 
-                // shoduje se heslo s hashem z databáze?
+                // shoduje se heslo s hashem z databáze
+                $authModel = new Application_Model_UserData();
+                $authModel->setUserId($identity->id);
+                $authModel->setUserRole($identity->roles['dochazka']);
+                $authModel->setDataUserId(self::$_identity->id);               
+            
+                try {
+                    if (sha1($request->getPost('currentPassword')) !== $authModel->getHashHesla()) {
+                        throw new Exception('Špatně vyplněné současné heslo');
+                    }
+
+                    // shoduje se heslo a potvrzení hesla
+                    if ($request->getPost('newPassword') !== $request->getPost('confirmPasswor')) {
+                        throw new Exception('Nově zadané heslo se neshoduje s potvrzením hesla');
+                    }
+                } catch (Exception $e) {
+                    $this->view->exceptionMessage = $e->getMessage();
+                    $this->view->form = $form;
+                }
                 
+                // nic nebrání změně hesla
+                $authModel->setHashHesla(sha1($request->getPost('newPassword')));
+                $authModel->zmenaHesla();
                 
-            }         
+                // uživatele za trest odhlásíme
+                $this->_helper->redirector('logout', 'auth', 'default');
+            } 
+            // případně vrátíme formulář s vypsanou chybovou hláškou
+            else {
+                $this->view->form = $form;
+            }    
         }     
         else {           
             $this->view->form = $form;

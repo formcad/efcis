@@ -15,4 +15,13 @@ $(document).ready(function() {
 
 <!-- Obsah stránky ------------------------------------------------------------>
 
+<?php if ($this->exceptionMessage): ?>
+    <div class="ui-widget errorDiv">
+        <div class="ui-state-error ui-corner-all">
+            <p><span class="ui-icon ui-icon-alert"></span>
+            <strong>Heslo se nepodařilo změnit:</strong> <?php echo $this->exceptionMessage; ?></p>
+        </div>
+    </div>
+<?php endif; ?>
+
 <?php echo $this->form; ?>

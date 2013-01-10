@@ -25,15 +25,21 @@ class Application_Model_UserData extends Fc_Model_DatabaseAbstract
     protected $_dataUserId = null;
        
     /**
+     * Hash uživatelského hesla
+     * @var string
+     */
+    protected $_hashHesla = null;
+
+    /**
      * Zjištění hashe hesla konkrétího uživatele
      * 
      * @return string
      */
-    public function getHashHesla()
+    public function getHeslo()
     {
         // základní ošetření bezpečnosti
         switch ($this->_userRole) {
-            // guest nic nevidí
+            // guest nic nemůže
             case 'guest':
                 throw new Exception('Nedostatečné oprávnění');        
                 break;
@@ -55,8 +61,34 @@ class Application_Model_UserData extends Fc_Model_DatabaseAbstract
         return $row['heslo'];
     }
     
-    
-    
+    /**
+     * Změna hashe hesla konkrétního uživatele
+     */
+    public function zmenaHesla()
+    {
+        // základní ošetření bezpečnosti
+        switch ($this->_userRole) {
+            // guest nic nemůže
+            case 'guest':
+                throw new Exception('Nedostatečné oprávnění');        
+                break;
+            // employee mění heslo jenom sám sobě
+            case 'employee':
+                if ($this->_userId <> $this->_dataUserId) {
+                    throw new Exception('Nedostatečné oprávnění');
+                }
+                break;                        
+        }
+        
+        $this->_adapter->update(
+            'osoby',
+            array(
+                'heslo' => $this->_hashHesla
+            ),
+            array(
+                'id_osoby = ?' => $this->_dataUserId
+            ));       
+    }
     
     public function getUserId() {
         return $this->_userId;
@@ -81,4 +113,12 @@ class Application_Model_UserData extends Fc_Model_DatabaseAbstract
     public function setDataUserId($dataUserId) {
         $this->_dataUserId = $dataUserId;
     }
+
+    public function getHashHesla() {
+        return $this->_hashHesla;
+    }
+
+    public function setHashHesla($hashHesla) {
+        $this->_hashHesla = $hashHesla;
+    }  
 }
