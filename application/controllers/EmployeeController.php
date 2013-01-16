@@ -38,7 +38,8 @@ class EmployeeController extends Zend_Controller_Action
     }
     
     /**
-     * Index Action - základní rozhraní informačního systému pro zaměstnance
+     * Index Action - základní rozhraní informačního systému pro zaměstnance,
+     * tedy mnoho informací na jedné stránce (a v jedné akci controlleru)
      */
     public function indexAction()
     {
@@ -72,11 +73,16 @@ class EmployeeController extends Zend_Controller_Action
         $poznamky->setIdUser(self::$_session->idOsoby);
         $nedavnePoznamky = $poznamky->getNedavnePoznamky();
         
+        /**** Hledání podobných pozic *****************************************/
+        
+        $hledaciForm = new Application_Form_HledaniPozic();
+        
         /**** Data do view ****************************************************/
         
         $this->view->idUzivatele = self::$_identity->id;
         $this->view->tab = $tab;
         $this->view->limitForm = $form;
+        $this->view->hledaciForm = $hledaciForm;
         $this->view->pracovniZaznamy = $aktualniPrace;
         $this->view->poznamky = $nedavnePoznamky;
     }

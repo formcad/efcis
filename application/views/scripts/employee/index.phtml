@@ -9,7 +9,7 @@
 //<![CDATA[    
 $(document).ready(function() {
     
-    /**** Základní nastavení **************************************************/
+    $("button").button();
     
     $("#default-employee-moznostiVyberu").tabs({
         selected: <?php echo $this->tab; ?>
@@ -71,6 +71,34 @@ $(document).ready(function() {
             }
         });
     });    
+    
+    /**** Vyhledávání pozic podle názvů ***************************************/
+    
+    $("#vyhledej").click(function() {
+    
+       // vymazání starých záznamů
+       $("#hledanyText").html('');
+       $("#default-hledaniPozic-vysledek").html('');
+    
+       var nazevDilu = $("#hledanyText").val();
+
+       $.ajax({
+            url:   "<?php echo $this->url(array('module'=>'vyroba','controller'=>'pozice','action'=>'ajax-hledani-pozice')); ?>",
+            data:  ({nazevDilu: nazevDilu}),
+            type:  "POST",
+            success: function(returnData){
+                $("#default-hledaniPozic-vysledek").html(returnData);               
+            }
+        });
+
+        $("#hledanyText").html(nazevDilu);
+        $("#default-hledaniPozic-vysledek").dialog({
+            modal: true,
+            width: 900,
+            height: 600
+        });    
+    
+    });
 });
 //]]>    
 </script>
@@ -275,8 +303,62 @@ $(document).ready(function() {
     
     <div id="default-employee-vyhledavani">
     
+        <h3>Hledání dílů v zakázkách podle názvů</h3>        
+        
+        <?php echo $this->hledaciForm; ?>        
+        
+        <div>
+            <h3>Nápověda k hledání</h3>
+            <p>
+                Vyhledávač nalezne pouze přesně zadaný název dílu (kvůli tomu, že
+                díly se jmenují hodně podobně). Toto lze změnit, když použijete
+                žolíkové znaky (příklady jsou v tabulce):
+            </p>
+            <table style="border-spacing: 0; margin-bottom: 15px;">
+                <tr>
+                    <td><b>%</b></td>
+                    <td>libovolné množství znaků (nebo i žádný znak)</td>
+                </tr>
+                <tr>
+                    <td><b>_</b></td>
+                    <td>právě jeden znak</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th>Vyhledávaný řetězec</th>
+                    <th>Vyhovující výsledky</th>
+                </tr>
+                <tr>
+                    <td>ABC</td>
+                    <td>ABC</td>
+                </tr>
+                <tr>
+                    <td>ABC%</td>
+                    <td>ABC, ABCD, ABCDE, ABCDEF, ...</td>
+                </tr>
+                <tr>
+                    <td>%XYZ%</td>
+                    <td>XYZ, UVXYZŽ, ...</td>
+                </tr>
+                <tr>
+                    <td>ABC_</td>
+                    <td>ABCD, ABCE, ABCX, ...</td>
+                </tr>
+                <tr>
+                    <td>ABC__</td>
+                    <td>ABCDD, ABCEX, ABCQX, ...</td>
+                </tr>
+            </table>
+        </div>
         <div style="clear: both;"></div>
     </div>
+    
+    <div id="default-hledaniPozic-vysledek"
+         title="Výsledek hledání">
+        
+    </div>
+    
     
     <!-- NASTAVENÍ ------------------------------------------------------------>
     

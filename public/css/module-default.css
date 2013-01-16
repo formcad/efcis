@@ -27,6 +27,10 @@
     width: 710px;
 }
 
+#default-hledaniPozic-vysledek {
+    display: none;
+}
+
 /**** FORMULÁŘE ***************************************************************/
 
 #form-timeLimits {

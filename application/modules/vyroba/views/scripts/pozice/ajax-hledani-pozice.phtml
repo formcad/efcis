@@ -1,0 +1,24 @@
+<?php if (empty($this->data)): ?>
+
+    <p>Zadanému výrazu neodpovídá žádná pozice v databázi</p>
+    
+<?php else: ?>
+
+    <table class="standardni odsazene-bunky">
+        <tr>
+            <th>Pozice</th>
+            <th>Zakázka</th>
+            <th>ID pozice</th>
+            <th>Odpracované technologie</th>
+        </tr>        
+    <?php foreach ($this->data as $zaznam): ?>
+        <tr>
+            <td><?php echo $zaznam['nazev']; ?></td>
+            <td><?php echo $zaznam['cisloZakazky']; ?></td>
+            <td><?php echo $zaznam['id']; ?></td>
+            <td><?php if (!empty($zaznam['technologie'])) echo implode(', ', $zaznam['technologie']); ?></td>
+        </tr>
+    <?php endforeach; ?>
+    </table>
+    
+<?php endif; ?>
