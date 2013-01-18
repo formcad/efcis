@@ -27,22 +27,31 @@ $(document).ready(function() {
 </script>
 
 
-    
 <?php if (!empty($this->poleChyb)): ?>
-<table class="standardni odsazene-bunky">
-    <tr>
-        <th>Jméno</th>
-        <th>Akce</th>
-        <th>Čas chyby</th>
-        <th></th>
-    </tr>
-<?php foreach ($this->poleChyb as $chyba): ?>
-    <tr>
-        <td><?php echo $chyba['jmeno'].' '.$chyba['prijmeni'].', '.$chyba['nazevCipu']; ?></td>
-        <td><?php echo $chyba['akce']; ?></td>
-        <td><?php echo date('d. m. Y, H.i',strtotime($chyba['cas'])); ?></td>
-        <td></td>
-    </tr>
-<?php endforeach; ?>
-</table>
+    <table class="standardni odsazene-bunky">
+        <tr>
+            <th>Jméno</th>
+            <th>Akce</th>
+            <th>Čas chyby</th>
+            <th></th>
+        </tr>
+    <?php foreach ($this->poleChyb as $chyba): ?>
+        <tr>
+            <td><?php echo $chyba['jmeno'].' '.$chyba['prijmeni'].', '.$chyba['nazevCipu']; ?></td>
+            <td><?php echo $chyba['akce']; ?></td>
+            <td><?php echo date('d. m. Y, H.i',strtotime($chyba['cas'])); ?></td>
+            <td></td>
+        </tr>
+    <?php endforeach; ?>
+    </table>
+
+<?php else: ?>
+
+    <div class="ui-widget infoDiv">
+        <div class="ui-state-highlight ui-corner-all">
+            <p><span class="ui-icon ui-icon-info"></span>
+            V docházce nejsou zaznamenané žádné chyby</p>
+        </div>
+    </div>
+
 <?php endif; ?>
