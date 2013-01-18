@@ -75,14 +75,19 @@ class EmployeeController extends Zend_Controller_Action
         
         /**** Hledání podobných pozic *****************************************/
         
-        $hledaciForm = new Application_Form_HledaniPozic();
+        $hledaciForm = new Application_Form_HledaniVyrazu();       
         
+        /**** Hledání podrobností o výrobě konkrétních pozic ******************/
+
+        $prehledovyFrom = new Application_Form_HledaniPozice();
+
         /**** Data do view ****************************************************/
         
         $this->view->idUzivatele = self::$_identity->id;
         $this->view->tab = $tab;
         $this->view->limitForm = $form;
         $this->view->hledaciForm = $hledaciForm;
+        $this->view->prehledovyFrom = $prehledovyFrom;
         $this->view->pracovniZaznamy = $aktualniPrace;
         $this->view->poznamky = $nedavnePoznamky;
     }
@@ -107,7 +112,7 @@ class EmployeeController extends Zend_Controller_Action
                 $authModel->setUserId($identity->id);
                 $authModel->setUserRole($identity->roles['dochazka']);
                 $authModel->setDataUserId(self::$_identity->id);               
-            
+         
                 try {
                     if (sha1($request->getPost('currentPassword')) !== $authModel->getHashHesla()) {
                         throw new Exception('Špatně vyplněné současné heslo');
@@ -120,14 +125,17 @@ class EmployeeController extends Zend_Controller_Action
                 } catch (Exception $e) {
                     $this->view->exceptionMessage = $e->getMessage();
                     $this->view->form = $form;
+                    $exception = true;
                 }
                 
-                // nic nebrání změně hesla
-                $authModel->setHashHesla(sha1($request->getPost('newPassword')));
-                $authModel->zmenaHesla();
-                
-                // uživatele za trest odhlásíme
-                $this->_helper->redirector('logout', 'auth', 'default');
+                if (!$exception) {
+                    // nic nebrání změně hesla
+                    $authModel->setHashHesla(sha1($request->getPost('newPassword')));
+                    $authModel->zmenaHesla();
+
+                    // uživatele za trest odhlásíme
+                    $this->_helper->redirector('logout', 'auth', 'default');
+                }
             } 
             // případně vrátíme formulář s vypsanou chybovou hláškou
             else {

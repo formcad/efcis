@@ -10,6 +10,7 @@
 $(document).ready(function() {
     
     $("button").button();
+    $("input:submit").button();
     
     $("#default-employee-moznostiVyberu").tabs({
         selected: <?php echo $this->tab; ?>
@@ -77,10 +78,9 @@ $(document).ready(function() {
     $("#vyhledej").click(function() {
     
        // vymazání starých záznamů
-       $("#hledanyText").html('');
        $("#default-hledaniPozic-vysledek").html('');
     
-       var nazevDilu = $("#hledanyText").val();
+       var nazevDilu = $("#hledanyVyraz").val();
 
        $.ajax({
             url:   "<?php echo $this->url(array('module'=>'vyroba','controller'=>'pozice','action'=>'ajax-hledani-pozice')); ?>",
@@ -91,7 +91,7 @@ $(document).ready(function() {
             }
         });
 
-        $("#hledanyText").html(nazevDilu);
+        $("#hledanyVyraz").html(nazevDilu);
         $("#default-hledaniPozic-vysledek").dialog({
             modal: true,
             width: 900,
@@ -167,9 +167,14 @@ $(document).ready(function() {
         </li>
         <li>
             <a href="#default-employee-vyhledavani">
-                Hledání
+                Hledání pozic
             </a>
-        </li>        
+        </li>     
+        <li>
+            <a href="#default-employee-prehledOVyrobe">
+                Přehled o výrobě
+            </a>
+        </li> 
         <li>
             <a href="#default-employee-uzivatelskeNastaveni">
                 Nastavení
@@ -358,6 +363,19 @@ $(document).ready(function() {
          title="Výsledek hledání">
         
     </div>
+    
+    <!-- PŘEHLED O VÝROBĚ POZIC ----------------------------------------------->
+    
+    <div id="default-employee-prehledOVyrobe">
+        
+        <p>
+            Zadejte ID číslo dílu, u kterého chcete zobrazit přehled výrobních
+            časů.
+        </p>        
+        <?php echo $this->prehledovyFrom; ?>
+        
+        <div style="clear: both;"></div>
+    </div>    
     
     
     <!-- NASTAVENÍ ------------------------------------------------------------>

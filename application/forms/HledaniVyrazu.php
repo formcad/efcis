@@ -1,6 +1,6 @@
 <?php
 
-class Application_Form_HledaniPozic extends Zend_Form
+class Application_Form_HledaniVyrazu extends Zend_Form
 {
 
     public function init()
@@ -8,7 +8,7 @@ class Application_Form_HledaniPozic extends Zend_Form
         $this->setName("login");
         $this->setAttrib("id", "form-hledani-pozic");  
 
-        $text = new Zend_Form_Element_Text('hledanyText');
+        $text = new Zend_Form_Element_Text('hledanyVyraz');
         $text->setRequired(true)
             ->addFilters(array('StringTrim'))
             ->addValidator(new Zend_Validate_NotEmpty);

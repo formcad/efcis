@@ -120,6 +120,71 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
         
         return $this->_adapter->fetchAll($select);
     }
+    
+    /**
+     * Pro danou pozici (podle nastaveného ID pozice) zjistíme všechny úkonoy
+     * výroby této pozice
+     * 
+     * @return array
+     */
+    public function zjistiSkutecnouVyrobu()
+    {
+        $select = $this->_adapter->select()
+            ->from(array('oc'=>'odpracovane_casy'),
+                array('id'=>'id_zaznamu','start'=>'time_start','end'=>'time_end',
+                    'update'=>'time_update'))
+            ->join(array('os'=>'osoby'),
+                'os.id_osoby = oc.id_osoby',
+                array('vyrabiJmeno'=>'jmeno','vyrabiPrijmeni'=>'prijmeni'))
+            ->joinLeft(array('om'=>'osoby'),
+                'om.id_osoby = oc.id_naposled_upravil',
+                array('meniJmeno'=>'jmeno','meniPrijmeni'=>'prijmeni'))
+            ->join(array('t'=>'technologie'),
+                't.cislo_technologie = oc.cislo_technologie',
+                array('technologie'=>'nazev_technologie'))
+            ->join(array('pz'=>'pozice'),
+                'pz.id_pozice = oc.id_pozice',
+                array('nazevPozice'=>'nazev'))
+            ->join(array('po'=>'polozky'),
+                'pz.id_polozky = po.id_polozky',
+                array('zakazka'=>'cislo_zakazky'))
+            ->where('oc.id_pozice = ?',$this->_id)
+            ->order(array('oc.time_start'));
+        
+        $data = $this->_adapter->fetchAll($select);
+        
+        // dopočítáme trvání operací
+        if (count($data)>0) {
+            foreach ($data as $index => $zaznam) {
+                
+                $trvani = strtotime($zaznam['end']) - strtotime($zaznam['start']);             
+                $trvani < 60 ? $trvani = 0 : $trvani = round($trvani/3600,2);
+                
+                $timeStart = strtotime($zaznam['start']);
+                // pokud byl záznam vložen ručně, vypíšeme pouze datum vložení
+                if (date('H:i:s', $timeStart) == '00:00:00') {
+                    $zacatek = date('d. m. Y', $timeStart); 
+                } 
+                // jinak vypíšeme celé datum včetně času
+                else {
+                    $zacatek =  date('d. m. Y H:i', $timeStart); 
+                }         
+                
+                if ($zaznam['update'] == null) {
+                    $updateRow = '';
+                } else {
+                    $updateRow = date('d. m. Y, H:i', strtotime($zaznam['update'])).', '
+                    .$zaznam['meniJmeno'].' '.$zaznam['meniPrijmeni'];
+                } 
+
+                $data[$index]['delkaOperace'] = $trvani;
+                $data[$index]['zacatekPrace'] = $zacatek;
+                $data[$index]['zaznamUpdate'] = $updateRow;
+            }
+        }
+        
+        return $data;
+    }
 
     public function getId() {
         return $this->_id;

@@ -1,0 +1,1 @@
+ERD schéma databáze je vytvoøeno v programu Case Studio verze 2.25.0

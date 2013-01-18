@@ -1,0 +1,45 @@
+<?php $this->title = "Výrobní záznamy pozice"; ?>
+
+
+<?php if ($this->exceptionMessage): ?>
+    <div class="ui-widget errorDiv">
+        <div class="ui-state-error ui-corner-all">
+            <p><span class="ui-icon ui-icon-alert"></span>
+            <strong>Nepodařilo se najít pozici:</strong> <?php echo $this->exceptionMessage; ?></p>
+        </div>
+    </div>
+<?php elseif (empty($this->data)): ?>
+    <p>U dané pozice nebyl nalezen žádný výrobní záznam</p> 
+<?php else: ?>
+    <table class="standardni odsazene-bunky">
+        <tr>
+            <th colspan="2">Identifikace pozice</th>
+        </tr>
+        <tr>
+            <td>Pozice</td>
+            <td><?php echo $this->data[0]['nazevPozice']; ?></td>
+        </tr>
+        <tr>
+            <td>Zakázka</td>
+            <td><?php echo $this->data[0]['zakazka']; ?></td>
+        </tr>
+    </table>
+    <table class="standardni odsazene-bunky margin-top-10">
+        <tr>       
+            <th>Začátek práce</th>
+            <th>Zaměstnanec</th>
+            <th>Operace</th>            
+            <th>Doba trvání [h]</th>
+            <th>Změna záznamu</th>
+        </tr>
+        <?php foreach ($this->data as $zaznam): ?>
+        <tr>   
+            <td><?php echo $zaznam['zacatekPrace']; ?></td>            
+            <td><?php echo $zaznam['vyrabiJmeno'].' '.$zaznam['vyrabiPrijmeni']; ?></td>
+            <td><?php echo $zaznam['technologie']; ?></td>            
+            <td><?php echo $zaznam['delkaOperace']; ?></td>
+            <td><?php echo $zaznam['zaznamUpdate']; ?></td>
+        </tr>        
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>

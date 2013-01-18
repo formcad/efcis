@@ -46,4 +46,43 @@ class Vyroba_PoziceController extends Zend_Controller_Action
         }
         $this->view->data = $data;
     }
+    
+    public function vyrobniZaznamyAction() 
+    {
+        $url = $this->_helper->url;
+        
+        $idPozice = $this->getRequest()->getParam('hledanyVyraz');
+        
+        $pozice = new Vyroba_Model_Pozice();
+        $pozice->setId($idPozice);
+        
+        // kontroly
+        try {
+            // kontrola, zda máme něco vyplněného
+            if (strlen($idPozice) == 0) {
+                throw new Exception('Není zadané ID pozice');
+            }
+            // kontrola, zda je vůbec záznam v databázi            
+            if (!$pozice->overExistenci()) {
+                throw new Exception('Chybně zadané ID pozice');
+            }
+        } catch (Exception $e) {
+            $this->view->exceptionMessage = $e->getMessage();
+            $exception = true;
+        }     
+        
+        if (!$exception) {
+            // zjistíme výrobní úkony u konkrétní pozice
+            $this->view->data = $pozice->zjistiSkutecnouVyrobu();            
+        }
+        
+        $this->view->leftNavigation = array(
+            array(
+                'img' => 'home.png',
+                'url' => $url->url(array('module' => 'default',
+                                         'controller' => 'employee',
+                                         'action' => 'index')),
+                'text' => 'Domovská stránka')
+        );           
+    }
 }
