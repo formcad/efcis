@@ -72,7 +72,8 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
                 } else {
                     $zdrojDat = 'Čárový kód';             
                 }
-                  
+                
+                $datum = date('d. m. Y', strtotime($zaznam['time_start']));
                 $trvani = strtotime($zaznam['time_end']) - strtotime($zaznam['time_start']);
                 $roundTrvani = round($trvani/3600, 2);
                 
@@ -81,6 +82,7 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
                     'casStart' => date('d. m. Y, H.i',strtotime($zaznam['time_start'])),
                     'casEnd' => date('d. m. Y, H.i',strtotime($zaznam['time_end'])),
                     'casUpdate' => $casUpdate,
+                    'datum' => $datum,
                     'timestampStart' => $zaznam['time_start'],
                     'timestampEnd' => $zaznam['time_end'],
                     'zdrojDat' => $zdrojDat,
