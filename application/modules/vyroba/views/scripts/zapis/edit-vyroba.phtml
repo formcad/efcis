@@ -128,30 +128,30 @@ $(document).ready(function() {
     
     
     <div id="div-vyroba-addZapisVyroby">
-        <form action="<?php echo $this->vyrobaFormAction; ?>"
-              method="<?php echo $this->vyrobaFormMethod; ?>"
-              id="<?php echo $this->vyrobaFormId; ?>">
+        <form action="<?php echo $this->vyrobaForm->getAction(); ?>"
+              method="<?php echo $this->vyrobaForm->getMethod(); ?>"
+              id="<?php echo $this->vyrobaForm->getId(); ?>">
             
         
         <div id="vyroba-div-zapisVyrobyDily"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
             
             <ul><li><a href="">Identifiátor dílů</a></li></ul>                        
-            <?php echo $this->vyrobaFormDily; ?>       
+            <?php echo $this->vyrobaForm->getDisplayGroup('dily'); ?>       
         </div>
         <div id="vyroba-div-zapisVyrobyPrace"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
             <ul>
                 <li><a href="">Určení činnosti</a></li>
             </ul>                
-            <?php echo $this->vyrobaFormPrace; ?>       
+            <?php echo $this->vyrobaForm->getDisplayGroup('prace'); ?>       
         </div>
         <div id="vyroba-div-zapisVyrobyUkony"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
             <ul>
                 <li><a href="">Výrobní operace</a></li>
             </ul>  
-            <?php echo $this->vyrobaFormUkony; ?>    
+            <?php echo $this->vyrobaForm->getDisplayGroup('ukony'); ?>    
         </div>
         </form>
     </div>

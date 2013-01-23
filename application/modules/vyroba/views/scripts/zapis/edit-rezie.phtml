@@ -57,9 +57,9 @@ $(document).ready(function() {
 <div id="div-vyroba-addZapis">
     <h3><a href="#">Změna režijních časů</a></h3>
     <div id="div-vyroba-addZapisRezie">
-        <form action="<?php echo $this->rezieFormAction; ?>"
-              method="<?php echo $this->rezieFormMethod; ?>"
-              id="<?php echo $this->rezieFormId; ?>">
+        <form action="<?php echo $this->rezieForm->getAction(); ?>"
+              method="<?php echo $this->rezieForm->getMethod(); ?>"
+              id="<?php echo $this->rezieForm->getId(); ?>">
             
         
         <div id="vyroba-div-zapisReziePrace"
@@ -67,14 +67,14 @@ $(document).ready(function() {
             <ul>
                 <li><a href="">Určení činnosti</a></li>
             </ul>                
-            <?php echo $this->rezieFormPrace; ?>       
+            <?php echo $this->rezieForm->getDisplayGroup('prace'); ?>       
         </div>
         <div id="vyroba-div-zapisRezieUkony"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
             <ul>
                 <li><a href="">Režijní operace</a></li>
             </ul>  
-            <?php echo $this->rezieFormUkony; ?>    
+            <?php echo $this->rezieForm->getDisplayGroup('ukony'); ?>    
         </div>
         </form>        
     </div>

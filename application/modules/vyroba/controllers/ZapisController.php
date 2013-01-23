@@ -185,18 +185,8 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         
         /**** DATA DO VIEW ****************************************************/ 
             
-        $this->view->vyrobaFormDily = $vyrobaForm->getDisplayGroup('dily');
-        $this->view->vyrobaFormPrace = $vyrobaForm->getDisplayGroup('prace');
-        $this->view->vyrobaFormUkony = $vyrobaForm->getDisplayGroup('ukony');
-        $this->view->vyrobaFormAction = $vyrobaForm->getAction();
-        $this->view->vyrobaFormMethod = $vyrobaForm->getMethod();
-        $this->view->vyrobaFormId = $vyrobaForm->getId();
-
-        $this->view->rezieFormPrace = $rezieForm->getDisplayGroup('prace');
-        $this->view->rezieFormUkony = $rezieForm->getDisplayGroup('ukony');
-        $this->view->rezieFormAction = $rezieForm->getAction();
-        $this->view->rezieFormMethod = $rezieForm->getMethod();
-        $this->view->rezieFormId = $rezieForm->getId();       
+        $this->view->vyrobaForm = $vyrobaForm;
+        $this->view->rezieForm = $rezieForm;
         
         $this->view->display = $display;
         $this->view->vyrobniZaznamy = $vyrobniZaznamy;
@@ -325,13 +315,8 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         }
         
         /**** DATA DO VIEW ****************************************************/ 
-            
-        $this->view->vyrobaFormDily = $vyrobaForm->getDisplayGroup('dily');
-        $this->view->vyrobaFormPrace = $vyrobaForm->getDisplayGroup('prace');
-        $this->view->vyrobaFormUkony = $vyrobaForm->getDisplayGroup('ukony');
-        $this->view->vyrobaFormAction = $vyrobaForm->getAction();
-        $this->view->vyrobaFormMethod = $vyrobaForm->getMethod();
-        $this->view->vyrobaFormId = $vyrobaForm->getId();
+         
+        $this->view->vyrobaForm = $vyrobaForm;
         $this->view->naseptavacPozice = $this->_initNaseptavacForm(null);
          
         // návratová stránka je závislá na uživatelském oprávnění
@@ -453,11 +438,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         
         /**** DATA DO VIEW ****************************************************/ 
             
-        $this->view->rezieFormPrace = $rezieForm->getDisplayGroup('prace');
-        $this->view->rezieFormUkony = $rezieForm->getDisplayGroup('ukony');
-        $this->view->rezieFormAction = $rezieForm->getAction();
-        $this->view->rezieFormMethod = $rezieForm->getMethod();
-        $this->view->rezieFormId = $rezieForm->getId();          
+        $this->view->rezieForm = $rezieForm;   
         
         // návratová stránka je závislá na uživatelském oprávnění
         if (self::$_identity->roles['default'] == 'employee') {
