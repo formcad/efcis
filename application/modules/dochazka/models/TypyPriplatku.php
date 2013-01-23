@@ -19,7 +19,7 @@ class Dochazka_Model_TypyPriplatku extends Fc_Model_DatabaseAbstract
     {
          $select = $this->_adapter->select()
              ->from('priplatky',
-                    array('id' => 'id_priplatku','nazev'))
+                    array('id' => 'id_priplatku','nazev','zkratka'))
              ->where('platnost_od <= ?', $this->_platnost)
              ->where('platnost_do >= ? OR platnost_do IS NULL', $this->_platnost)
              ->order(array('poradi'));

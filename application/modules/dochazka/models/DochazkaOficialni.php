@@ -6,6 +6,12 @@
 class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
 {
     /**
+     * Pole průchodů v docházce používané při zaokrouhlování docházky
+     * @var array 
+     */
+    protected static $_polePruchodu = array();
+    
+    /**
      * ID výkazu docházky
      * @var integer
      */
@@ -59,6 +65,27 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected $_novaOficialniData = array();
 
+    /**
+     * Proměnná pro nastavení počátečního času, který je použit při zaokrouhlení
+     * docházky
+     * @var string 
+     */
+    protected $_updateCasOd = null;
+    
+    /**
+     * Proměnná pro nastavení koncového času, který je použit při zaokrouhlení
+     * docházky
+     * @var string 
+     */
+    protected $_updateCasDo = null;
+    
+    /**
+     * Proměnná pro nastavení času, na který se zaokrouhluje docházka mezi
+     * počátečním a koncovým časem     
+     * @var string 
+     */
+    protected $_updateCasCil = null;    
+    
     /**
      * Ověří, zda už má zaměstnanec docházku pro konkrétní měsíc a rok
      * @return array 
@@ -252,7 +279,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
                 array('mesic','rok'))
             ->where('id_dochazky = ?', $this->_idDochazky);
         
-        return $this->_adapter->fetchAll($select);
+        return $this->_adapter->fetchRow($select);
     }
     
     /**
@@ -280,16 +307,19 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
                 if ($akce['datum'] == $den['datum']) {
                     
                     // upravíme časové údaje do čitelnějších podob
-                    $prichod = strtotime($akce['cas_prichod']);
+                    $prichod = strtotime($akce['prichod']);
                     $akce['casPrichod'] = date('d. m. y, H.i', $prichod);
                     $akce['timestampPrichod'] = date('Y-m-d, H.i', $prichod);
                     $akce['dbTimestampPrichod'] = date('Y-m-d H:i:s', $prichod);
+                    $akce['shortCasPrichod'] = date('H:i', $prichod);
                     
                     // upravíme časové údaje do čitelnějších podob
-                    $odchod = strtotime($akce['cas_prichod']);
-                    $akce['casPrichod'] = date('d. m. y, H.i', $odchod);
-                    $akce['timestampPrichod'] = date('Y-m-d, H.i', $odchod);
-                    $akce['dbTimestampPrichod'] = date('Y-m-d H:i:s', $odchod);                    
+                    $odchod = strtotime($akce['odchod']);
+                    $akce['casOdchod'] = date('d. m. y, H.i', $odchod);
+                    $akce['timestampOdchod'] = date('Y-m-d, H.i', $odchod);
+                    $akce['dbTimestampOdchod'] = date('Y-m-d H:i:s', $odchod);         
+                    $akce['shortCasOdchod'] = date('H:i', $odchod);
+                    
                     // zdrojový záznam přesuneme do výsledného pole
                     $polePruchodu[] = $akce;
                     
@@ -323,15 +353,66 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             }            
     
             $result[] = array(
-                'datum' => $den['datum'],
+                'datum' => date('d. m. y', strtotime($den['datum'])),
                 'svatek' => $den['svatek'],
                 'pruchody' => $polePruchodu,
                 'preruseni' => $polePreruseni,
                 'priplatky' => $polePriplatku,
                 'poznamka' => $polePoznamek
             );            
-        }
+        } 
         return $result;
+    }
+    
+    /**
+     * Pro nastavené období, id člověka a jeho konkrétní čip vybere z oficiální
+     * docházky časy průchodů, spočítá jejich rozdíl a v případě, že je průchodů
+     * za den víc, sečte všechny průchody v dni do jedné sumy. Data funkce vrátí
+     * @return array
+     */
+    public function sumaCasuDochazky()
+    {
+        $result = array();
+        
+        $kalendarInstance = new Application_Model_Kalendar();
+        $kalendarInstance->setDateFrom($this->_datumOd);
+        $kalendarInstance->setDateTo($this->_datumDo);
+    
+        $kalendar = $kalendarInstance->getKalendar();        
+        $pruchody = $this->_getOficialniPruchody();
+        $preruseni = $this->_getOficialniPreruseni();
+        
+        foreach ($kalendar as $den)
+        {
+            $tempPruchody = 0;
+            foreach ($pruchody as $index => $zaznam) {
+          
+                if ($zaznam['datum'] == $den['datum']) {
+               
+                    if (!empty($zaznam['odchod'])) {
+                        $tempPruchody += strtotime($zaznam['odchod']) - strtotime($zaznam['prichod']);
+                    }
+                    // ve zdrojovém poli dál tento záznam nebude potřeba
+                    unset($pruchody[$index]);
+                }                
+            } 
+            
+            $tempPreruseni = 0;
+            foreach ($preruseni as $index => $zaznam) {
+           
+                if ($zaznam['datum'] == $den['datum']) {                    
+                    $tempPreruseni = $zaznam['delka']*3600;
+                    unset($preruseni[$index]);
+                }         
+            }
+                                    
+            $result[] = array (
+                'dochazka' => round($tempPruchody/3600,2),
+                'pauza' => round($tempPreruseni/3600,2),
+                'cistaDochazka' => round(($tempPruchody - $tempPreruseni)/3600,2)
+            );
+        }
+        return json_encode($result);
     }
     
     /**
@@ -432,6 +513,67 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         
         return $this->_adapter->fetchAll($select);            
     }
+    
+    /**
+     * Projede časy oficiální docházky mezi _datumOd a _datumDo, přičemž
+     * příchody mezi _updateCasOd a _updateCasDo změní na hodnotu _updateCasCil
+     */
+    public function zaokrouhliPrichodyDochazky()
+    {
+        // pokud nemáme uložené pole průchodů, získáme ho
+        if (empty(self::$_polePruchodu)) {
+            self::$_polePruchodu = $this->_vyberPrichodyDochazky();
+        }
+        
+        // příchody vyhovující některému z nastavených kritérií změníme
+        foreach (self::$_polePruchodu as $pruchod) {
+            
+            $datumPrichod = date('Y-m-d',strtotime($pruchod['prichod']));
+            $timePrichod = strtotime($pruchod['prichod']);
+            
+            $updateOd = strtotime($datumPrichod.' '.$this->_updateCasOd);
+            $updateDo = strtotime($datumPrichod.' '.$this->_updateCasDo);
+                
+            // pokud je čas příchodu mezi limity pro změnu
+            if ($timePrichod >= $updateOd and $timePrichod <= $updateDo) {
+
+                // čas změníme
+                $this->_zmenCasPrichodu($pruchod['id'],$datumPrichod.' '.$this->_updateCasCil);
+            }                                            
+        }
+         
+    }
+    
+    /**
+     * Výběr příchodů docházky mezi limitními daty (v proměnných _datumOd a
+     * _datumDo)
+     * @return array
+     */
+    protected function _vyberPrichodyDochazky() 
+    {
+        $select = $this->_adapter->select()
+            ->from( array('op'=>'oficialni_pruchody'),
+                    array('prichod'=>'cas_prichod','id'=>'id_zaznamu'))
+            ->where( 'op.datum >= ?', $this->_datumOd)
+            ->where( 'op.datum <= ?', $this->_datumDo);       
+        
+        return $this->_adapter->fetchAll($select);             
+    }
+   
+    /**
+     * Pomocná funkce provádějící změnu konkrétního času příchodu oficiální 
+     * docházky
+     * @param integer $idZaznamu ID záznamu v tabulce oficialni_pruchody
+     * @param string $casPrichodu Přesný datum a čas příchodu
+     */
+    protected function _zmenCasPrichodu($idZaznamu,$casPrichodu) 
+    {
+        $this->_adapter->update(
+            'oficialni_pruchody',
+            array('cas_prichod' => $casPrichodu),
+            array('id_zaznamu = ?' => $idZaznamu)
+        );
+    }
 
     public function getIdDochazky() {
         return $this->_idDochazky;
@@ -503,6 +645,29 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
 
     public function setNovaOficialniData($novaOficialniData) {
         $this->_novaOficialniData = $novaOficialniData;
-    } 
-    
+    }
+
+    public function getUpdateCasOd() {
+        return $this->_updateCasOd;
+    }
+
+    public function setUpdateCasOd($updateCasOd) {
+        $this->_updateCasOd = $updateCasOd;
+    }
+
+    public function getUpdateCasDo() {
+        return $this->_updateCasDo;
+    }
+
+    public function setUpdateCasDo($updateCasDo) {
+        $this->_updateCasDo = $updateCasDo;
+    }
+
+    public function getUpdateCasCil() {
+        return $this->_updateCasCil;
+    }
+
+    public function setUpdateCasCil($updateCasCil) {
+        $this->_updateCasCil = $updateCasCil;
+    }    
 }

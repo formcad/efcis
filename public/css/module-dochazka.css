@@ -101,6 +101,12 @@
     padding-top: 20px;
 }
 
+/**** DIVy ********************************************************************/
+
+#div-dochazka-officialZakorouhleniCasu,
+#div-dochazka-officialZmenaCasu {
+    display: none;
+}
 
 /**** FORMULÁŘE ***************************************************************/
 
@@ -118,6 +124,19 @@
 #form-dochazka-addHromadnePreruseni dt,
 #form-dochazka-addHromadnePriplatky dt {
     width: 180px;
+}
+
+#form-dochazka-zaokrouhleniCasu fieldset {
+    border: 0;
+}
+
+#form-dochazka-zaokrouhleniCasu input[type="text"] {
+    width: 60px;
+}
+
+#form-dochazka-zaokrouhleniCasu label {
+    width: 110px;
+    display: inline-block;
 }
 
 /**** TABULKY *****************************************************************/

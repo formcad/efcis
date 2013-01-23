@@ -1,1 +1,187 @@
-<?php $this->title = "Přehled oficiálních výkazů docházky ($this->uzivatel)"; ?>
+<?php $this->title = "Změna oficiálního výkazu docházky ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+
+$(document).ready(function() {
+    
+    $('#dochazka-officialZakorouhleniCasu').button({
+        icons: {primary: 'ui-icon-clock'}
+    }); 
+    
+    $('.dochazka-officialZmenaCasu').button({
+        icons: {primary: 'ui-icon-search'},
+        text: false
+    });
+    
+    /**** AJAXOVÉ POČÍTÁNÍ ČASŮ ***********************************************/
+     
+    $.ajax({      
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-pocitani-casu'),null,true);?>",
+        data: ({id: <?php echo $this->idVykazu; ?>}),        
+        dataType: 'json',
+        success: function(data) { 
+       
+            var i = 0;
+            for ( i == 0; i <= (data.length -1); i++) {
+                
+                $('#officialni-dochazka-dochazka-'+i).html(data[i]['dochazka']);
+                $('#officialni-dochazka-pauza-'+i).html(data[i]['pauza']);
+                $('#officialni-dochazka-cistaDochazka-'+i).html(data[i]['cistaDochazka']);                
+            }
+        }
+    });    
+       
+    /***************************************************************************
+     * Modální dialog pro změnu konkrétního časového záznamu docházky
+     */   
+    $('.dochazka-officialZmenaCasu').click(function(){
+        
+        // do formuláře doplníme konkrétní data
+        
+        // vykreslíme dialogové okno
+        $("#div-dochazka-officialZmenaCasu").dialog({            
+            modal: true,
+            width: 600,
+            height: 400,        
+            buttons: {
+                "Provést": function() {                                       
+                    $( this ).dialog( "close" );               
+                },
+                "Zrušit": function() {
+                    $( this ).dialog( "close" );
+                }
+            }               
+        });
+    });            
+    
+    /***************************************************************************
+     * Modální dialog pro hromadné zaokrouhlování časů
+     */
+    $("#dochazka-officialZakorouhleniCasu").click(function(){    
+        $("#div-dochazka-officialZakorouhleniCasu").dialog({            
+            modal: true,
+            width: 600,
+            height: 600,
+            buttons: {
+                "Provést": function() {         
+                   
+                    // ajaxové zaokrouhlení časů příchodů na směny
+                    $.ajax({      
+                        type: "POST",
+                        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-zaokrouhleni-prichodu'),null,true);?>",
+                        data: $('#form-dochazka-zaokrouhleniCasu').serialize(),        
+                        dataType: 'json',
+                        success: function() { 
+                            location.reload();
+                        }
+                    });                    
+                    
+                    $( this ).dialog( "close" );               
+                },
+                "Zrušit": function() {
+                    $( this ).dialog( "close" );
+                }
+            }                        
+        });    
+    });    
+    
+});
+//]]>    
+</script>
+
+<a href="#"
+   id="dochazka-officialZakorouhleniCasu">
+    Zaokrouhlení příchodů
+</a>
+
+<table class="standardni odsazene-bunky margin-top-10">
+    <tr>
+        <th>Datum</th>
+        <th>Docházka</th>
+        <th>Suma<br />práce</th>
+        <th>Suma<br />pauzy</th>
+        <th>Čistá<br />práce</th>
+        <?php foreach ($this->typyPriplatku as $typPriplatku): ?>
+        <th><?php echo $typPriplatku['zkratka']; ?></th>
+        <?php endforeach; ?>
+        <th>Poznámka</th>
+    </tr>
+
+<?php foreach ($this->data as $i => $zaznam): ?>
+    <tr>
+        <td><?php echo $zaznam['datum']; ?></td>
+        <td>
+            <table style="padding: 0; margin: 0;">
+            <?php foreach ($zaznam['pruchody'] as $pruchod): ?>         
+                <tr>
+                    <td> 
+                        <?php echo $pruchod['shortCasPrichod']; ?> - 
+                        <?php echo $pruchod['shortCasOdchod']; ?>
+                        <a href="#"
+                           id=""
+                           class="dochazka-officialZmenaCasu">
+                            &nbsp;
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </table>
+        </td>
+        <td id="officialni-dochazka-dochazka-<?php echo $i; ?>"></td>
+        <td id="officialni-dochazka-pauza-<?php echo $i; ?>"></td>
+        <td id="officialni-dochazka-cistaDochazka-<?php echo $i; ?>"></td>        
+    <?php 
+        // projedeme všechny příplatky podle typu, pro každý vypíšeme buňku tabulky
+        foreach ($this->typyPriplatku as $typPriplatku):
+    ?>
+        <td>
+        <?php
+            // pokud máme nějaký zapsaný příplatek, časem ho vypíšeme
+            if (!empty($zaznam['priplatky'])) {
+                foreach ($zaznam['priplatky'] as $priplatek) {
+              
+                    // pokud se shoduje typ příplatku se zapsaným příplatkem, vypíšeme jej právě teď
+                    if ($typPriplatku['id'] == $priplatek['idPriplatku']) {           
+                        echo $priplatek['delka']; 
+                    }
+                }
+            } ?>
+        </td>
+    <?php endforeach; ?>
+        <td>
+            <?php 
+            // poznámka bude z proncipu věci jenom jedna
+            if (!empty($zaznam['poznamka'])) {
+                echo $zaznam['poznamka'][0]['text'];
+            } ?>
+        </td>
+    </tr>
+<?php endforeach; ?>
+</table>
+
+<!-- Dialogový DIV pro zaokrouhlování časů ------------------------------------>
+<div id="div-dochazka-officialZakorouhleniCasu"
+     title="Hromadné zaokrouhlení časů příchodů">
+    
+    <p>Pokud některý z filtrů nechcete použít, nechte hodnoty nevyplněné</p>
+    
+    <form action="<?php echo $this->zaokrouhleniForm->getId(); ?>"
+          method="<?php echo $this->zaokrouhleniForm->getMethod(); ?>"
+          id="<?php echo $this->zaokrouhleniForm->getId(); ?>">
+
+    
+    <?php echo $this->zaokrouhleniForm->getDisplayGroup('ranni'); ?>
+    <?php echo $this->zaokrouhleniForm->getDisplayGroup('odpoledni'); ?>
+    <?php echo $this->zaokrouhleniForm->getDisplayGroup('nocni'); ?>
+        
+    </form>
+</div>
+
+<!-- Dialogový DIV pro změnu záznamů docházky --------------------------------->
+
+<div id="div-dochazka-officialZmenaCasu"
+     title="Změna záznamu oficiální docházky">
+
+</div>

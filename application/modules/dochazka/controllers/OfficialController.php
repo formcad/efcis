@@ -234,15 +234,30 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $dochazkaOficialni->setCip(self::$_session->idCipu);
         $dochazkaOficialni->setIdDochazky($idVykazu);
         
+        // měsíc a rok oficiální docházky
         $rozsah = $dochazkaOficialni->getRozsahDochazky();
-        
-        // máme časový rozsah, získáme data oficiální docházky
+
+        // nastavíme časové limitní hodnoty docházky
         $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
         $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
-        
+
         // získáme pole oficiální docházky
         $poleZaznamu = $dochazkaOficialni->getAkce();
+       
+        // získáme typy příplatků
+        $modelPriplatku = new Dochazka_Model_TypyPriplatku();       
+        $modelPriplatku->setPlatnost($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
+
+        // formulář pro zaokrouhlení časů
+        $zaokrouhleniForm = new Dochazka_Form_ZaokrouhleniCasu;
+        $idElement = $zaokrouhleniForm->getElement('idDochazky');
+        $idElement->setValue($idVykazu);
+
         
+        $this->view->data = $poleZaznamu;
+        $this->view->idVykazu = $idVykazu;
+        $this->view->typyPriplatku = $modelPriplatku->getTypy();
+        $this->view->zaokrouhleniForm = $zaokrouhleniForm;
         
         /**** DATA DO VIEW ****************************************************/
  
@@ -346,4 +361,83 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         } 
         return $vyslednePole;   
     }
+    
+    /**
+     * Funkce spočítá rozdíly mezi příchody a odchody, v jednotlivých dnech
+     * provede součty těchto rozdílů a vrátí je
+     */
+    public function ajaxPocitaniCasuAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $idVykazu = $this->getRequest()->getParam('id');
+        
+        // získáme rok a měsíc výkazu
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
+        $dochazkaOficialni->setCip(self::$_session->idCipu);
+        $dochazkaOficialni->setIdDochazky($idVykazu);
+        
+        // měsíc a rok oficiální docházky
+        $rozsah = $dochazkaOficialni->getRozsahDochazky();
+
+        // nastavíme časové limitní hodnoty docházky
+        $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
+        $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
+
+        $this->view->dataCasu = $dochazkaOficialni->sumaCasuDochazky();
+        
+    }
+    
+    /**
+     * Funkce v dané oficiální docházce projede časy všech příchodů a podle
+     * nastavených kritérií je zaokrouhlí a uloží
+     */
+    public function ajaxZaokrouhleniPrichoduAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $data = $this->getRequest()->getParams();
+        
+        $idVykazu = $data['idDochazky'];
+        
+        // získáme rok a měsíc výkazu
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
+        $dochazkaOficialni->setCip(self::$_session->idCipu);
+        $dochazkaOficialni->setIdDochazky($idVykazu);
+        
+        // měsíc a rok oficiální docházky
+        $rozsah = $dochazkaOficialni->getRozsahDochazky();
+
+        // nastavíme časové limitní hodnoty docházky
+        $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
+        $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
+        
+        // budeme zaokrouhlovat ranní směnu
+        if (strlen($data['ranniCil']) <> 0) {
+            $dochazkaOficialni->setUpdateCasOd($data['ranniOd']);
+            $dochazkaOficialni->setUpdateCasDo($data['ranniDo']);
+            $dochazkaOficialni->setUpdateCasCil($data['ranniCil']);            
+            $dochazkaOficialni->zaokrouhliPrichodyDochazky();
+        }
+        // budeme zaokrouhlovat odpolední  směnu
+        if (strlen($data['odpoledniCil']) <> 0) {
+            $dochazkaOficialni->setUpdateCasOd($data['odpoledniOd']);
+            $dochazkaOficialni->setUpdateCasDo($data['odpoledniDo']);
+            $dochazkaOficialni->setUpdateCasCil($data['odpoledniCil']);            
+            $dochazkaOficialni->zaokrouhliPrichodyDochazky();            
+        }
+        // budeme zaokrouhlovat noční směnu
+        if (strlen($data['nocniCil']) <> 0) {
+            $dochazkaOficialni->setUpdateCasOd($data['nocniOd']);
+            $dochazkaOficialni->setUpdateCasDo($data['nocniDo']);
+            $dochazkaOficialni->setUpdateCasCil($data['nocniCil']);            
+            $dochazkaOficialni->zaokrouhliPrichodyDochazky();
+        }
+        
+        
+        $dochazkaOficialni->zaokrouhliPrichodyDochazky();
+        
+//        var_dump($idVykazu);
+    }
+    
 }
