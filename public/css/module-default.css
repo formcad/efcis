@@ -3,28 +3,9 @@
 
 /**** DIV *********************************************************************/
 
-#default-employee-infoDiv {
-    padding: 0px 5px;
-    width: 704px;
-}
-
-#default-employee-infoDiv span {
-    float: left; 
-    margin-right: 0.3em;
-}
-
-#default-employee-infoDiv table {  
-    margin-top: 7px;
-    margin-bottom: 7px;
-}
-
-#default-employee-infoDiv table tr td:first-child {  
-    padding-right: 5px;
-}
-
 #default-employee-moznostiVyberu {
     margin-top: 10px; 
-    width: 710px;
+    width: 805px;
 }
 
 #default-hledaniPozic-vysledek {

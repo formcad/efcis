@@ -57,12 +57,12 @@ $(document).ready(function() {
     
     <h3>Ověřovací záznamy</h3>
     
-    <div class="dochazka-show-infoDiv ui-widget ui-state-highlight ui-corner-all ">
-        <p>
-            <span class="ui-icon ui-icon-info"></span>
-            Ověřovací záznamy nejsou závislé na zaznamenané docházce
-        </p>
-    </div>         
+    <div class="ui-widget infoDiv">
+        <div class="ui-state-highlight ui-corner-all">
+            <p><span class="ui-icon ui-icon-info"></span>
+            Ověřovací záznamy nejsou závislé na zaznamenané docházce</p>
+        </div>
+    </div>            
     
     <a href="<?php echo $this->url(array('module' => 'vyroba',
                                          'controller' => 'time',
@@ -78,15 +78,15 @@ $(document).ready(function() {
         Zapsané režie
     </a>          
 
-    <h3>Oficiální docházka</h3>
+    <h3>Oficiální docházka</h3>      
     
-    <div class="dochazka-show-infoDiv ui-widget ui-state-highlight ui-corner-all ">
-        <p>
-            <span class="ui-icon ui-icon-info"></span>
-            Vytvořit výkaz oficiální docházky je vhodné až po skončení daného měsíce
-            (další data by bylo nutné dopsat ručně)
-        </p>
-    </div>     
+    <div class="ui-widget infoDiv">
+        <div class="ui-state-highlight ui-corner-all">
+            <p><span class="ui-icon ui-icon-info"></span>
+            Vytvořit výkaz docházky je vhodné až po skončení daného měsíce
+            (další data by bylo nutné dopsat ručně)</p>
+        </div>
+    </div>      
     
     <a href="<?php echo $this->url(array('module' => 'dochazka',
                                          'controller' => 'official',

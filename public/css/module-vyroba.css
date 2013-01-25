@@ -7,17 +7,6 @@
 
 /**** DIV *********************************************************************/
 
-.vyrobaInfoDiv {
-    padding: 0px 5px;
-    width: 704px;
-    margin-bottom: 20px;
-}
-
-.vyrobaInfoDiv span {
-    float: left; 
-    margin-right: 0.3em;
-}
-
 .vyroba-zapisVyrobyDiv {
     margin-right: 20px;
     min-height: 370px;

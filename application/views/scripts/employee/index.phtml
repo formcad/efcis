@@ -105,47 +105,47 @@ $(document).ready(function() {
 
 <!-- Záznam rozpracované práce ------------------------------------------------>
 
-<div class="ui-widget ui-state-highlight ui-corner-all" 
-     id="default-employee-infoDiv">
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">    
 
-<?php if (empty($this->pracovniZaznamy)): ?>
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Při načtení stránky nebyl v databázi nalezen záznam o rozpracované práci
-    </p>
-<?php else: ?>
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Při načtení stránky existoval záznam o probíhající práci:
-    </p>
-    <p>
-    <?php foreach ($this->pracovniZaznamy as $zaznam): ?>
-        <table>
-            <tr>
-                <td>Zakázka</td>
-                <td><strong><?php echo $zaznam["cisloZakazky"]; ?></strong></td>
-            </tr>
-            <tr>
-                <td>Pozice</td>
-                <td><strong><?php echo $zaznam["nazevPozice"]; ?></strong></td>
-            </tr>
-            <tr>
-                <td>ID číslo</td>
-                <td><strong><?php echo $zaznam["idPozice"]; ?></strong></td>
-            </tr>
-            <tr>
-                <td>Operace</td>
-                <td><strong><?php echo $zaznam["technologie"]; ?></strong></td>
-            </tr>
-            <tr>
-                <td>Zahájeno</td>
-                <td><strong><?php echo $zaznam["casStart"]; ?></strong></td>
-            </tr>
-        </table>        
-    <?php endforeach; ?>        
-    </p>   
-<?php endif; ?>  
-    
+    <?php if (empty($this->pracovniZaznamy)): ?>
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Při načtení stránky nebyl v databázi nalezen záznam o rozpracované práci
+        </p>
+    <?php else: ?>
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Při načtení stránky existoval záznam o probíhající práci:
+        </p>
+        <p>
+        <?php foreach ($this->pracovniZaznamy as $zaznam): ?>
+            <table>
+                <tr>
+                    <td>Zakázka</td>
+                    <td><strong><?php echo $zaznam["cisloZakazky"]; ?></strong></td>
+                </tr>
+                <tr>
+                    <td>Pozice</td>
+                    <td><strong><?php echo $zaznam["nazevPozice"]; ?></strong></td>
+                </tr>
+                <tr>
+                    <td>ID číslo</td>
+                    <td><strong><?php echo $zaznam["idPozice"]; ?></strong></td>
+                </tr>
+                <tr>
+                    <td>Operace</td>
+                    <td><strong><?php echo $zaznam["technologie"]; ?></strong></td>
+                </tr>
+                <tr>
+                    <td>Zahájeno</td>
+                    <td><strong><?php echo $zaznam["casStart"]; ?></strong></td>
+                </tr>
+            </table>        
+        <?php endforeach; ?>        
+        </p>   
+    <?php endif; ?>  
+    </div>
 </div>        
 
 <!-- Hlavní menu pro zaměstnance ---------------------------------------------->

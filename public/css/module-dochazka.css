@@ -55,18 +55,6 @@
     padding: 0.7em;
 }
 
-.dochazka-terminal-infoDiv {
-    width: 800px;
-    padding: 0 5px;
-    margin: 20px 0;
-}
-
-
-.dochazka-terminal-infoDiv span {
-    float: left; 
-    margin-right: 0.3em;
-}
-
 #dochazka-terminalovaAkce .deleteButton {
     margin-left: 10px;
 }
@@ -84,17 +72,6 @@
     display: block;
     margin-top: 10px;
     width: 200px;
-}
-
-.dochazka-show-infoDiv {
-    padding: 0px 5px;
-    margin: 10px 0;
-    width: 704px;
-}
-
-.dochazka-show-infoDiv span {
-    float: left; 
-    margin-right: 0.3em;
 }
 
 #dochazka-mozneAkce h3 {

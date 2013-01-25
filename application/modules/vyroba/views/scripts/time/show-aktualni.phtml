@@ -19,16 +19,18 @@ $(document).ready(function() {
 
 <h4>Celkový přehled aktuální směny</h4>
 
-<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        V následující tabulce není započítaný čas pauzy, který se do databáze
-        ukládá až při odchodu.
-    </p>
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Časy jsou v hodinách, celkem práce = čistá výroba + čistá režie
-    </p>
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            V následující tabulce není započítaný čas pauzy, který se do databáze
+            ukládá až při odchodu
+        </p>
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Časy jsou v hodinách, celkem práce = čistá výroba + čistá režie
+        </p>
+    </div>
 </div>
 <table id="vyroba-time-tableSumarCasu">
     <tr>
@@ -59,12 +61,14 @@ $(document).ready(function() {
 
 <h4>Časy docházky</h4>
 
-<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Čas odchodu zapsaný kurzívou není uložený v databázi - jde o aktuální 
-        čas.
-    </p>
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Čas odchodu zapsaný kurzívou není uložený v databázi - jde o aktuální 
+            čas
+        </p>
+    </div>
 </div>
 
 <table id="vyroba-time-tableSumarDochazky"
@@ -106,12 +110,14 @@ $(document).ready(function() {
 
         <h4>Výrobní záznamy</h4>
         
-        <div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
-            <p>
-                <span class="ui-icon ui-icon-info"></span>
-                V tabulce jsou jenom ukončené časy práce. Záznam o rozpracované 
-                práci je na úvodní stránce.
-            </p>    
+        <div class="ui-widget infoDiv">
+            <div class="ui-state-highlight ui-corner-all">
+                <p>
+                    <span class="ui-icon ui-icon-info"></span>
+                    V tabulce jsou jenom ukončené časy práce - záznam o rozpracované 
+                    práci je na úvodní stránce
+                </p>    
+            </div>
         </div>          
 
         <table id="vyroba-time-tableSumarPrace"
@@ -229,12 +235,14 @@ $(document).ready(function() {
 
 <h4>Dopsat časy</h4>    
 
-<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Při zápisu časů si dejte pozor na den směny, zvlášť pokud pracujete přes
-        půlnoc - den směny je den, kdy jste přišli do práce.
-    </p>    
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Při zápisu časů si dejte pozor na den směny, zvlášť pokud pracujete přes
+            půlnoc - den směny je den, kdy jste přišli do práce
+        </p>    
+    </div>
 </div>    
 
 <a class="plusButton"
@@ -244,16 +252,18 @@ $(document).ready(function() {
 
 <?php else: ?>
 
-<div class="ui-widget ui-state-highlight ui-corner-all vyrobaInfoDiv">
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Pravděpodobně chybí záznam příchodu z docházky. Než bude do databáze 
-        doplněn, své časy si můžete zkontrolovat následujícími způsoby:
-        <ul>
-            <li>Tabulkou kontrolních záznamů</li>
-            <li>Přehledem uzavřených směn</li>
-        </ul>
-    </p>
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Pravděpodobně chybí záznam příchodu z docházky. Než bude do databáze 
+            doplněn, své časy si můžete zkontrolovat následujícími způsoby:
+            <ul>
+                <li>Tabulkou kontrolních záznamů</li>
+                <li>Přehledem uzavřených směn</li>
+            </ul>
+        </p>
+    </div>
 </div>
 <p>
 

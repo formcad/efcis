@@ -16,25 +16,25 @@ $(document).ready(function() {
 //]]>    
 </script>
 
-<div class="dochazka-terminal-infoDiv ui-widget ui-state-highlight ui-corner-all">
-    
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Zobrazeni jsou pouze lidé, kteří příchod zaznamenali na terminálu.
-        Ručně doplněné příchody zde nejsou!
-    </p>    
-    
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">    
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Zobrazeni jsou pouze lidé, kteří příchod zaznamenali na terminálu.
+            Ručně doplněné příchody zde nejsou!
+        </p>    
+    </div>
 </div>
 
 <?php if (empty($this->pritomniLide)):?>
 
-<div class="dochazka-terminal-infoDiv ui-widget ui-state-highlight ui-corner-all">
-    
-    <p>
-        <span class="ui-icon ui-icon-info"></span>
-        Nikdo není přítomný!
-    </p>    
-    
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">       
+        <p>
+            <span class="ui-icon ui-icon-info"></span>
+            Nikdo není přítomný!
+        </p>    
+    </div>
 </div>
 
 <?php else: ?>
