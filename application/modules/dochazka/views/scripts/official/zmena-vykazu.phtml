@@ -14,6 +14,11 @@ $(document).ready(function() {
         text: false
     });
     
+    $('.dochazka-officialSmazaniCasu').button({
+        icons: {primary: 'ui-icon-trash'},
+        text: false
+    });
+    
     /**** AJAXOVÉ POČÍTÁNÍ ČASŮ ***********************************************/
      
     $.ajax({      
@@ -38,7 +43,33 @@ $(document).ready(function() {
      */   
     $('.dochazka-officialZmenaCasu').click(function(){
         
+        // hack, aby se neotevíraly datepickery po otevření dialogu
+        $("#form-dochazka-zmenaCasu-datumSmeny").datepicker("disable");
+        $("#form-dochazka-zmenaCasu-prichodDen").datepicker("disable");
+        $("#form-dochazka-zmenaCasu-odchodDen").datepicker("disable");
+        
         // do formuláře doplníme konkrétní data
+        $.ajax({      
+            type: "POST",
+            url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-podrobnosti-zaznamu'),null,true);?>",
+            data: ({id: $(this).attr('id')}),        
+            dataType: 'json',
+            success: function(data) { 
+
+                // vyplnění dat z databáze na správné místo formuláře
+                $('#form-dochazka-zmenaCasu-datumSmeny').val(data['datumSmeny']);
+                $('#form-dochazka-zmenaCasu-prichodDen').val(data['denPrichod']);
+                $('#form-dochazka-zmenaCasu-prichodCas').val(data['hodPrichod']);
+                $('#form-dochazka-zmenaCasu-odchodDen').val(data['denOdchod']);
+                $('#form-dochazka-zmenaCasu-odchodCas').val(data['hodOdchod']);
+                $('#form-dochazka-zmenaCasu-idZaznamu').val(data['id']);
+                
+                // hack, aby vůbec datepickery šly otevřít
+                $("#form-dochazka-zmenaCasu-datumSmeny").datepicker("enable");
+                $("#form-dochazka-zmenaCasu-prichodDen").datepicker("enable");
+                $("#form-dochazka-zmenaCasu-odchodDen").datepicker("enable");
+            }
+        });            
         
         // vykreslíme dialogové okno
         $("#div-dochazka-officialZmenaCasu").dialog({            
@@ -46,7 +77,17 @@ $(document).ready(function() {
             width: 600,
             height: 400,        
             buttons: {
-                "Provést": function() {                                       
+                "Změnit": function() {   
+                    
+                    // provedení změny času příchodu a odchodu
+                    $.ajax({      
+                        type: "POST",
+                        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-zmena-pruchodu'),null,true);?>",
+                        data: ($('#form-dochazka-zmenaCasu').serialize()),        
+                        success: function() {   
+                            location.reload();
+                        }
+                    });                                         
                     $( this ).dialog( "close" );               
                 },
                 "Zrušit": function() {
@@ -55,6 +96,49 @@ $(document).ready(function() {
             }               
         });
     });            
+    
+    /***************************************************************************
+     * Modální dialog pro mazání jednotlivých časů z oficiální docházky
+     */
+     $('.dochazka-officialSmazaniCasu').click(function(){
+    
+        var id = $(this).attr('id');
+    
+        // do DIVu zobrazíme data o mazaném záznamu
+        $.ajax({      
+            type: "POST",
+            url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-mazani-zaznamu'),null,true);?>",
+            data: ({id: id}),          
+            success: function(data) { 
+                $("#div-dochazka-officialSmazaniCasu").html(data);
+            }
+        });            
+        
+        // vykreslíme dialogové okno
+        $("#div-dochazka-officialSmazaniCasu").dialog({            
+            modal: true,
+            width: 600,
+            height: 400,        
+            buttons: {
+                "Smazat": function() {   
+                    
+                    // provedení smazání času příchodu a odchodu
+                    $.ajax({      
+                        type: "POST",
+                        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-mazani-pruchodu'),null,true);?>",
+                        data: ({id: id}),        
+                        success: function() {   
+                            location.reload();
+                        }
+                    });                                         
+                    $( this ).dialog( "close" );               
+                },
+                "Zrušit": function() {
+                    $( this ).dialog( "close" );
+                }
+            }               
+        });
+    });                    
     
     /***************************************************************************
      * Modální dialog pro hromadné zaokrouhlování časů
@@ -72,12 +156,10 @@ $(document).ready(function() {
                         type: "POST",
                         url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-zaokrouhleni-prichodu'),null,true);?>",
                         data: $('#form-dochazka-zaokrouhleniCasu').serialize(),        
-                        dataType: 'json',
                         success: function() { 
                             location.reload();
                         }
-                    });                    
-                    
+                    });                                        
                     $( this ).dialog( "close" );               
                 },
                 "Zrušit": function() {
@@ -120,8 +202,13 @@ $(document).ready(function() {
                         <?php echo $pruchod['shortCasPrichod']; ?> - 
                         <?php echo $pruchod['shortCasOdchod']; ?>
                         <a href="#"
-                           id=""
+                           id="<?php echo $pruchod['id']; ?>"
                            class="dochazka-officialZmenaCasu">
+                            &nbsp;
+                        </a>
+                        <a href="#"
+                           id="<?php echo $pruchod['id']; ?>"
+                           class="dochazka-officialSmazaniCasu">
                             &nbsp;
                         </a>
                     </td>
@@ -167,21 +254,22 @@ $(document).ready(function() {
     
     <p>Pokud některý z filtrů nechcete použít, nechte hodnoty nevyplněné</p>
     
-    <form action="<?php echo $this->zaokrouhleniForm->getId(); ?>"
-          method="<?php echo $this->zaokrouhleniForm->getMethod(); ?>"
-          id="<?php echo $this->zaokrouhleniForm->getId(); ?>">
-
+    <?php echo $this->zaokrouhleniForm; ?>
     
-    <?php echo $this->zaokrouhleniForm->getDisplayGroup('ranni'); ?>
-    <?php echo $this->zaokrouhleniForm->getDisplayGroup('odpoledni'); ?>
-    <?php echo $this->zaokrouhleniForm->getDisplayGroup('nocni'); ?>
-        
-    </form>
 </div>
 
 <!-- Dialogový DIV pro změnu záznamů docházky --------------------------------->
 
 <div id="div-dochazka-officialZmenaCasu"
      title="Změna záznamu oficiální docházky">
+    
+    <?php echo $this->zmenaCasuForm; ?>
+    
+</div>
 
+<!-- Dialogový DIV pro mazání záznamů docházky -------------------------------->
+
+<div id="div-dochazka-officialSmazaniCasu"
+     title="Smazání záznamu oficiální docházky">        
+    
 </div>

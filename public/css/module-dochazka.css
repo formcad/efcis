@@ -104,7 +104,8 @@
 /**** DIVy ********************************************************************/
 
 #div-dochazka-officialZakorouhleniCasu,
-#div-dochazka-officialZmenaCasu {
+#div-dochazka-officialZmenaCasu,
+#officialSmazaniCasu {
     display: none;
 }
 
@@ -126,7 +127,8 @@
     width: 180px;
 }
 
-#form-dochazka-zaokrouhleniCasu fieldset {
+#form-dochazka-zaokrouhleniCasu fieldset,
+#form-dochazka-zmenaCasu fieldset {
     border: 0;
 }
 
@@ -134,9 +136,18 @@
     width: 60px;
 }
 
+#form-dochazka-zmenaCasu input[type="text"] {
+    width: 120px;
+}
+
 #form-dochazka-zaokrouhleniCasu label {
     width: 110px;
     display: inline-block;
+}
+
+#form-dochazka-zmenaCasu label {
+    width: 130px;
+    display: inline-block;    
 }
 
 /**** TABULKY *****************************************************************/

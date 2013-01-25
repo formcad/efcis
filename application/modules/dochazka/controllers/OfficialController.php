@@ -253,11 +253,14 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $idElement = $zaokrouhleniForm->getElement('idDochazky');
         $idElement->setValue($idVykazu);
 
+        // formulář pro změnu časů průchodů
+        $zmenaCasuForm = new Dochazka_Form_ZmenaCasu;
         
         $this->view->data = $poleZaznamu;
         $this->view->idVykazu = $idVykazu;
         $this->view->typyPriplatku = $modelPriplatku->getTypy();
         $this->view->zaokrouhleniForm = $zaokrouhleniForm;
+        $this->view->zmenaCasuForm = $zmenaCasuForm;
         
         /**** DATA DO VIEW ****************************************************/
  
@@ -401,8 +404,6 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         
         // získáme rok a měsíc výkazu
         $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-        $dochazkaOficialni->setCip(self::$_session->idCipu);
         $dochazkaOficialni->setIdDochazky($idVykazu);
         
         // měsíc a rok oficiální docházky
@@ -434,10 +435,73 @@ class Dochazka_OfficialController extends Zend_Controller_Action
             $dochazkaOficialni->zaokrouhliPrichodyDochazky();
         }
         
-        
         $dochazkaOficialni->zaokrouhliPrichodyDochazky();
-        
-//        var_dump($idVykazu);
     }
     
+    /**
+     * Funkce pro oficiální docházku načte z databáze řádek s podrobnostmi
+     * o konkrétním průchodu
+     */
+    public function ajaxPodrobnostiZaznamuAction() 
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $idZaznamu = $this->getRequest()->getParam('id');
+
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setIdPruchodu($idZaznamu);
+        
+        $this->view->data = json_encode($dochazkaOficialni->ziskejPruchod());
+    }
+    
+    /**
+     * Změna konkrétních průchodů v oficiální docházce
+     */
+    public function ajaxZmenaPruchoduAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $data = $this->getRequest()->getParams();
+        
+        $idZaznamu = $data['idZaznamu'];    
+        $datum = date('Y-m-d',strtotime(str_replace(' ','',$data['datumSmeny'])));
+        $prichod = date('Y-m-d H:i',strtotime(str_replace(' ','',$data['prichodDen']).' '.$data['prichodCas']));
+        $odchod = date('Y-m-d H:i',strtotime(str_replace(' ','',$data['odchodDen']).' '.$data['odchodCas']));
+
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setMeni(self::$_identity->id);
+        $dochazkaOficialni->setUpdateDatum($datum);
+        $dochazkaOficialni->setUpdateCasPrichod($prichod);
+        $dochazkaOficialni->setUpdateCasOdchod($odchod);
+        $dochazkaOficialni->setIdPruchodu($idZaznamu);    
+        
+        $dochazkaOficialni->zmenZaznam();
+    }
+   
+    /**
+     * Smazání konkrétního záznamu oficiální docházky -> zobrazení podrobností
+     * o vybraném záznamu
+     */
+    public function ajaxMazaniZaznamuAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $id = $this->getRequest()->getParam('id');
+         
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setIdPruchodu($id);
+        $this->view->data = $dochazkaOficialni->ziskejPruchod();
+    }
+    
+    /**
+     * Smazání konkrétního záznamu oficiální docházky -> provedení smazání
+     */
+    public function ajaxMazaniPruchoduAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $id = $this->getRequest()->getParam('id');
+
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setMeni(self::$_identity->id);
+        $dochazkaOficialni->setIdPruchodu($id);    
+        
+        $dochazkaOficialni->smazZaznam();        
+    }
 }

@@ -24,6 +24,12 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     protected $_osoba = null;
     
     /**
+     * ID zaměstnance provádějícího změnu záznamu
+     * @var integer 
+     */
+    protected $_meni = null;    
+    
+    /**
      * ID čipu
      * @var integer
      */
@@ -86,6 +92,30 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected $_updateCasCil = null;    
     
+    /**
+     * ID průchodu oficiální docházky
+     * @var integer
+     */
+    protected $_idPruchodu = null;
+
+    /**
+     * Proměnná času příchodu použitá při změně záznamu oficiálního průchodu
+     * @var string
+     */
+    protected $_updateCasPrichod = null;
+    
+    /**
+     * Proměnná času odchodu použitá při změně záznamu oficiálního průchodu
+     * @var string
+     */
+    protected $_updateCasOdchod = null;
+    
+    /**
+     * Proměnná data směny použitá při změně záznamu oficiálního průchodu
+     * @var string
+     */
+    protected $_updateDatum = null;
+
     /**
      * Ověří, zda už má zaměstnanec docházku pro konkrétní měsíc a rok
      * @return array 
@@ -574,7 +604,66 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             array('id_zaznamu = ?' => $idZaznamu)
         );
     }
+    
+    /**
+     * Z databáze vybere řádek s id, které se rovná _idPruchodu
+     * @return array
+     */
+    public function ziskejPruchod()
+    {
+        $select = $this->_adapter->select()
+            ->from(array('pr' => 'oficialni_pruchody'),
+                array('prichod'=>'cas_prichod','odchod'=>'cas_odchod','datum',
+                    'id'=>'id_zaznamu'))
+            ->where('id_zaznamu = ?',$this->_idPruchodu);
+        
+        $data = $this->_adapter->fetchRow($select);
+        $data['datumSmeny'] = date('d. m. Y',strtotime($data['datum']));
+        $data['denPrichod'] = date('d. m. Y',strtotime($data['prichod']));
+        $data['denOdchod']  = date('d. m. Y',strtotime($data['odchod']));
+        $data['hodPrichod'] = date('H:i',strtotime($data['prichod']));
+        $data['hodOdchod']  = date('H:i',strtotime($data['odchod']));
+        
+        return $data;
+    }
+    
+    /**
+     * V tabulce oficialni_dochazka změní řádek se zadaným _idPruchodu
+     */
+    public function zmenZaznam()
+    {
+        $this->_adapter->update(
+            'oficialni_pruchody',
+            array(
+                'cas_prichod' => $this->_updateCasPrichod,
+                'cas_odchod' => $this->_updateCasOdchod,
+                'datum' => $this->_updateDatum,
+                'id_zmenil' => $this->_meni,
+            ),
+            array(
+                'id_zaznamu = ?' => $this->_idPruchodu
+            )
+        );
+    }
 
+    /**
+     * V tabulce oficialni_dochazka změní řádek se zadaným _idPruchodu - nastaví
+     * příznak smazano na hodnotu TRUE
+     */
+    public function smazZaznam()
+    {
+        $this->_adapter->update(
+            'oficialni_pruchody',
+            array(
+                'smazano' => true,
+                'id_zmenil' => $this->_meni,
+            ),
+            array(
+                'id_zaznamu = ?' => $this->_idPruchodu
+            )
+        );
+    }    
+    
     public function getIdDochazky() {
         return $this->_idDochazky;
     }
@@ -669,5 +758,46 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
 
     public function setUpdateCasCil($updateCasCil) {
         $this->_updateCasCil = $updateCasCil;
-    }    
+    }
+
+    public function getIdPruchodu() {
+        return $this->_idPruchodu;
+    }
+
+    public function setIdPruchodu($idPruchodu) {
+        $this->_idPruchodu = $idPruchodu;
+    }
+    
+    public function getUpdateCasPrichod() {
+        return $this->_updateCasPrichod;
+    }
+
+    public function setUpdateCasPrichod($updateCasPrichod) {
+        $this->_updateCasPrichod = $updateCasPrichod;
+    }
+
+    public function getUpdateCasOdchod() {
+        return $this->_updateCasOdchod;
+    }
+
+    public function setUpdateCasOdchod($updateCasOdchod) {
+        $this->_updateCasOdchod = $updateCasOdchod;
+    }
+    
+    public function getUpdateDatum() {
+        return $this->_updateDatum;
+    }
+
+    public function setUpdateDatum($updateDatum) {
+        $this->_updateDatum = $updateDatum;
+    }
+
+    public function getMeni() {
+        return $this->_meni;
+    }
+
+    public function setMeni($meni) {
+        $this->_meni = $meni;
+    }
+    
 }
