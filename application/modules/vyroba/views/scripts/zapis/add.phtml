@@ -67,7 +67,7 @@ $(document).ready(function() {
         $.ajax({
             async: false,
             type: "POST",
-            url: "<?php echo $this->url(array('action' => 'ajax-form-vyroba-check'));?>",
+            url: "<?php //echo $this->url(array('action' => 'ajax-form-vyroba-check'));?>",
             data: ($(this).serialize()),
             success: function(chyboveHlaseni) {
                 if (chyboveHlaseni.length > 0) {
@@ -185,7 +185,7 @@ $(document).ready(function() {
 </script>
 
 <div id="div-vyroba-addZapis">
-    <h3><a href="#">Zápis výrobních časů</a></h3>
+    <h3>Zápis výrobních časů</h3>
     
     
     <div id="div-vyroba-addZapisVyroby">
@@ -197,27 +197,33 @@ $(document).ready(function() {
         <div id="vyroba-div-zapisVyrobyDily"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
             
-            <ul><li><a href="">Identifiátor dílů</a></li></ul>                        
-            <?php echo $this->vyrobaForm->getDisplayGroup('dily'); ?>       
+            <ul><li><a href="#tabs-vyroba-dily">Identifiátor dílů</a></li></ul>         
+            <div id="tabs-vyroba-dily">
+                <?php echo $this->vyrobaForm->getDisplayGroup('dily'); ?>       
+            </div>
         </div>
         <div id="vyroba-div-zapisVyrobyPrace"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
             <ul>
-                <li><a href="">Určení činnosti</a></li>
-            </ul>                
-            <?php echo $this->vyrobaForm->getDisplayGroup('prace'); ?>       
+                <li><a href="#tabs-vyroba-prace">Určení činnosti</a></li>
+            </ul>  
+            <div id="tabs-vyroba-prace">
+                <?php echo $this->vyrobaForm->getDisplayGroup('prace'); ?>       
+            </div>
         </div>
         <div id="vyroba-div-zapisVyrobyUkony"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
             <ul>
-                <li><a href="">Výrobní operace</a></li>
+                <li><a href="#tabs-vyroba-ukony">Výrobní operace</a></li>
             </ul>  
-            <?php echo $this->vyrobaForm->getDisplayGroup('ukony'); ?>    
+            <div id="tabs-vyroba-ukony">
+                <?php echo $this->vyrobaForm->getDisplayGroup('ukony'); ?>    
+            </div>
         </div>
         </form>
     </div>
         
-    <h3><a href="#">Zápis režijních časů</a></h3>
+    <h3>Zápis režijních časů</h3>
     <div id="div-vyroba-addZapisRezie">
         <form action="<?php echo $this->rezieForm->getAction(); ?>"
               method="<?php echo $this->rezieForm->getMethod(); ?>"
@@ -227,16 +233,20 @@ $(document).ready(function() {
         <div id="vyroba-div-zapisReziePrace"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
             <ul>
-                <li><a href="">Určení činnosti</a></li>
+                <li><a href="#tabs-rezie-prace">Určení činnosti</a></li>
             </ul>                
-            <?php echo $this->rezieForm->getDisplayGroup('prace'); ?>       
+            <div id="tabs-rezie-prace">
+                <?php echo $this->rezieForm->getDisplayGroup('prace'); ?>       
+            </div>
         </div>
         <div id="vyroba-div-zapisRezieUkony"
              class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
             <ul>
-                <li><a href="">Režijní operace</a></li>
-            </ul>  
-            <?php echo $this->rezieForm->getDisplayGroup('ukony'); ?>    
+                <li><a href="#tabs-rezie-ukony">Režijní operace</a></li>
+            </ul>
+            <div id="tabs-rezie-ukony">
+                <?php echo $this->rezieForm->getDisplayGroup('ukony'); ?>    
+            </div>
         </div>
         </form>        
     </div>
