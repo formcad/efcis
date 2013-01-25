@@ -246,23 +246,13 @@ class Dochazka_OfficialController extends Zend_Controller_Action
        
         // získáme typy příplatků
         $modelPriplatku = new Dochazka_Model_TypyPriplatku();       
-        $modelPriplatku->setPlatnost($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
+        $modelPriplatku->setPlatnost($rozsah['rok'].'-'.$rozsah['mesic'].'-01');     
 
-        // formulář pro zaokrouhlení časů
-        $zaokrouhleniForm = new Dochazka_Form_ZaokrouhleniCasu;
-        $idElement = $zaokrouhleniForm->getElement('idDochazky');
-        $idElement->setValue($idVykazu);
-
-        // formulář pro změnu časů průchodů
-        $zmenaCasuForm = new Dochazka_Form_ZmenaCasu;
+        /**** DATA DO VIEW ****************************************************/
         
         $this->view->data = $poleZaznamu;
         $this->view->idVykazu = $idVykazu;
-        $this->view->typyPriplatku = $modelPriplatku->getTypy();
-        $this->view->zaokrouhleniForm = $zaokrouhleniForm;
-        $this->view->zmenaCasuForm = $zmenaCasuForm;
-        
-        /**** DATA DO VIEW ****************************************************/
+        $this->view->typyPriplatku = $modelPriplatku->getTypy();  
  
         $url = $this->_helper->url;
         $this->view->leftNavigation = array(
@@ -390,92 +380,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $this->view->dataCasu = $dochazkaOficialni->sumaCasuDochazky();
         
     }
-    
-    /**
-     * Funkce v dané oficiální docházce projede časy všech příchodů a podle
-     * nastavených kritérií je zaokrouhlí a uloží
-     */
-    public function ajaxZaokrouhleniPrichoduAction()
-    {
-        $this->_helper->getHelper('layout')->disableLayout();
-        $data = $this->getRequest()->getParams();
-        
-        $idVykazu = $data['idDochazky'];
-        
-        // získáme rok a měsíc výkazu
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setIdDochazky($idVykazu);
-        
-        // měsíc a rok oficiální docházky
-        $rozsah = $dochazkaOficialni->getRozsahDochazky();
 
-        // nastavíme časové limitní hodnoty docházky
-        $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
-        $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
-        
-        // budeme zaokrouhlovat ranní směnu
-        if (strlen($data['ranniCil']) <> 0) {
-            $dochazkaOficialni->setUpdateCasOd($data['ranniOd']);
-            $dochazkaOficialni->setUpdateCasDo($data['ranniDo']);
-            $dochazkaOficialni->setUpdateCasCil($data['ranniCil']);            
-            $dochazkaOficialni->zaokrouhliPrichodyDochazky();
-        }
-        // budeme zaokrouhlovat odpolední  směnu
-        if (strlen($data['odpoledniCil']) <> 0) {
-            $dochazkaOficialni->setUpdateCasOd($data['odpoledniOd']);
-            $dochazkaOficialni->setUpdateCasDo($data['odpoledniDo']);
-            $dochazkaOficialni->setUpdateCasCil($data['odpoledniCil']);            
-            $dochazkaOficialni->zaokrouhliPrichodyDochazky();            
-        }
-        // budeme zaokrouhlovat noční směnu
-        if (strlen($data['nocniCil']) <> 0) {
-            $dochazkaOficialni->setUpdateCasOd($data['nocniOd']);
-            $dochazkaOficialni->setUpdateCasDo($data['nocniDo']);
-            $dochazkaOficialni->setUpdateCasCil($data['nocniCil']);            
-            $dochazkaOficialni->zaokrouhliPrichodyDochazky();
-        }
-        
-        $dochazkaOficialni->zaokrouhliPrichodyDochazky();
-    }
-    
-    /**
-     * Funkce pro oficiální docházku načte z databáze řádek s podrobnostmi
-     * o konkrétním průchodu
-     */
-    public function ajaxPodrobnostiZaznamuAction() 
-    {
-        $this->_helper->getHelper('layout')->disableLayout();
-        $idZaznamu = $this->getRequest()->getParam('id');
-
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setIdPruchodu($idZaznamu);
-        
-        $this->view->data = json_encode($dochazkaOficialni->ziskejPruchod());
-    }
-    
-    /**
-     * Změna konkrétních průchodů v oficiální docházce
-     */
-    public function ajaxZmenaPruchoduAction()
-    {
-        $this->_helper->getHelper('layout')->disableLayout();
-        $data = $this->getRequest()->getParams();
-        
-        $idZaznamu = $data['idZaznamu'];    
-        $datum = date('Y-m-d',strtotime(str_replace(' ','',$data['datumSmeny'])));
-        $prichod = date('Y-m-d H:i',strtotime(str_replace(' ','',$data['prichodDen']).' '.$data['prichodCas']));
-        $odchod = date('Y-m-d H:i',strtotime(str_replace(' ','',$data['odchodDen']).' '.$data['odchodCas']));
-
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setMeni(self::$_identity->id);
-        $dochazkaOficialni->setUpdateDatum($datum);
-        $dochazkaOficialni->setUpdateCasPrichod($prichod);
-        $dochazkaOficialni->setUpdateCasOdchod($odchod);
-        $dochazkaOficialni->setIdPruchodu($idZaznamu);    
-        
-        $dochazkaOficialni->zmenZaznam();
-    }
-   
     /**
      * Smazání konkrétního záznamu oficiální docházky -> zobrazení podrobností
      * o vybraném záznamu
@@ -503,5 +408,221 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $dochazkaOficialni->setIdPruchodu($id);    
         
         $dochazkaOficialni->smazZaznam();        
+    }
+    
+    /**
+     * Změna konkrétního průchodu oficiální docházky
+     */
+    public function zmenaPruchoduAction()
+    {
+        $idZaznamu = $this->getRequest()->getParam('idZaznamu');
+        $idVykazu = $this->getRequest()->getParam('id');
+        
+        $url = $this->_helper->url;
+        
+        $form = new Dochazka_Form_ZmenaCasu;
+        $form->setAction($url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'zmena-pruchodu',
+                                         'id' => $idVykazu,
+                                         'idZaznamu' => $idZaznamu),null,true));
+        
+        /**** ZPRACOVÁNÍ OBSAHU ***********************************************/
+        
+        $request = $this->getRequest();
+        if ($request->isPost()) {        
+        
+           // v případě odeslaného a zvalidovaného formuláře zapíšeme data
+            if ($form->isValid($request->getPost())) {         
+           
+                $datum = date('Y-m-d',strtotime(str_replace(' ','',$request->getPost('datumSmeny'))));
+                $prichod = date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('prichodDen')).' '.$request->getPost('prichodCas')));
+                $odchod = date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('odchodDen')).' '.$request->getPost('odchodCas')));
+
+                $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+                    
+                $dochazkaOficialni->setUpdateDatum($datum);
+                $dochazkaOficialni->setUpdateCasPrichod($prichod);
+                $dochazkaOficialni->setUpdateCasOdchod($odchod);
+                $dochazkaOficialni->setIdPruchodu($idZaznamu);    
+                $dochazkaOficialni->setUzivatel(self::$_identity->id);
+                
+                $dochazkaOficialni->zmenZaznam();                
+                
+                // skok zpátky na oficiální docházku
+                $this->_helper->redirector('zmena-vykazu', 'official', 'dochazka', array('id'=>$idVykazu));
+            }           
+        }
+        else {            
+            // vyplníme hodnoty            
+            $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+            $dochazkaOficialni->setIdPruchodu($idZaznamu);
+            $data = $dochazkaOficialni->ziskejPruchod();
+            
+            $form->populate($data);   
+        }
+        /**** DATA DO VIEW ****************************************************/
+        
+        $this->view->form = $form;                
+        $this->view->leftNavigation = array(
+            array(
+                'img' => '',
+                'url' => $url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'zmena-vykazu',
+                                         'id' => $idVykazu),null,true),
+                'text' => 'Výkaz docházky')
+        );    
+        $this->view->uzivatel = self::$_session->uzivatel;          
+        
+    }
+    
+    /**
+     *  přidání průchodu do požadovaného dne
+     */
+    public function pridaniPruchoduAction()
+    {
+        $den = $this->getRequest()->getParam('den');
+        $idVykazu = $this->getRequest()->getParam('id');
+        
+        $url = $this->_helper->url;
+        
+        $form = new Dochazka_Form_ZmenaCasu;
+        $form->setAction($url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'pridani-pruchodu',
+                                         'id' => $idVykazu,
+                                         'den' => $den),null,true));        
+        
+        /**** ZPRACOVÁNÍ OBSAHU ***********************************************/
+        
+        $request = $this->getRequest();
+        if ($request->isPost()) {        
+        
+           // v případě odeslaného a zvalidovaného formuláře zapíšeme data
+            if ($form->isValid($request->getPost())) {          
+                
+                // uložení dat
+                $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+                                
+                $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
+                $dochazkaOficialni->setCip(self::$_session->idCipu);
+                $dochazkaOficialni->setUpdateDatum(date('Y-m-d',strtotime(str_replace(' ','',$request->getPost('datumSmeny')))));             
+                $dochazkaOficialni->setUpdateCasPrichod(date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('prichodDen')).' '.$request->getPost('prichodCas'))));
+                $dochazkaOficialni->setUpdateCasOdchod(date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('odchodDen')).' '.$request->getPost('odchodCas'))));
+                $dochazkaOficialni->setUzivatel(self::$_identity->id);
+                
+                $dochazkaOficialni->ulozNovyOficialniPruchod();
+                
+                // skok zpátky na oficiální docházku
+                $this->_helper->redirector('zmena-vykazu', 'official', 'dochazka', array('id'=>$idVykazu));
+            }
+        }     
+        else {            
+            // vyplníme hodnoty
+            $elDatumSmeny = $form->getElement('datumSmeny');
+            $elDatumSmeny->setValue(date('d. m. Y',strtotime($den)));
+            $elDatumPrichod = $form->getElement('prichodDen');
+            $elDatumPrichod->setValue(date('d. m. Y',strtotime($den)));
+            $elDatumOdchod = $form->getElement('odchodDen');
+            $elDatumOdchod->setValue(date('d. m. Y',strtotime($den)));
+            $elCasPrichod = $form->getElement('prichodCas');
+            $elCasPrichod->setValue('06:00');
+            $elCasOdchod = $form->getElement('odchodCas');
+            $elCasOdchod->setValue('14:30');
+        }
+        
+        /**** DATA DO VIEW ****************************************************/
+        
+        $this->view->form = $form;                
+        $this->view->leftNavigation = array(
+            array(
+                'img' => '',
+                'url' => $url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'zmena-vykazu',
+                                         'id' => $idVykazu),null,true),
+                'text' => 'Výkaz docházky')
+        );    
+        $this->view->uzivatel = self::$_session->uzivatel;      
+    }
+    
+    /**
+     * Funkce v dané oficiální docházce projede časy všech příchodů a podle
+     * nastavených kritérií je zaokrouhlí a uloží
+     */    
+    public function zaokrouhleniPrichoduAction()
+    {
+        $idVykazu = $this->getRequest()->getParam('id');
+        $data = $this->getRequest()->getParams();
+        
+        $url = $this->_helper->url;
+        
+        // formulář pro zaokrouhlení časů
+        $form = new Dochazka_Form_ZaokrouhleniCasu;
+        $form->setAction($url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'zaokrouhleni-prichodu',
+                                         'id' => $idVykazu),null,true));      
+        
+        /**** ZPRACOVÁNÍ OBSAHU ***********************************************/
+        
+        $request = $this->getRequest();
+        if ($request->isPost()) {        
+        
+            // v případě odeslaného a zvalidovaného formuláře zapíšeme data
+            // partial validace je kvůli možným disabled inputům
+            if ($form->isValidPartial($request->getPost())) {                  
+        
+                // získáme rok a měsíc výkazu
+                $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+                $dochazkaOficialni->setIdDochazky($idVykazu);
+
+                // měsíc a rok oficiální docházky
+                $rozsah = $dochazkaOficialni->getRozsahDochazky();
+
+                // nastavíme časové limitní hodnoty docházky
+                $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
+                $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
+
+                // budeme zaokrouhlovat ranní směnu
+                if (strlen($data['ranniCil']) <> 0) {
+                    $dochazkaOficialni->setUpdateCasOd($data['ranniOd']);
+                    $dochazkaOficialni->setUpdateCasDo($data['ranniDo']);
+                    $dochazkaOficialni->setUpdateCasCil($data['ranniCil']);            
+                    $dochazkaOficialni->zaokrouhliPrichodyDochazky();
+                }
+                // budeme zaokrouhlovat odpolední  směnu
+                if (strlen($data['odpoledniCil']) <> 0) {
+                    $dochazkaOficialni->setUpdateCasOd($data['odpoledniOd']);
+                    $dochazkaOficialni->setUpdateCasDo($data['odpoledniDo']);
+                    $dochazkaOficialni->setUpdateCasCil($data['odpoledniCil']);            
+                    $dochazkaOficialni->zaokrouhliPrichodyDochazky();            
+                }
+                // budeme zaokrouhlovat noční směnu
+                if (strlen($data['nocniCil']) <> 0) {
+                    $dochazkaOficialni->setUpdateCasOd($data['nocniOd']);
+                    $dochazkaOficialni->setUpdateCasDo($data['nocniDo']);
+                    $dochazkaOficialni->setUpdateCasCil($data['nocniCil']);            
+                    $dochazkaOficialni->zaokrouhliPrichodyDochazky();
+                }        
+            
+                // skok zpátky na oficiální docházku
+                $this->_helper->redirector('zmena-vykazu', 'official', 'dochazka', array('id'=>$idVykazu));                
+            }
+        }     
+                    
+        $this->view->form = $form;            
+                
+        $this->view->leftNavigation = array(
+            array(
+                'img' => '',
+                'url' => $url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'zmena-vykazu',
+                                         'id' => $idVykazu),null,true),
+                'text' => 'Výkaz docházky')
+        );    
+        $this->view->uzivatel = self::$_session->uzivatel;             
     }
 }

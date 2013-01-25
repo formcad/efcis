@@ -150,6 +150,10 @@
     display: inline-block;    
 }
 
+.form-dochazka-zaokrouhleniCasu-filtr {
+    width: 300px;
+}
+
 /**** TABULKY *****************************************************************/
 
 #table-dochazka-addAction,

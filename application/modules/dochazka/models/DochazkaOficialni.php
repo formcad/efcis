@@ -195,6 +195,22 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     }
     
     /**
+     * Zaslání dat _sqlUlozOficialniPruchod
+     */
+    public function ulozNovyOficialniPruchod()
+    {
+        $data = array(
+            'osoba' => $this->_osoba,
+            'cip' => $this->_cip,
+            'datum' => $this->_updateDatum,
+            'prichod' => $this->_updateCasPrichod,
+            'odchod' => $this->_updateCasOdchod,
+            'zmenil' => $this->_uzivatel                   
+        );
+        $this->_sqlUlozOficialniPruchod($data);
+    }
+    
+    /**
      * Funkce uloží do databáze jeden řádek s průchodem. Bohžel tedy
      * sekvenčně a ne dávkově
      * Čas změny a smazáno = false jsou výchozí hodnoty přímo v databázi
@@ -384,6 +400,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     
             $result[] = array(
                 'datum' => date('d. m. y', strtotime($den['datum'])),
+                'dbDatum' => $den['datum'],
                 'svatek' => $den['svatek'],
                 'pruchody' => $polePruchodu,
                 'preruseni' => $polePreruseni,
@@ -619,10 +636,10 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         
         $data = $this->_adapter->fetchRow($select);
         $data['datumSmeny'] = date('d. m. Y',strtotime($data['datum']));
-        $data['denPrichod'] = date('d. m. Y',strtotime($data['prichod']));
-        $data['denOdchod']  = date('d. m. Y',strtotime($data['odchod']));
-        $data['hodPrichod'] = date('H:i',strtotime($data['prichod']));
-        $data['hodOdchod']  = date('H:i',strtotime($data['odchod']));
+        $data['prichodDen'] = date('d. m. Y',strtotime($data['prichod']));
+        $data['odchodDen']  = date('d. m. Y',strtotime($data['odchod']));
+        $data['prichodCas'] = date('H:i',strtotime($data['prichod']));
+        $data['odchodCas']  = date('H:i',strtotime($data['odchod']));
         
         return $data;
     }
@@ -638,7 +655,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
                 'cas_prichod' => $this->_updateCasPrichod,
                 'cas_odchod' => $this->_updateCasOdchod,
                 'datum' => $this->_updateDatum,
-                'id_zmenil' => $this->_meni,
+                'id_zmenil' => $this->_uzivatel,
             ),
             array(
                 'id_zaznamu = ?' => $this->_idPruchodu

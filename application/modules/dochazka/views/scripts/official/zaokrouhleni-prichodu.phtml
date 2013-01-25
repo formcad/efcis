@@ -1,0 +1,59 @@
+<?php $this->title = "Zaokrouhlení časů příchodů docházky ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+
+$(document).ready(function() {
+    
+    $('input:submit').button(); 
+    $('button').button();
+    
+    // zakázat nebo povolit filtr ranní směny
+    $('#zakazRanni').click(function(){        
+        if ($('#ranniOd').prop('disabled') == true) {
+            $('#ranniOd').prop('disabled', false);
+            $('#ranniDo').prop('disabled', false);
+            $('#ranniCil').prop('disabled', false);                  
+        } else {        
+            $('#ranniOd').prop('disabled', true);
+            $('#ranniDo').prop('disabled', true);
+            $('#ranniCil').prop('disabled', true);              
+        }      
+    });
+    // zakázat nebo povolit filtr odpolední směny
+    $('#zakazOdpoledni').click(function(){        
+        if ($('#odpoledniOd').prop('disabled') == true) {
+            $('#odpoledniOd').prop('disabled', false);
+            $('#odpoledniDo').prop('disabled', false);
+            $('#odpoledniCil').prop('disabled', false);                  
+        } else {        
+            $('#odpoledniOd').prop('disabled', true);
+            $('#odpoledniDo').prop('disabled', true);
+            $('#odpoledniCil').prop('disabled', true);              
+        }      
+    });
+    // zakázat nebo povolit filtr noční směny
+    $('#zakazNocni').click(function(){        
+        if ($('#nocniOd').prop('disabled') == true) {
+            $('#nocniOd').prop('disabled', false);
+            $('#nocniDo').prop('disabled', false);
+            $('#nocniCil').prop('disabled', false);                  
+        } else {        
+            $('#nocniOd').prop('disabled', true);
+            $('#nocniDo').prop('disabled', true);
+            $('#nocniCil').prop('disabled', true);              
+        }      
+    });    
+
+});
+//]]>    
+</script>
+
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">
+        <p><span class="ui-icon ui-icon-info"></span>
+        Nechcete-li nějaký z filtrů použít, klikněte na tlačítko "Zakázat/povolit"</p>
+    </div>
+</div>      
+
+<?php echo $this->form; ?>
