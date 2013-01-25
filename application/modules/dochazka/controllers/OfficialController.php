@@ -466,7 +466,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $this->view->form = $form;                
         $this->view->leftNavigation = array(
             array(
-                'img' => '',
+                'img' => 'clovek.png',
                 'url' => $url->url(array('module' => 'dochazka',
                                          'controller' => 'official',
                                          'action' => 'zmena-vykazu',
@@ -537,7 +537,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $this->view->form = $form;                
         $this->view->leftNavigation = array(
             array(
-                'img' => '',
+                'img' => 'clovek.png',
                 'url' => $url->url(array('module' => 'dochazka',
                                          'controller' => 'official',
                                          'action' => 'zmena-vykazu',
@@ -616,7 +616,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
                 
         $this->view->leftNavigation = array(
             array(
-                'img' => '',
+                'img' => 'clovek.png',
                 'url' => $url->url(array('module' => 'dochazka',
                                          'controller' => 'official',
                                          'action' => 'zmena-vykazu',

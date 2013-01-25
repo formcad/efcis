@@ -13,3 +13,7 @@ http://en.wikipedia.org/wiki/File:Vista-folder_home.svg
 ==== Creative Commons 2.5 ============================================
 
 http://commons.wikimedia.org/wiki/File:Human-emblem-people.svg
+
+==== Creative Commons 3.0 ============================================
+
+http://commons.wikimedia.org/wiki/File:PL_Wiki_pomoc_ikona.svg
