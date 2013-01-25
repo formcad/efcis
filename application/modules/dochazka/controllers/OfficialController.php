@@ -441,9 +441,9 @@ class Dochazka_OfficialController extends Zend_Controller_Action
 
                 $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
                     
-                $dochazkaOficialni->setUpdateDatum($datum);
-                $dochazkaOficialni->setUpdateCasPrichod($prichod);
-                $dochazkaOficialni->setUpdateCasOdchod($odchod);
+                $dochazkaOficialni->setDatumSmeny($datum);
+                $dochazkaOficialni->setCasPrichod($prichod);
+                $dochazkaOficialni->setCasOdchod($odchod);
                 $dochazkaOficialni->setIdPruchodu($idZaznamu);    
                 $dochazkaOficialni->setUzivatel(self::$_identity->id);
                 
@@ -507,9 +507,9 @@ class Dochazka_OfficialController extends Zend_Controller_Action
                                 
                 $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
                 $dochazkaOficialni->setCip(self::$_session->idCipu);
-                $dochazkaOficialni->setUpdateDatum(date('Y-m-d',strtotime(str_replace(' ','',$request->getPost('datumSmeny')))));             
-                $dochazkaOficialni->setUpdateCasPrichod(date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('prichodDen')).' '.$request->getPost('prichodCas'))));
-                $dochazkaOficialni->setUpdateCasOdchod(date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('odchodDen')).' '.$request->getPost('odchodCas'))));
+                $dochazkaOficialni->setDatumSmeny(date('Y-m-d',strtotime(str_replace(' ','',$request->getPost('datumSmeny')))));             
+                $dochazkaOficialni->setCasPrichod(date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('prichodDen')).' '.$request->getPost('prichodCas'))));
+                $dochazkaOficialni->setCasOdchod(date('Y-m-d H:i',strtotime(str_replace(' ','',$request->getPost('odchodDen')).' '.$request->getPost('odchodCas'))));
                 $dochazkaOficialni->setUzivatel(self::$_identity->id);
                 
                 $dochazkaOficialni->ulozNovyOficialniPruchod();
@@ -587,23 +587,23 @@ class Dochazka_OfficialController extends Zend_Controller_Action
 
                 // budeme zaokrouhlovat ranní směnu
                 if (strlen($data['ranniCil']) <> 0) {
-                    $dochazkaOficialni->setUpdateCasOd($data['ranniOd']);
-                    $dochazkaOficialni->setUpdateCasDo($data['ranniDo']);
-                    $dochazkaOficialni->setUpdateCasCil($data['ranniCil']);            
+                    $dochazkaOficialni->setCasOd($data['ranniOd']);
+                    $dochazkaOficialni->setCasDo($data['ranniDo']);
+                    $dochazkaOficialni->setCasCil($data['ranniCil']);            
                     $dochazkaOficialni->zaokrouhliPrichodyDochazky();
                 }
                 // budeme zaokrouhlovat odpolední  směnu
                 if (strlen($data['odpoledniCil']) <> 0) {
-                    $dochazkaOficialni->setUpdateCasOd($data['odpoledniOd']);
-                    $dochazkaOficialni->setUpdateCasDo($data['odpoledniDo']);
-                    $dochazkaOficialni->setUpdateCasCil($data['odpoledniCil']);            
+                    $dochazkaOficialni->setCasOd($data['odpoledniOd']);
+                    $dochazkaOficialni->setCasDo($data['odpoledniDo']);
+                    $dochazkaOficialni->setCasCil($data['odpoledniCil']);            
                     $dochazkaOficialni->zaokrouhliPrichodyDochazky();            
                 }
                 // budeme zaokrouhlovat noční směnu
                 if (strlen($data['nocniCil']) <> 0) {
-                    $dochazkaOficialni->setUpdateCasOd($data['nocniOd']);
-                    $dochazkaOficialni->setUpdateCasDo($data['nocniDo']);
-                    $dochazkaOficialni->setUpdateCasCil($data['nocniCil']);            
+                    $dochazkaOficialni->setCasOd($data['nocniOd']);
+                    $dochazkaOficialni->setCasDo($data['nocniDo']);
+                    $dochazkaOficialni->setCasCil($data['nocniCil']);            
                     $dochazkaOficialni->zaokrouhliPrichodyDochazky();
                 }        
             

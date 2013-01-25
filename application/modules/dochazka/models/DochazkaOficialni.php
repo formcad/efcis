@@ -70,21 +70,21 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      * docházky
      * @var string 
      */
-    protected $_updateCasOd = null;
+    protected $_casOd = null;
     
     /**
      * Proměnná pro nastavení koncového času, který je použit při zaokrouhlení
      * docházky
      * @var string 
      */
-    protected $_updateCasDo = null;
+    protected $_casDo = null;
     
     /**
      * Proměnná pro nastavení času, na který se zaokrouhluje docházka mezi
      * počátečním a koncovým časem     
      * @var string 
      */
-    protected $_updateCasCil = null;    
+    protected $_casCil = null;    
     
     /**
      * ID průchodu oficiální docházky
@@ -93,22 +93,25 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     protected $_idPruchodu = null;
 
     /**
-     * Proměnná času příchodu použitá při změně záznamu oficiálního průchodu
+     * Proměnná času příchodu použitá při změně záznamu oficiálního průchodu a
+     * při zadávání nového průchodu
      * @var string
      */
-    protected $_updateCasPrichod = null;
+    protected $_casPrichod = null;
     
     /**
-     * Proměnná času odchodu použitá při změně záznamu oficiálního průchodu
+     * Proměnná času odchodu použitá při změně záznamu oficiálního průchodu a
+     * při zadávání nového průchodu
      * @var string
      */
-    protected $_updateCasOdchod = null;
+    protected $_casOdchod = null;
     
     /**
-     * Proměnná data směny použitá při změně záznamu oficiálního průchodu
+     * Proměnná data směny použitá při změně záznamu oficiálního průchodu a
+     * při zadávání nového průchodu
      * @var string
      */
-    protected $_updateDatum = null;
+    protected $_datumSmeny = null;
 
     /**
      * Ověří, zda už má zaměstnanec docházku pro konkrétní měsíc a rok
@@ -196,9 +199,9 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         $data = array(
             'osoba' => $this->_osoba,
             'cip' => $this->_cip,
-            'datum' => $this->_updateDatum,
-            'prichod' => $this->_updateCasPrichod,
-            'odchod' => $this->_updateCasOdchod,
+            'datum' => $this->_datumSmeny,
+            'prichod' => $this->_casPrichod,
+            'odchod' => $this->_casOdchod,
             'zmenil' => $this->_uzivatel                   
         );
         $this->_sqlUlozOficialniPruchod($data);
@@ -557,7 +560,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     
     /**
      * Projede časy oficiální docházky mezi _datumOd a _datumDo, přičemž
-     * příchody mezi _updateCasOd a _updateCasDo změní na hodnotu _updateCasCil
+     * příchody mezi _casOd a _casDo změní na hodnotu _casCil
      */
     public function zaokrouhliPrichodyDochazky()
     {
@@ -572,14 +575,14 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             $datumPrichod = date('Y-m-d',strtotime($pruchod['prichod']));
             $timePrichod = strtotime($pruchod['prichod']);
             
-            $updateOd = strtotime($datumPrichod.' '.$this->_updateCasOd);
-            $updateDo = strtotime($datumPrichod.' '.$this->_updateCasDo);
+            $updateOd = strtotime($datumPrichod.' '.$this->_casOd);
+            $updateDo = strtotime($datumPrichod.' '.$this->_casDo);
                 
             // pokud je čas příchodu mezi limity pro změnu
             if ($timePrichod >= $updateOd and $timePrichod <= $updateDo) {
 
                 // čas změníme
-                $this->_zmenCasPrichodu($pruchod['id'],$datumPrichod.' '.$this->_updateCasCil);
+                $this->_zmenCasPrichodu($pruchod['id'],$datumPrichod.' '.$this->_casCil);
             }                                            
         }
          
@@ -646,9 +649,9 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         $this->_adapter->update(
             'oficialni_pruchody',
             array(
-                'cas_prichod' => $this->_updateCasPrichod,
-                'cas_odchod' => $this->_updateCasOdchod,
-                'datum' => $this->_updateDatum,
+                'cas_prichod' => $this->_casPrichod,
+                'cas_odchod' => $this->_casOdchod,
+                'datum' => $this->_datumSmeny,
                 'id_zmenil' => $this->_uzivatel,
             ),
             array(
@@ -747,30 +750,6 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         $this->_novaOficialniData = $novaOficialniData;
     }
 
-    public function getUpdateCasOd() {
-        return $this->_updateCasOd;
-    }
-
-    public function setUpdateCasOd($updateCasOd) {
-        $this->_updateCasOd = $updateCasOd;
-    }
-
-    public function getUpdateCasDo() {
-        return $this->_updateCasDo;
-    }
-
-    public function setUpdateCasDo($updateCasDo) {
-        $this->_updateCasDo = $updateCasDo;
-    }
-
-    public function getUpdateCasCil() {
-        return $this->_updateCasCil;
-    }
-
-    public function setUpdateCasCil($updateCasCil) {
-        $this->_updateCasCil = $updateCasCil;
-    }
-
     public function getIdPruchodu() {
         return $this->_idPruchodu;
     }
@@ -779,28 +758,52 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         $this->_idPruchodu = $idPruchodu;
     }
     
-    public function getUpdateCasPrichod() {
-        return $this->_updateCasPrichod;
+    public function getCasOd() {
+        return $this->_casOd;
     }
 
-    public function setUpdateCasPrichod($updateCasPrichod) {
-        $this->_updateCasPrichod = $updateCasPrichod;
+    public function setCasOd($casOd) {
+        $this->_casOd = $casOd;
     }
 
-    public function getUpdateCasOdchod() {
-        return $this->_updateCasOdchod;
+    public function getCasDo() {
+        return $this->_casDo;
     }
 
-    public function setUpdateCasOdchod($updateCasOdchod) {
-        $this->_updateCasOdchod = $updateCasOdchod;
+    public function setCasDo($casDo) {
+        $this->_casDo = $casDo;
     }
+
+    public function getCasCil() {
+        return $this->_casCil;
+    }
+
+    public function setCasCil($casCil) {
+        $this->_casCil = $casCil;
+    }    
     
-    public function getUpdateDatum() {
-        return $this->_updateDatum;
+    public function getCasPrichod() {
+        return $this->_casPrichod;
     }
 
-    public function setUpdateDatum($updateDatum) {
-        $this->_updateDatum = $updateDatum;
+    public function setCasPrichod($casPrichod) {
+        $this->_casPrichod = $casPrichod;
+    }
+
+    public function getCasOdchod() {
+        return $this->_casOdchod;
+    }
+
+    public function setCasOdchod($casOdchod) {
+        $this->_casOdchod = $casOdchod;
+    }
+
+    public function getDatumSmeny() {
+        return $this->_datumSmeny;
+    }
+
+    public function setDatumSmeny($datumSmeny) {
+        $this->_datumSmeny = $datumSmeny;
     }
     
 }
