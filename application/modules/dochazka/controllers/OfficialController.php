@@ -404,7 +404,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $id = $this->getRequest()->getParam('id');
 
         $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setMeni(self::$_identity->id);
+        $dochazkaOficialni->setUzivatel(self::$_identity->id);
         $dochazkaOficialni->setIdPruchodu($id);    
         
         $dochazkaOficialni->smazZaznam();        

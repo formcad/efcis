@@ -21,13 +21,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      * ID zaměstnance
      * @var integer 
      */
-    protected $_osoba = null;
-    
-    /**
-     * ID zaměstnance provádějícího změnu záznamu
-     * @var integer 
-     */
-    protected $_meni = null;    
+    protected $_osoba = null; 
     
     /**
      * ID čipu
@@ -673,7 +667,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             'oficialni_pruchody',
             array(
                 'smazano' => true,
-                'id_zmenil' => $this->_meni,
+                'id_zmenil' => $this->_uzivatel,
             ),
             array(
                 'id_zaznamu = ?' => $this->_idPruchodu
@@ -807,14 +801,6 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
 
     public function setUpdateDatum($updateDatum) {
         $this->_updateDatum = $updateDatum;
-    }
-
-    public function getMeni() {
-        return $this->_meni;
-    }
-
-    public function setMeni($meni) {
-        $this->_meni = $meni;
     }
     
 }
