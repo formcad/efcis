@@ -147,7 +147,11 @@ $(document).ready(function() {
                 <td><?php echo $zaznam['typPrace']; ?></td>
                 <td>
                     <a class="zmenaButton"
-                       href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=vyroba">
+                       href="<?php echo $this->url(array('module' => 'vyroba',
+                                                         'controller' => 'zapis',
+                                                         'action' => 'edit-vyroba',
+                                                         'zmena' => $zaznam['id'],
+                                                         'navrat' => 'show-aktualni'),null,true); ?>">
                         Změna
                     </a>                           
                 </td>
@@ -169,7 +173,11 @@ $(document).ready(function() {
                 <td><?php echo $zaznam['typPrace']; ?></td>
                 <td>
                     <a class="zmenaButton"
-                       href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=vyroba">
+                       href="<?php echo $this->url(array('module' => 'vyroba',
+                                                         'controller' => 'zapis',
+                                                         'action' => 'edit-vyroba',
+                                                         'zmena' => $zaznam['id'],
+                                                         'navrat' => 'show-aktualni'),null,true); ?>">
                         Změna
                     </a>                           
                 </td>
@@ -191,7 +199,11 @@ $(document).ready(function() {
                 <td><?php echo $zaznam['typPrace']; ?></td>
                 <td>
                     <a class="zmenaButton"
-                       href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=vyroba">
+                       href="<?php echo $this->url(array('module' => 'vyroba',
+                                                         'controller' => 'zapis',
+                                                         'action' => 'edit-vyroba',
+                                                         'zmena' => $zaznam['id'],
+                                                         'navrat' => 'show-aktualni'),null,true); ?>">
                         Změna
                     </a>                         
                 </td>
@@ -223,7 +235,11 @@ $(document).ready(function() {
             <td><?php echo $zaznam['zdrojDat']; ?></td>
             <td>
                 <a class="zmenaButton"
-                   href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>&amp;uprava_zaznamu=<?php echo $zaznam['id']; ?>&amp;typ_upravy=rezie">
+                   href="<?php echo $this->url(array('module' => 'vyroba',
+                                                     'controller' => 'zapis',
+                                                     'action' => 'edit-rezie',
+                                                     'zmena' => $zaznam['id'],
+                                                     'navrat' => 'show-aktualni'),null,true); ?>">
                     Změna
                 </a>                      
             </td>
@@ -246,7 +262,9 @@ $(document).ready(function() {
 </div>    
 
 <a class="plusButton"
-   href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>">
+   href="<?php echo $this->url(array('module' => 'vyroba',
+                                     'controller' => 'zapis',
+                                     'action' => 'add'),null,true); ?>">
     Zápis času
 </a>
 

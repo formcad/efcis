@@ -31,7 +31,9 @@ $(document).ready(function() {
         </td>
         <td class="horizontal background">
             <a class="plusButton"
-               href="<?php echo $this->oldIsPath();?>/index.php?clanek=zapis_casu&amp;uzivatel=<?php echo $this->idUzivatele; ?>">
+               href="<?php echo $this->url(array('module' => 'vyroba',
+                                                 'controller' => 'zapis',
+                                                 'action' => 'add'),null,true); ?>">
                 Zápis času
             </a>             
         </td>

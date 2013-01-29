@@ -9,13 +9,14 @@
 
 .vyroba-zapisVyrobyDiv {
     margin-right: 20px;
-    min-height: 400px;
+    min-height: 420px;
 }
 
 #div-vyroba-addZapisVyroby div,
 #div-vyroba-addZapisRezie div {
     float: left;
     clear: none;
+    margin-bottom: 20px;
 }
 
 #div-vyroba-hiddenIdNaseptavac {
@@ -27,7 +28,7 @@
     width: 610px;    
     clear: both;
     padding: 10px;
-    margin: 20px 0;  
+    margin: 20px 0;
 }
 
 #div-vyroba-zaznamovyDiv  {

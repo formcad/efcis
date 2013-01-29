@@ -67,7 +67,7 @@ $(document).ready(function() {
         $.ajax({
             async: false,
             type: "POST",
-            url: "<?php //echo $this->url(array('action' => 'ajax-form-vyroba-check'));?>",
+            url: "<?php echo $this->url(array('action' => 'ajax-form-vyroba-check'));?>",
             data: ($(this).serialize()),
             success: function(chyboveHlaseni) {
                 if (chyboveHlaseni.length > 0) {

@@ -1,20 +1,12 @@
-<!-- Nadpis ------------------------------------------------------------------->
-
-<?php $this->title = "Změna časového záznamu"; ?>
-
-<!-- Obsah stránky ------------------------------------------------------------>
+<?php $this->title = "Změna režijního času"; ?>
 
 <script type="text/javascript">
 //<![CDATA[  
 
 $(function() {
 
-    $( "#div-vyroba-addZapis" ).accordion();
     $( "#div-vyroba-zaznamovyDiv").tabs();
-  
 });
-
-
 
 $(document).ready(function() {
     
@@ -54,36 +46,35 @@ $(document).ready(function() {
 //]]>    
 </script>
 
-<div id="div-vyroba-addZapis">
-    <h3><a href="#">Změna režijních časů</a></h3>
-    <div id="div-vyroba-addZapisRezie">
-        <form action="<?php echo $this->rezieForm->getAction(); ?>"
-              method="<?php echo $this->rezieForm->getMethod(); ?>"
-              id="<?php echo $this->rezieForm->getId(); ?>">
-            
-        
-        <div id="vyroba-div-zapisReziePrace"
-             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
-            <ul>
-                <li><a href="">Určení činnosti</a></li>
-            </ul>                
+<div id="div-vyroba-addZapisRezie">
+    <form action="<?php echo $this->rezieForm->getAction(); ?>"
+          method="<?php echo $this->rezieForm->getMethod(); ?>"
+          id="<?php echo $this->rezieForm->getId(); ?>">
+
+
+    <div id="vyroba-div-zapisReziePrace"
+         class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
+        <ul>
+            <li><a href="#tabs-urceni-cinnosti">Určení činnosti</a></li>
+        </ul>   
+        <div id="tabs-urceni-cinnosti">
             <?php echo $this->rezieForm->getDisplayGroup('prace'); ?>       
         </div>
-        <div id="vyroba-div-zapisRezieUkony"
-             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
-            <ul>
-                <li><a href="">Režijní operace</a></li>
-            </ul>  
+    </div>
+    <div id="vyroba-div-zapisRezieUkony"
+         class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
+        <ul>
+            <li><a href="#tabs-rezijni-operace">Režijní operace</a></li>
+        </ul>  
+        <div id="tabs-rezijni-operace">
             <?php echo $this->rezieForm->getDisplayGroup('ukony'); ?>    
         </div>
-        </form>        
     </div>
+    </form>        
 </div>
 
 <div id="div-vyroba-messageDiv"
      class="ui-state-error ui-corner-all">
-
-    
 
 </div>
 
@@ -93,4 +84,4 @@ $(document).ready(function() {
     <p>Vyberte zakázku a následně díl</p>
     <?php echo $this->naseptavacPozice; ?>
     
-</di
+</div>

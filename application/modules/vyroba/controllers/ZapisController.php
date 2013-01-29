@@ -294,6 +294,10 @@ class Vyroba_ZapisController extends Zend_Controller_Action
                 case 'add':
                     $this->_helper->redirector('add','zapis','vyroba',array('display'=>'vyroba'));  
                     break;
+                
+                case 'show-aktualni':
+                    $this->_helper->redirector('show-aktualni','time','vyroba');  
+                    break;
             }
         } 
         // jinak musíme vyplnit formulář
@@ -416,6 +420,10 @@ class Vyroba_ZapisController extends Zend_Controller_Action
                 
                 case 'add':
                     $this->_helper->redirector('add','zapis','vyroba',array('display'=>'rezie'));  
+                    break;
+                
+                case 'show-aktualni':
+                    $this->_helper->redirector('show-aktualni','time','vyroba');  
                     break;
             }                                   
         } 

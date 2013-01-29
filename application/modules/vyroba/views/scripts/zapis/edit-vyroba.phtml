@@ -1,15 +1,10 @@
-<!-- Nadpis ------------------------------------------------------------------->
-
-<?php $this->title = "Změna časového záznamu"; ?>
-
-<!-- Obsah stránky ------------------------------------------------------------>
+<?php $this->title = "Změna výrobního času"; ?>
 
 <script type="text/javascript">
 //<![CDATA[  
 
 /**
  * Do prnvího prázdného ID inputu nakopírujeme získané ID
- * 
  * @return boolean Pokud se nepodařilo vyplnit, vrátí false
  */
 function vyplnId() {
@@ -28,12 +23,8 @@ function vyplnId() {
 
 $(function() {
 
-    $( "#div-vyroba-addZapis" ).accordion();
     $( "#div-vyroba-zaznamovyDiv").tabs();
-  
 });
-
-
 
 $(document).ready(function() {
     
@@ -123,52 +114,53 @@ $(document).ready(function() {
 //]]>    
 </script>
 
-<div id="div-vyroba-addZapis">
-    <h3><a href="#">Změna výrobních časů</a></h3>
     
-    
-    <div id="div-vyroba-addZapisVyroby">
-        <form action="<?php echo $this->vyrobaForm->getAction(); ?>"
-              method="<?php echo $this->vyrobaForm->getMethod(); ?>"
-              id="<?php echo $this->vyrobaForm->getId(); ?>">
-            
-        
-        <div id="vyroba-div-zapisVyrobyDily"
-             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
-            
-            <ul><li><a href="">Identifiátor dílů</a></li></ul>                        
+<div id="div-vyroba-addZapisVyroby">
+    <form action="<?php echo $this->vyrobaForm->getAction(); ?>"
+          method="<?php echo $this->vyrobaForm->getMethod(); ?>"
+          id="<?php echo $this->vyrobaForm->getId(); ?>">
+
+
+    <div id="vyroba-div-zapisVyrobyDily"
+         class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
+
+        <ul>
+            <li><a href="#tabs-identifikator-dilu">Identifiátor dílů</a></li>
+        </ul>        
+        <div id="tabs-identifikator-dilu">
             <?php echo $this->vyrobaForm->getDisplayGroup('dily'); ?>       
         </div>
-        <div id="vyroba-div-zapisVyrobyPrace"
-             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
-            <ul>
-                <li><a href="">Určení činnosti</a></li>
-            </ul>                
+    </div>
+    <div id="vyroba-div-zapisVyrobyPrace"
+         class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">            
+        <ul>
+            <li><a href="#tabs-urceni-cinnosti">Určení činnosti</a></li>
+        </ul>                
+        <div id="tabs-urceni-cinnosti">
             <?php echo $this->vyrobaForm->getDisplayGroup('prace'); ?>       
         </div>
-        <div id="vyroba-div-zapisVyrobyUkony"
-             class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
-            <ul>
-                <li><a href="">Výrobní operace</a></li>
-            </ul>  
+    </div>
+    <div id="vyroba-div-zapisVyrobyUkony"
+         class="ui-widget ui-widget-content ui-corner-all ui-tabs vyroba-zapisVyrobyDiv">
+        <ul>
+            <li><a href="#tabs-vyrobni-operace">Výrobní operace</a></li>
+        </ul>  
+        <div id="tabs-vyrobni-operace">
             <?php echo $this->vyrobaForm->getDisplayGroup('ukony'); ?>    
         </div>
-        </form>
     </div>
+    </form>
 </div>
 
 <div id="div-vyroba-messageDiv"
      class="ui-state-error ui-corner-all">
-
-    
 
 </div>
 
 <div id="div-vyroba-hiddenIdNaseptavac"
      title="Vyhledání ID dílu">
       
-    <p>Vyberte zakázku a následně díl</p>
-    
+    <p>Vyberte zakázku a následně díl</p>   
     <?php echo $this->naseptavacPozice; ?>
   
 </div>
