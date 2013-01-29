@@ -30,7 +30,6 @@ $(document).ready(function() {
 </script>
 
  
-
 <div>
     <h3>Výběr údajů</h3>  
     <?php echo $this->form; ?>
@@ -78,6 +77,13 @@ $(document).ready(function() {
         Zapsané režie
     </a>          
 
+    <a href="<?php echo $this->url(array('module' => 'vyroba',
+                                         'controller' => 'zapis',
+                                         'action' => 'add'),null,true); ?>"
+       class="dochazka-arrowButton">
+        Zápis výrobních časů
+    </a>   
+    
     <h3>Oficiální docházka</h3>      
     
     <div class="ui-widget infoDiv">
