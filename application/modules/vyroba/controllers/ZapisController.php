@@ -45,7 +45,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         
         $zamestnanci = new Application_Model_UserList();
         $zamestnanci->setId(self::$_identity->id);
-        $zamestnanci->setRole(self::$_identity->roles['default']);      
+        $zamestnanci->setRole(self::$_identity->roles['vyroba']);      
         
         // pro forumuláře potřebujeme pole zaměstnanců
         $poleUzivatelu = $zamestnanci->getVyrobaUsers();
@@ -228,7 +228,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         
         $zamestnanci = new Application_Model_UserList();
         $zamestnanci->setId(self::$_identity->id);
-        $zamestnanci->setRole(self::$_identity->roles['default']);      
+        $zamestnanci->setRole(self::$_identity->roles['vyroba']);      
         
         // pro forumuláře potřebujeme pole zaměstnanců
         $poleUzivatelu = $zamestnanci->getVyrobaUsers();
@@ -358,7 +358,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         
         $zamestnanci = new Application_Model_UserList();
         $zamestnanci->setId(self::$_identity->id);
-        $zamestnanci->setRole(self::$_identity->roles['default']);      
+        $zamestnanci->setRole(self::$_identity->roles['vyroba']);      
         
         // pro forumuláře potřebujeme pole zaměstnanců
         $poleRezie = $zamestnanci->getRezieUsers();
@@ -628,7 +628,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
     protected function _initNaseptavacForm($idPolozky)
     {
         $zakazky = new Application_Model_PolozkyList();
-        $zakazky->setRole(self::$_identity->roles['default']);     
+        $zakazky->setRole(self::$_identity->roles['vyroba']);     
         $poleZakazek = $zakazky->getAktivniZakazky();
         
         switch ($idPolozky) {
@@ -637,7 +637,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         }        
         
         $pozice = new Application_Model_PoziceList();
-        $pozice->setRole(self::$_identity->roles['default']);
+        $pozice->setRole(self::$_identity->roles['vyroba']);
         $pozice->setIdPolozky($id);
         
         Vyroba_Form_Naseptavac::$poleZakazek = $poleZakazek;    
