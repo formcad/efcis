@@ -27,22 +27,6 @@ function vyplnId() {
     return false;
 }
 
-$(function() {
-    var display = '<?php echo $this->display; ?>';
-    switch (display) {
-        case 'vyroba':
-            $( "#div-vyroba-addZapis" ).accordion();
-            $( "#div-vyroba-zaznamovyDiv").tabs();
-            break;
-        case 'rezie':
-            $( "#div-vyroba-addZapis" ).accordion({ active: 1 });
-            $( "#div-vyroba-zaznamovyDiv").tabs({ selected: 1 });
-            break;            
-    }   
-});
-
-
-
 $(document).ready(function() {
     
     $('a.odkaz').button();
@@ -55,6 +39,18 @@ $(document).ready(function() {
     $("#vyroba-div-zapisVyrobyUkony").tabs();     
     $("#vyroba-div-zapisReziePrace").tabs();
     $("#vyroba-div-zapisRezieUkony").tabs();
+    
+    var display = '<?php echo $this->display; ?>';
+    switch (display) {
+        case 'vyroba':
+            $( "#div-vyroba-addZapis" ).accordion();
+            $( "#div-vyroba-zaznamovyDiv").tabs();
+            break;
+        case 'rezie':
+            $( "#div-vyroba-addZapis" ).accordion({ active: 1 });
+            $( "#div-vyroba-zaznamovyDiv").tabs({ active: 1 });
+            break;            
+    }       
     
     /**
      * Odeslání výrobního formuláře - provedeme validaci předem, synchronně,
