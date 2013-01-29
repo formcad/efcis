@@ -69,7 +69,8 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
                     'nazevPozice' => $zaznam['nazev'],
                     'idPozice' => $zaznam['id_pozice'],
                     'technologie' => $zaznam['nazev_technologie'],
-                    'casStart' => $zaznam['cas']
+                    'casStart' => $zaznam['cas'],
+                    'dateTimeStart' => date('d. m. Y H:i',strtotime($zaznam['cas']))
                 );
             }
         }
