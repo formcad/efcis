@@ -784,7 +784,7 @@ class Dochazka_EditController extends Zend_Controller_Action
 
                         $preruseni = new Dochazka_Model_PreruseniDochazky();
                         
-                        $preruseni->setIdTypuPreruseni($request->getPost('typ'));
+                        $preruseni->setIdPreruseni($request->getPost('typ'));
                         $preruseni->setDelka($filter->filter($request->getPost('delkaPreruseni')));
                         $preruseni->setIdCipu(self::$_session->idCipu);
                         $preruseni->setIdOsoby(self::$_session->idOsoby);
