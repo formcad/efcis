@@ -95,7 +95,9 @@ $(document).ready(function() {
     $("#naseptavacZakazka").change(function(){
         $.ajax({
             type: "POST",
-            url: "<?php echo $this->url(array('action' => 'ajax-naseptavac'));?>",
+            url: "<?php echo $this->url(array('module' => 'default',
+                                              'controller' => 'employee',
+                                              'action' => 'ajax-naseptavac'));?>",
             data: ({id: $("#naseptavacZakazka").val()}),
             success: function(element) {
 

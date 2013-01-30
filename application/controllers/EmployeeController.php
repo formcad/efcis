@@ -81,6 +81,11 @@ class EmployeeController extends Zend_Controller_Action
 
         $prehledovyFrom = new Application_Form_HledaniPozice();
 
+        /**** Našeptávač ID pozice při vybraném názvu pozice ******************/
+        
+        $naseptavacForm = $this->_helper->
+            naseptavacPozice(null,self::$_identity->roles['vyroba']);
+        
         /**** Data do view ****************************************************/
         
         $this->view->idUzivatele = self::$_identity->id;
@@ -88,6 +93,7 @@ class EmployeeController extends Zend_Controller_Action
         $this->view->limitForm = $form;
         $this->view->hledaciForm = $hledaciForm;
         $this->view->prehledovyFrom = $prehledovyFrom;
+        $this->view->naseptavacForm = $naseptavacForm;
         $this->view->pracovniZaznamy = $aktualniPrace;
         $this->view->poznamky = $nedavnePoznamky;
     }
@@ -176,7 +182,17 @@ class EmployeeController extends Zend_Controller_Action
         
         }
     }
-
+    
+    /**
+     * Doplnění seznamu pozic do formuláře našeptávače pro zjištění ID pozice
+     */
+    public function ajaxNaseptavacAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();     
+        
+        $idPolozky = $this->_getParam('id');
+        $this->view->form = $this->_helper->naseptavacPozice($idPolozky,self::$_identity->roles['vyroba']);
+    }    
 
 }
 

@@ -192,7 +192,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         $this->view->vyrobniZaznamy = $vyrobniZaznamy;
         $this->view->rezijniZaznamy = $rezijniZaznamy;
         $this->view->naseptavacPozice = $this->_helper->naseptavacPozice(null,self::$_identity->roles['vyroba']);
-        
+              
         // návratová stránka je závislá na uživatelském oprávnění
         if (self::$_identity->roles['default'] == 'employee') {
             $this->view->leftNavigation = array(
@@ -618,18 +618,6 @@ class Vyroba_ZapisController extends Zend_Controller_Action
             return $time;
         } 
     }
-
-    /**
-     * Doplnění seznamu pozic do formuláře našeptávače pro zjištění ID pozice
-     */
-    public function ajaxNaseptavacAction()
-    {
-        $this->_helper->getHelper('layout')->disableLayout();     
-        
-        $idPolozky = $this->_getParam('id');
-        $this->view->form = $this->_helper->naseptavacPozice($idPolozky,self::$_identity->roles['vyroba']);
-    }
-
 
     /**
      * Ajaxové přidání řádku pro ID pozice do výrobního formuláře
