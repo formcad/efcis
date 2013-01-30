@@ -6,7 +6,7 @@ class Application_Form_HledaniVyrazu extends Zend_Form
     public function init()
     {        
         $this->setName("login");
-        $this->setAttrib("id", "form-hledani-pozic");  
+        $this->setAttrib("id", "form-hledani-vyrazu");  
 
         $text = new Zend_Form_Element_Text('hledanyVyraz');
         $text->setRequired(true)
