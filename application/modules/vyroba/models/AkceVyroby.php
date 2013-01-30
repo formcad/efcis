@@ -88,19 +88,21 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
         
         $select = $this->_adapter->select()
             ->from( array('o' => 'odpracovane_casy'),
-                    array('id_zaznamu','time_start','time_end','time_update'))
+                    array('id'=>'id_zaznamu', 'timeStart'=>'time_start',
+                        'timeEnd'=>'time_end', 'timeUpdate'=>'time_update',
+                        'idUpravil'=>'id_naposled_upravil'))
             ->join( array('pz' => 'pozice'),
                     'o.id_pozice = pz.id_pozice',
-                    array('id_pozice','nazev') )    
+                    array('idPozice'=>'id_pozice', 'nazevPozice'=>'nazev'))    
             ->join( array('pl' => 'polozky'),
                     'pz.id_polozky = pl.id_polozky',
-                    array('cislo_zakazky') )        
+                    array('cisloZakazky'=>'cislo_zakazky') )        
             ->join( array('t' => 'technologie'),
                     't.cislo_technologie = o.cislo_technologie',
-                    array('nazev_technologie') ) 
+                    array('technologie'=>'nazev_technologie') ) 
             ->join( array('tp' => 'typy_prace'),
                     'tp.id_typu = o.id_typu',
-                    array('id_typu','zkratka'))
+                    array('idPrace'=>'id_typu', 'zkratkaPrace'=>'zkratka'))
             ->joinLeft( array('os' => 'osoby'),
                         'o.id_naposled_upravil = os.id_osoby',
                         array('jmeno','prijmeni'))
@@ -128,45 +130,43 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
             
             foreach ($data as $zaznam) {
                 
-                if ($zaznam['timp_update'] !== null) {
-                    $casUpdate = date('d. m. Y, H:i',strtotime($zaznam['time_update']));
+                if ($zaznam['timeUpdate'] !== null) {
+                    $casUpdate = date('d. m. Y, H:i',strtotime($zaznam['timeUpdate']));
                 } else {
                     $casUpdate = null;       
                 }
                                 
-                if ($zaznam['id_naposled_upravil'] !== null) {
-                    $zdrojDat  = $zaznam['jmeno'];
-                    $zdrojDat .= ' ';
-                    $zdrojDat .= $zaznam['prijmeni'];        
+                if ($zaznam['idUpravil'] !== null) {
+                    $zdrojDat  = $zaznam['jmeno'].' '.$zaznam['prijmeni'];
                     $tinyCasStart = '';
                 } else {
                     $zdrojDat = 'Čárový kód';
-                    $tinyCasStart = date('H.i',strtotime($zaznam['time_start']));
+                    $tinyCasStart = date('H.i',strtotime($zaznam['timeStart']));
                 }
                 
                 if ($tinyCasStart == '00.00') {
                     $tinyCasStart = '';
                 }                
                 
-                $trvani = strtotime($zaznam['time_end']) - strtotime($zaznam['time_start']);
+                $trvani = strtotime($zaznam['timeEnd']) - strtotime($zaznam['timeStart']);
                 $roundTrvani = round($trvani/3600, 2);
                 
                 $akce[] = array (
-                    'id' => $zaznam['id_zaznamu'],
-                    'casStart' => date('d. m. Y, H.i',strtotime($zaznam['time_start'])),
+                    'id' => $zaznam['id'],
+                    'casStart' => date('d. m. Y, H.i',strtotime($zaznam['timeStart'])),
                     'tinyCasStart' => $tinyCasStart,
-                    'denStart' => date('d. m. Y',strtotime($zaznam['time_start'])),
-                    'casEnd' => date('d. m. Y, H.i',strtotime($zaznam['time_end'])),
+                    'denStart' => date('d. m. Y',strtotime($zaznam['timeStart'])),
+                    'casEnd' => date('d. m. Y, H.i',strtotime($zaznam['timeEnd'])),
                     'casUpdate' => $casUpdate,
-                    'timestampStart' => $zaznam['time_start'],
-                    'timestampEnd' => $zaznam['time_end'],
+                    'timestampStart' => $zaznam['timeStart'],
+                    'timestampEnd' => $zaznam['timeEnd'],
                     'trvani' => $roundTrvani,
-                    'typPrace' => $zaznam['zkratka'],
-                    'idTypuPrace' => $zaznam['id_typu'],
-                    'idPozice' => $zaznam['id_pozice'],
-                    'nazevPozcie' => $zaznam['nazev'],
-                    'cisloZakazky' => $zaznam['cislo_zakazky'],
-                    'technologie' => $zaznam['nazev_technologie'],
+                    'typPrace' => $zaznam['zkratkaPrace'],
+                    'idTypuPrace' => $zaznam['idPrace'],
+                    'idPozice' => $zaznam['idPozice'],
+                    'nazevPozcie' => $zaznam['nazevPozice'],
+                    'cisloZakazky' => $zaznam['cisloZakazky'],
+                    'technologie' => $zaznam['technologie'],
                     'zdrojDat' => $zdrojDat                    
                 );                
             }
@@ -177,8 +177,7 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
     }
     
     /**
-     * Zpracování pole výrobních akcí filtrovaného na základě ručního nebo 
-     * automatického zápisu - výstupem je celkový součet práce
+     * Zpracování pole výrobních akcí - výstupem je celkový součet práce
      * 
      * @param array $poleAkci 
      * @return float 
