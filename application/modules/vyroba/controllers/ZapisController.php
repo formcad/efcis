@@ -191,7 +191,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         $this->view->display = $display;
         $this->view->vyrobniZaznamy = $vyrobniZaznamy;
         $this->view->rezijniZaznamy = $rezijniZaznamy;
-        $this->view->naseptavacPozice = $this->_initNaseptavacForm(null);
+        $this->view->naseptavacPozice = $this->_helper->naseptavacPozice(null,self::$_identity->roles['vyroba']);
         
         // návratová stránka je závislá na uživatelském oprávnění
         if (self::$_identity->roles['default'] == 'employee') {
@@ -321,7 +321,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         /**** DATA DO VIEW ****************************************************/ 
          
         $this->view->vyrobaForm = $vyrobaForm;
-        $this->view->naseptavacPozice = $this->_initNaseptavacForm(null);
+        $this->view->naseptavacPozice = $this->_helper->naseptavacPozice(null,self::$_identity->roles['vyroba']);
          
         // návratová stránka je závislá na uživatelském oprávnění
         if (self::$_identity->roles['default'] == 'employee') {
@@ -620,34 +620,6 @@ class Vyroba_ZapisController extends Zend_Controller_Action
     }
 
     /**
-     * Získání formuláře našeptávače s defaultně zadaným ID položky
-     * 
-     * @param integer|null $idPolozky
-     * @return \Vyroba_Form_Naseptavac
-     */
-    protected function _initNaseptavacForm($idPolozky)
-    {
-        $zakazky = new Application_Model_PolozkyList();
-        $zakazky->setRole(self::$_identity->roles['vyroba']);     
-        $poleZakazek = $zakazky->getAktivniZakazky();
-        
-        switch ($idPolozky) {
-            case null: $id = $poleZakazek[0]['id']; break;
-            default: $id = $idPolozky;
-        }        
-        
-        $pozice = new Application_Model_PoziceList();
-        $pozice->setRole(self::$_identity->roles['vyroba']);
-        $pozice->setIdPolozky($id);
-        
-        Vyroba_Form_Naseptavac::$poleZakazek = $poleZakazek;    
-        Vyroba_Form_Naseptavac::$polePozic = $pozice->getPlnohodnotnePozice();
-        Vyroba_Form_Naseptavac::$idPolozky = $id;
-        
-        return new Vyroba_Form_Naseptavac;
-    }
-    
-    /**
      * Doplnění seznamu pozic do formuláře našeptávače pro zjištění ID pozice
      */
     public function ajaxNaseptavacAction()
@@ -655,7 +627,7 @@ class Vyroba_ZapisController extends Zend_Controller_Action
         $this->_helper->getHelper('layout')->disableLayout();     
         
         $idPolozky = $this->_getParam('id');
-        $this->view->form = $this->_initNaseptavacForm($idPolozky);
+        $this->view->form = $this->_helper->naseptavacPozice($idPolozky,self::$_identity->roles['vyroba']);
     }
 
 
