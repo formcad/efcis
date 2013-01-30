@@ -29,11 +29,11 @@
     text-align: right;
 }
 
-#form-hledani-pozic input[type="text"] {
+#form-hledaniPozice input[type="text"] {
     width: 195px;
 }
 
-#form-hledani-pozic button {
+#form-hledaniPozice button {
     width: 200px;
 }
 
