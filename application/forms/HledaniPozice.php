@@ -16,8 +16,15 @@ class Application_Form_HledaniPozice extends Zend_Form
         $this->setMethod('post');
         $this->setAction($action);  
 
+        $pozice = new Zend_Form_Element_Button('najdiPozici');
+        $pozice->setRequired(true)
+            ->setAttrib('id','form-hledani-pozic-najdiPozici')
+            ->setIgnore(true)
+            ->setLabel('Neznám ID pozice');
+        
         $text = new Zend_Form_Element_Text('hledanyVyraz');
         $text->setRequired(true)
+            ->setAttrib('id','form-hledani-pozic-hledanyVyraz')
             ->addFilters(array('StringTrim'))
             ->addValidator(new Zend_Validate_NotEmpty);
         
@@ -26,7 +33,7 @@ class Application_Form_HledaniPozice extends Zend_Form
             ->setIgnore(true)
             ->setLabel('Najít');
         
-        $this->addElements(array($text,$button));
+        $this->addElements(array($pozice,$text,$button));
 
     }
 }
