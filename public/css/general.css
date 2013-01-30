@@ -111,7 +111,7 @@ div .nostyle {
     float: left; margin-right: .3em;
 }
 
-/**** FORMULÁŘE ***************************************************************/
+/**** OBECNÉ FORMULÁŘE ********************************************************/
 
 form dt {    
     display: block;
@@ -132,6 +132,13 @@ form ul.errors {
     padding-left: 10px;
     float: right;
     color: red;
+}
+
+/**** FORMULÁŘE POUŽITÉ NA VÍCE MÍSTECH EFICSu ********************************/
+
+#form-naseptavacZakazekForm label {
+    width: 70px;
+    display: inline-block;
 }
 
 /**** TABULKY *****************************************************************/

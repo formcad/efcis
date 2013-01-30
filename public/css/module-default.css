@@ -8,7 +8,8 @@
     width: 805px;
 }
 
-#default-hledaniPozic-vysledek {
+#default-hledaniPozic-vysledek,
+#default-employee-hiddenIdNaseptavac {
     display: none;
 }
 
@@ -26,6 +27,14 @@
 #form-passwordChange dt {
     width: 130px;
     text-align: right;
+}
+
+#form-hledani-pozic input[type="text"] {
+    width: 195px;
+}
+
+#form-hledani-pozic button {
+    width: 200px;
 }
 
 /**** TABULKY *****************************************************************/
