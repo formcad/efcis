@@ -7,6 +7,39 @@
 
 <script type="text/javascript">
 //<![CDATA[    
+
+/**
+ * Vyhledání pozice a zobrazení výsledků v modálním dialogovém okně
+ */
+function hledejPozici() {
+    // vymazání starých záznamů
+    $("#default-hledaniPozic-vysledek").html('');
+
+    var nazevDilu = $("#hledanyVyraz").val();
+ 
+    $.ajax({
+        url:   "<?php echo $this->url(array('module'=>'vyroba','controller'=>'pozice','action'=>'ajax-hledani-pozice')); ?>",
+        data:  ({nazevDilu: nazevDilu}),
+        type:  "POST",
+        success: function(returnData){
+            $("#default-hledaniPozic-vysledek").html(returnData);               
+        }
+    });
+ 
+    $("#hledanyVyraz").html(nazevDilu);
+    $("#default-hledaniPozic-vysledek").dialog({
+        modal: true,
+        width: 900,
+        height: 800,
+        buttons: {
+            "Zavřít": function() {
+                $( this ).dialog( "close" );
+            }
+        }     
+    });    
+} 
+
+
 $(document).ready(function() {
     
     $("button").button();
@@ -75,30 +108,11 @@ $(document).ready(function() {
     
     /**** Vyhledávání pozic podle názvů ***************************************/
     
-    $("#vyhledej").click(function() {
-    
-       // vymazání starých záznamů
-       $("#default-hledaniPozic-vysledek").html('');
-    
-       var nazevDilu = $("#hledanyVyraz").val();
-
-       $.ajax({
-            url:   "<?php echo $this->url(array('module'=>'vyroba','controller'=>'pozice','action'=>'ajax-hledani-pozice')); ?>",
-            data:  ({nazevDilu: nazevDilu}),
-            type:  "POST",
-            success: function(returnData){
-                $("#default-hledaniPozic-vysledek").html(returnData);               
-            }
-        });
-
-        $("#hledanyVyraz").html(nazevDilu);
-        $("#default-hledaniPozic-vysledek").dialog({
-            modal: true,
-            width: 900,
-            height: 600
-        });    
-    
+    $('#form-hledani-pozic').submit(function(){
+        hledejPozici();
+        return false;
     });
+
 });
 //]]>    
 </script>
@@ -360,7 +374,7 @@ $(document).ready(function() {
     </div>
     
     <div id="default-hledaniPozic-vysledek"
-         title="Výsledek hledání">
+         title="Výsledky hledání">
         
     </div>
     

@@ -13,9 +13,8 @@ class Application_Form_HledaniVyrazu extends Zend_Form
             ->addFilters(array('StringTrim'))
             ->addValidator(new Zend_Validate_NotEmpty);
         
-        $button = new Zend_Form_Element_Button('vyhledej');
-        $button->setRequired(true)
-            ->setLabel('Najít');
+        $button = new Zend_Form_Element_Submit('vyhledej');
+        $button->setLabel('Najít');
         
         $this->addElements(array($text,$button));
 
