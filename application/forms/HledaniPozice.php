@@ -12,19 +12,19 @@ class Application_Form_HledaniPozice extends Zend_Form
                             null, true);  
         
         $this->setName("login");
-        $this->setAttrib("id", "form-hledani-pozic");  
+        $this->setAttrib("id", "form-hledaniPozice");  
         $this->setMethod('post');
         $this->setAction($action);  
 
         $pozice = new Zend_Form_Element_Button('najdiPozici');
         $pozice->setRequired(true)
-            ->setAttrib('id','form-hledani-pozic-najdiPozici')
+            ->setAttrib('id','form-hledaniPozice-najdiPozici')
             ->setIgnore(true)
             ->setLabel('Neznám ID pozice');
         
         $text = new Zend_Form_Element_Text('hledanyVyraz');
         $text->setRequired(true)
-            ->setAttrib('id','form-hledani-pozic-hledanyVyraz')
+            ->setAttrib('id','form-hledaniPozice-hledanyVyraz')
             ->addFilters(array('StringTrim'))
             ->addValidator(new Zend_Validate_NotEmpty);
         
