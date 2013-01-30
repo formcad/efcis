@@ -183,17 +183,22 @@ class Vyroba_TimeController extends Zend_Controller_Action
             $poleStandardni = array();            
             $poleDvoustroj = array();
             
-            foreach ($poleAktualni as $zaznam) {
-                switch ($zaznam['idTypuPrace']) {
-                    case 1: $poleStandardni[] = $zaznam; break;
-                    case 2: $poleDvoustroj[] = $zaznam;  break;
-                }                
+            if (!empty($poleAktualni)) {
+                foreach ($poleAktualni as $zaznam) {
+                    switch ($zaznam['idTypuPrace']) {
+                        case 1: $poleStandardni[] = $zaznam; break;
+                        case 2: $poleDvoustroj[] = $zaznam;  break;
+                    }                
+                }
+                $sumaStandardni = $vyroba->sumaVyrobnichAkci($poleStandardni);
+                $sumaDvoustroj  = $vyroba->sumaVyrobnichAkci($poleDvoustroj);                                    
+            } 
+            else {
+                $sumaStandardni = 0;
+                $sumaDvoustroj  = 0;                                   
             }
-            
-            $sumaStandardni = $vyroba->sumaVyrobnichAkci($poleStandardni);
-            $sumaDvoustroj  = $vyroba->sumaVyrobnichAkci($poleDvoustroj);           
-            $sumaAktualni = $sumaStandardni + $sumaDvoustroj;
- 
+            $sumaAktualni = $sumaStandardni + $sumaDvoustroj;       
+
             // k celkovým výrobním časům musíme připočítat časy za dobu, kdy 
             // není uložená docházka
             $poleZaznamu[0]['sumaVyroby'] += round($sumaAktualni,2);            
