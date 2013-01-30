@@ -3,7 +3,7 @@
 /**
  * Formulář pro vyhledání zakázky a pozice
  */
-class Vyroba_Form_Naseptavac extends Zend_Form
+class Application_Form_Naseptavac extends Zend_Form
 {
     /**
      * Pole zakázek
