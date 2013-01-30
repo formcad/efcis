@@ -178,12 +178,29 @@ class Vyroba_TimeController extends Zend_Controller_Action
             $vyroba->setZapis('automaticky');
         
             $poleAktualni = $vyroba->getAkce();
-            $sumaAktualni = $vyroba->sumaVyrobnichAkci($poleAktualni);
+                      
+            // aktuální záznamy roztřídíme na standardní a dvoustrojové
+            $poleStandardni = array();            
+            $poleDvoustroj = array();
             
-            // k celkovému času výroby musíme připočítat čas neuložené docházky
+            foreach ($poleAktualni as $zaznam) {
+                switch ($zaznam['idTypuPrace']) {
+                    case 1: $poleStandardni[] = $zaznam; break;
+                    case 2: $poleDvoustroj[] = $zaznam;  break;
+                }                
+            }
+            
+            $sumaStandardni = $vyroba->sumaVyrobnichAkci($poleStandardni);
+            $sumaDvoustroj  = $vyroba->sumaVyrobnichAkci($poleDvoustroj);           
+            $sumaAktualni = $sumaStandardni + $sumaDvoustroj;
+ 
+            // k celkovým výrobním časům musíme připočítat časy za dobu, kdy 
+            // není uložená docházka
             $poleZaznamu[0]['sumaVyroby'] += round($sumaAktualni,2);            
-            $poleZaznamu[0]['sumaPrace'] += round($sumaAktualni,2);                        
-                
+            $poleZaznamu[0]['sumaPrace']  += round($sumaAktualni,2);                        
+            $poleZaznamu[0]['sumaStandardni'] += round($sumaStandardni,2);
+            $poleZaznamu[0]['sumaDvoustroj']  += round($sumaDvoustroj,2);
+            
         }
                 
         /**** DATA DO VIEW ****************************************************/
