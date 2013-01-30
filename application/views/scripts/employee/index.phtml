@@ -9,13 +9,15 @@
 //<![CDATA[    
 
 /**
- * Vyhledání pozice a zobrazení výsledků v modálním dialogovém okně
+ * Vyhledání pozice podle zadaného názvu a zobrazení výsledků v modálním
+ * dialogovém okně
  */
 function hledejPozici() {
+    
     // vymazání starých záznamů
     $("#default-hledaniPozic-vysledek").html('');
 
-    var nazevDilu = $("#hledanyVyraz").val();
+    var nazevDilu = $("#form-hledaniVyrazu-hledanyVyraz").val();
  
     $.ajax({
         url:   "<?php echo $this->url(array('module'=>'vyroba','controller'=>'pozice','action'=>'ajax-hledani-pozice')); ?>",
@@ -26,7 +28,6 @@ function hledejPozici() {
         }
     });
  
-    $("#hledanyVyraz").html(nazevDilu);
     $("#default-hledaniPozic-vysledek").dialog({
         modal: true,
         width: 900,
@@ -38,7 +39,6 @@ function hledejPozici() {
         }     
     });    
 } 
-
 
 $(document).ready(function() {
     
@@ -108,10 +108,55 @@ $(document).ready(function() {
     
     /**** Vyhledávání pozic podle názvů ***************************************/
     
-    $('#form-hledani-pozic').submit(function(){
+    $('#form-hledaniVyrazu').submit(function(){
         hledejPozici();
         return false;
     });
+    
+    /**** Vyhledávání podrobností o výrobě pozice *****************************/
+    
+    $('#form-hledaniPozice-najdiPozici').click(function(){
+        
+        $("#default-employee-hiddenIdNaseptavac").dialog({
+            modal: true,
+            width: 500,
+            height: 350,
+            buttons: {
+                "Vyplnit ID": function() {                    
+                    $('#form-hledaniPozice-hledanyVyraz').val($("#naspetavacPozice").val());                    
+                    $( this ).dialog( "close" );
+                },                
+                "Zrušit": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        });            
+       
+    });
+
+    /**
+     * Funkce slouží k obsluze akce při změně zakázky v našeptávači a je
+     * redundatně napsaná v application\modules\vyroba\views\scripts\zapis\add.phtml
+     * a v application\modules\vyroba\views\scripts\zapis\edit-vyroba.phtml
+     */
+    $("#naseptavacZakazka").change(function(){
+        $.ajax({
+            type: "POST",
+            url: "<?php echo $this->url(array('module' => 'default',
+                                              'controller' => 'employee',
+                                              'action' => 'ajax-naseptavac'));?>",
+            data: ({id: $("#naseptavacZakazka").val()}),
+            success: function(element) {
+
+                // smažeme starý výběr dílů
+                $("#naspetavacPozice-element").remove();           
+                $("#naspetavacPozice-label").remove();
+
+                // přidáme nový výběr dílů
+                $("#naseptavacZakazka-element").after(element);
+            }
+        });        
+    }); 
 
 });
 //]]>    
@@ -383,7 +428,7 @@ $(document).ready(function() {
     <div id="default-employee-prehledOVyrobe">
         
         <p>
-            Zadejte ID číslo dílu, u kterého chcete zobrazit přehled výrobních
+            Zadejte ID číslo pozice, u kteréh chcete zobrazit přehled výrobních
             časů.
         </p>        
         <?php echo $this->prehledovyFrom; ?>
@@ -408,5 +453,16 @@ $(document).ready(function() {
     
         <div style="clear: both;"></div>
     </div>
+</div>
+
+<!-- Skrytý DIV pro vyhledávání pozic ----------------------------------------->
+
+<div id="default-employee-hiddenIdNaseptavac"
+     title="Vyhledání ID dílu">
+    
+    <p>Vyberte zakázku a následně díl</p>
+    
+    <?php echo $this->naseptavacForm; ?>
+    
 </div>
 
