@@ -22,7 +22,8 @@ class Fc_Controller_Action_Helper_IntegrityAdd
      * Přiřadí záznam ze souboru integrity do pole záznamů. Předpokládá se, že 
      * počet záznamů v obou polích je sejný
      * 
-     * @param array $data pole dat
+     * @param  array $pole
+     * @param  array $souborIntegrity
      * @return array pole s hodnotami, zda data každého jednoho dne jsou v pořádku nebo ne
      */
     public function integrityAdd($poleZaznamu, $souborIntegrity) 

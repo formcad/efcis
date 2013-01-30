@@ -10,8 +10,7 @@ class Fc_Controller_Action_Helper_DateAdd
     /**
      * Strategy pattern: call helper as broker method
      *
-     * @param  array $pole
-     * @param  array $souborIntegrity
+     * @param  array $poleZaznamu
      * @return array
      */ 
     public function direct($poleZaznamu) 
@@ -23,8 +22,8 @@ class Fc_Controller_Action_Helper_DateAdd
      * Přiřadí záznam ze souboru integrity do pole záznamů. Předpokládá se, že 
      * počet záznamů v obou polích je sejný
      * 
-     * @param array $data pole dat
-     * @return array pole s hodnotami, zda data každého jednoho dne jsou v pořádku nebo ne
+     * @param  array $poleZaznamu
+     * @return array
      */
     public function dateAdd($poleZaznamu) 
     {              
