@@ -33,7 +33,7 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
     /**
      * Získání režijních akcí na základě vstupních kritérií
      * 
-     * @return array
+     * @return array/null
      */
     public function getAkce() 
     {
@@ -41,60 +41,63 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
         
         $select = $this->_adapter->select()
             ->from( array('o' => 'odpracovane_rezie'),
-                    array('id_zaznamu','time_start','time_end','time_update','poznamka'))                   
+                    array('id'=>'id_zaznamu', 'timeStart'=>'time_start',
+                        'timeEnd'=>'time_end', 'timeUpdate'=>'time_update',
+                        'poznamka', 'idUpravil'=>'id_naposled_upravil'))                   
             ->join( array('t' => 'rezijni_technologie'),
                     't.id_operace = o.id_operace',
-                    array('nazev_operace') ) 
+                    array('operace'=>'nazev_operace')) 
             ->joinLeft( array('os' => 'osoby'),
-                        'o.id_naposled_upravil = os.id_osoby',
-                        array('jmeno','prijmeni'))
+                    'o.id_naposled_upravil = os.id_osoby',
+                    array('jmeno','prijmeni'))
             ->where( 'o.time_start >= ?', $this->_dateFrom)
             ->where( 'o.time_end <= ?', $this->_dateTo)
             ->where( 'o.id_osoby = ?', $this->_idUser)
-            ->order( array('time_start') );        
+            ->order( array('time_start'));        
                         
         $data = $this->_adapter->fetchAll($select);        
       
-        if (!empty($data)) {
+        if (empty($data)) {
+            
+            return null;
+        }
+        else {
             
             foreach ($data as $zaznam) {
                  
-                if ($zaznam['time_update'] !== null) {
-                    $casUpdate = date('d. m. Y, H:i',strtotime($zaznam['time_update']));
+                if ($zaznam['timeUpdate'] !== null) {
+                    $casUpdate = date('d. m. Y, H:i',strtotime($zaznam['timeUpdate']));
                 } else {
                     $casUpdate = null;       
                 }
                                 
-                if ($zaznam['id_naposled_upravil'] !== null) {
-                    $zdrojDat  = $zaznam['jmeno'];
-                    $zdrojDat .= ' ';
-                    $zdrojDat .= $zaznam['prijmeni'];             
+                if ($zaznam['idUpravil'] !== null) {
+                    $zdrojDat  = $zaznam['jmeno'].' '.$zaznam['prijmeni'];           
                 } else {
                     $zdrojDat = 'Čárový kód';             
                 }
                 
-                $datum = date('d. m. Y', strtotime($zaznam['time_start']));
-                $trvani = strtotime($zaznam['time_end']) - strtotime($zaznam['time_start']);
+                $datum = date('d. m. Y', strtotime($zaznam['timeStart']));
+                $trvani = strtotime($zaznam['timeEnd']) - strtotime($zaznam['timeStart']);
                 $roundTrvani = round($trvani/3600, 2);
                 
                 $akce[] = array (
-                    'id' => $zaznam['id_zaznamu'],
-                    'casStart' => date('d. m. Y, H.i',strtotime($zaznam['time_start'])),
-                    'casEnd' => date('d. m. Y, H.i',strtotime($zaznam['time_end'])),
+                    'id' => $zaznam['id'],
+                    'casStart' => date('d. m. Y, H.i',strtotime($zaznam['timeStart'])),
+                    'casEnd' => date('d. m. Y, H.i',strtotime($zaznam['timeEnd'])),
                     'casUpdate' => $casUpdate,
                     'datum' => $datum,
-                    'timestampStart' => $zaznam['time_start'],
-                    'timestampEnd' => $zaznam['time_end'],
+                    'timestampStart' => $zaznam['timeStart'],
+                    'timestampEnd' => $zaznam['timeEnd'],
                     'zdrojDat' => $zdrojDat,
                     'trvani' => $roundTrvani,
-                    'technologie' => $zaznam['nazev_operace'],
+                    'technologie' => $zaznam['operace'],
                     'poznamka' => $zaznam['poznamka']
                 );
             }
             return $akce; 
         }
-        else 
-            return null;                 
+   
     }    
     
     /**
