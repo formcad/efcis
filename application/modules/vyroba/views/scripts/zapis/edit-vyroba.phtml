@@ -92,6 +92,11 @@ $(document).ready(function() {
         });     
     });
 
+    /**
+     * Funkce slouží k obsluze akce při změně zakázky v našeptávači a je
+     * redundatně napsaná v application\views\scripts\employee\index.phtml
+     * a v application\modules\vyroba\views\scripts\zapis\add.phtml
+     */
     $("#naseptavacZakazka").change(function(){
         $.ajax({
             type: "POST",
