@@ -28,7 +28,7 @@ class Application_Form_Naseptavac extends Zend_Form
         /**** Inicializace formuláře ******************************************/
  
         $this->setName("naseptavacZakazekForm");
-        $this->setAttrib("id", "form-vyroba-naseptavacZakazekForm");
+        $this->setAttrib("id", "form-naseptavacZakazekForm");
         $this->setMethod("post");                       
         
         /**** Element - Pole zakázek ******************************************/
