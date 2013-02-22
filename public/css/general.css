@@ -68,6 +68,13 @@ div .nostyle {
     color: red;
 }
 
+.smallInfoDiv div,
+.smallErrorDiv div {
+    width: 500px;
+    padding: 0 5px;
+    margin: 20px 0;    
+}
+
 .infoDiv div,
 .errorDiv div {
     width: 800px;
@@ -76,7 +83,9 @@ div .nostyle {
 }
 
 .infoDiv span,
-.errorDiv span {
+.errorDiv span,
+.smallInfoDiv span,
+.smallErrorDiv span {
     float: left; 
     margin-right: 0.3em;
 }

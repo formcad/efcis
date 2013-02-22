@@ -13,6 +13,8 @@ class Application_Form_Login extends Zend_Form
         $this->setMethod('post');
         $this->setAction($action);            
 
+        /**** Element - uživatelské jméno *************************************/
+        
         $username = new Zend_Form_Element_Text('username');
         $username->setLabel('Uživatelské jméno')
             ->setRequired(true)
@@ -23,6 +25,8 @@ class Application_Form_Login extends Zend_Form
                   array('messages' => array('isEmpty' => 'Nezadali jste uživatelské jméno!'))
               );
      
+        /**** Element - heslo *************************************************/
+        
         $password = new Zend_Form_Element_Password('password');
         $password->setLabel('Heslo')
             ->setRequired(true)
@@ -32,6 +36,8 @@ class Application_Form_Login extends Zend_Form
                   true, 
                   array('messages' => array('isEmpty' => 'Nezadali jste heslo!'))
               );
+        
+        /**** Element - odeslní formuláře *************************************/
         
         $submit = new Zend_Form_Element_Submit('submit_login');
         $submit->setRequired(true)

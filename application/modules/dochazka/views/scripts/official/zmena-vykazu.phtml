@@ -4,16 +4,116 @@
 <script type="text/javascript">
 //<![CDATA[    
 
+/**
+ * Ajaxvá validace délky pauzy - musí jít o Zend_Locale číselný formát
+ * 
+ * @param  float delka Délka jako desetinné číslo s čárkou
+ * @return null|string Chybový DIV vkládaný na stránku
+ */
+function validacePauzy(delka) 
+{
+    var chyba = null;
+    
+    $.ajax({      
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-validace-delky-pauzy'),null,true);?>",
+        data: ({delka: delka}),
+        async: false,
+        success: function(data) { chyba = data; }
+    });   
+    
+    return chyba;
+}
+
+/**
+ * Ajaxové provedení změny délky pauzy pro konkrétního člověka v konkrétním dni
+ *
+ * @param string  datum Datum dne směny
+ * @param integer osoba ID osoby
+ * @param integer cip   ID čipu
+ * @param float   delka Délka pauzy jako desetinné číslo s čárkou
+ * @return void
+ */
+function zmenaPauzy(datum,osoba,cip,delka) 
+{
+    $.ajax({      
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-zmena-pauzy'),null,true);?>",
+        data: ({datum: datum, osoba: osoba, cip: cip, delka: delka}),
+        success: function() {}
+    });           
+}
+
+/**
+ * Ajaxové nahrání časů docházky, pauzy a čisté docházky do stránky - provádí
+ * se vždy při načtení stránky
+ */
+function spocitejCasyDochazky()
+{
+    $.ajax({      
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-pocitani-casu-dochazky'),null,true);?>",
+        data: ({id: <?php echo $this->idVykazu; ?>}),        
+        dataType: 'json',
+        success: function(data) { 
+       
+            var i = 0;
+            for ( i == 0; i <= (data.length -1); i++) {
+                
+                $('#oficialni-dochazka-dochazka-'+i).html(data[i]['dochazka']);
+                $('#oficialni-dochazka-pauza-'+i).html(data[i]['pauza']);
+                $('#oficialni-dochazka-cistaDochazka-'+i).html(data[i]['cistaDochazka']);                
+            }
+        }
+    });  
+}
+
+/**
+ * Ajaxové nahrání časů docházky, apuzy a čisté docházky pro konkrétní den
+ * docházky
+ * 
+ * @param string  datum Datum, pro které hodnoty počítáme
+ * @param integer radek Číslo řádku, který počítáme
+ */
+function spocitejCasyDne(datum,radek)
+{ 
+    $.ajax({      
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-pocitani-casu-dne'),null,true);?>",
+        data: ({datum: datum}),        
+        dataType: 'json',
+        success: function(data) { 
+       
+            $('#oficialni-dochazka-dochazka-'+radek).html(data[0]['dochazka']);
+            $('#oficialni-dochazka-pauza-'+radek).html(data[0]['pauza']);
+            $('#oficialni-dochazka-cistaDochazka-'+radek).html(data[0]['cistaDochazka']);                        
+        }
+    });     
+}
+
 $(document).ready(function() {
     
     $('#dochazka-officialZakorouhleniCasu').button({
         icons: {primary: 'ui-icon-clock'}
     }); 
     
+    $('#dochazka-officialDoplneniPauzy').button({
+        icons: {primary: 'ui-icon-star'}
+    });    
+    
+    $('#dochazka-officialDoplneniPriplatku').button({
+        icons: {primary: 'ui-icon-script'}
+    });        
+    
     $('.dochazka-officialZmenaCasu').button({
         icons: {primary: 'ui-icon-search'},
         text: false
     });
+    
+    $('.dochazka-oficialni-pauzaEdit').button({
+        icons: {primary: 'ui-icon-wrench'},
+        text: false
+    });            
     
     $('.dochazka-officialSmazaniCasu').button({
         icons: {primary: 'ui-icon-trash'},
@@ -25,24 +125,10 @@ $(document).ready(function() {
         text: false
     });
     
-    /**** AJAXOVÉ POČÍTÁNÍ ČASŮ ***********************************************/
-     
-    $.ajax({      
-        type: "POST",
-        url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-pocitani-casu'),null,true);?>",
-        data: ({id: <?php echo $this->idVykazu; ?>}),        
-        dataType: 'json',
-        success: function(data) { 
-       
-            var i = 0;
-            for ( i == 0; i <= (data.length -1); i++) {
-                
-                $('#officialni-dochazka-dochazka-'+i).html(data[i]['dochazka']);
-                $('#officialni-dochazka-pauza-'+i).html(data[i]['pauza']);
-                $('#officialni-dochazka-cistaDochazka-'+i).html(data[i]['cistaDochazka']);                
-            }
-        }
-    });                
+    /***************************************************************************
+     * Ajaxové doplnění časů docházky, pauzy a čisté docházky
+     */
+    spocitejCasyDochazky();
     
     /***************************************************************************
      * Modální dialog pro mazání jednotlivých časů z oficiální docházky
@@ -52,6 +138,7 @@ $(document).ready(function() {
         // hack, aby se stránka neodscrollovala nahoru
         event.preventDefault();    
     
+        // id mazaného záznamu
         var id = $(this).attr('id');
     
         // do DIVu zobrazíme data o mazaném záznamu
@@ -90,6 +177,66 @@ $(document).ready(function() {
         });
     });           
     
+    /***************************************************************************
+     * Modální dialog pro změnu sumy pauzy
+     */
+    $('.dochazka-oficialni-pauzaEdit').click(function(event){
+    
+        // hack, aby se stránka neodscrollovala nahoru
+        event.preventDefault();    
+    
+        var datum = $(this).data('datum');
+        var osoba = $(this).data('osoba');
+        var cip   = $(this).data('cip');
+        var radek = $(this).data('radek');
+        
+        // do DIVu zobrazíme data o upravovaném záznamu a formulář změny
+        $.ajax({      
+            type: "POST",
+            url: "<?php echo $this->url(array('module'=>'dochazka','controller'=>'official','action' => 'ajax-podrobnosti-dne-pauza'),null,true);?>",
+            data: ({datum: datum, osoba: osoba, cip: cip}),          
+            success: function(data) { 
+                $("#div-dochazka-officialSumaPauzy").html(data);
+            }
+        });     
+        
+        // vykreslíme dialogové okno
+        $("#div-dochazka-officialSumaPauzy").dialog({            
+            modal: true,
+            width: 600,
+            height: 400,        
+            buttons: {
+                "Změnit": function() {   
+                    
+                    // provedení odeslání formuláře - validace
+                    var chyba = validacePauzy( $('#delkaPauzy').val() );
+                    
+                    // nic nebrání provedení změny
+                    if (chyba.length == 0) {
+                        // změníme pauzu
+                        zmenaPauzy( datum,osoba,cip,$('#delkaPauzy').val() );
+                        
+                        // znovu načteme změněný řádek
+                        spocitejCasyDne(datum,radek);
+                        
+                        // zavřeme dialog
+                        $( this ).dialog( "close" );
+                    } 
+                    // změna není možná kvůli špatně vyplněnému formuláři
+                    else {
+                        $("#div-dochazka-officialSumaPauzy").append(chyba);
+                    }                                                                                   
+                },
+                "Zrušit": function() {
+                    $( this ).dialog( "close" );
+                }
+            }               
+        });        
+            
+    })
+    
+    
+    
 });
 //]]>    
 </script>
@@ -98,16 +245,34 @@ $(document).ready(function() {
                   'controller' => 'official',
                   'action' => 'zaokrouhleni-prichodu',
                   'id' => $this->idVykazu)); ?>"
-   id="dochazka-officialZakorouhleniCasu">
+   id="dochazka-officialZakorouhleniCasu"
+   class="dochazka-officialHromadnyButton">
     Zaokrouhlení příchodů
 </a>
+<a href ="<?php echo $this->url(array('module' => 'dochazka',
+                  'controller' => 'official',
+                  'action' => 'doplneni-pauzy',
+                  'id' => $this->idVykazu)); ?>"
+   id="dochazka-officialDoplneniPauzy"
+   class="dochazka-officialHromadnyButton">
+    Doplnění pauzy
+</a>
+<a href ="<?php echo $this->url(array('module' => 'dochazka',
+                  'controller' => 'official',
+                  'action' => 'doplneni-priplatku',
+                  'id' => $this->idVykazu)); ?>"
+   id="dochazka-officialDoplneniPriplatku"
+   class="dochazka-officialHromadnyButton">
+    Doplnění příplatků
+</a>
 
-<table class="standardni odsazene-bunky margin-top-10">
+<table id="table-dochazka-oficialni-prehledDochazky"
+    class="standardni odsazene-bunky margin-top-10">
     <tr>
         <th>Datum</th>
         <th>Docházka</th>
         <th>Suma<br />práce</th>
-        <th>Suma<br />pauzy</th>
+        <th colspan="2">Suma<br />pauzy</th>
         <th>Čistá<br />práce</th>
         <?php foreach ($this->typyPriplatku as $typPriplatku): ?>
         <th><?php echo $typPriplatku['zkratka']; ?></th>
@@ -151,9 +316,20 @@ $(document).ready(function() {
             <?php endforeach; ?>
             </table>
         </td>
-        <td id="officialni-dochazka-dochazka-<?php echo $i; ?>"></td>
-        <td id="officialni-dochazka-pauza-<?php echo $i; ?>"></td>
-        <td id="officialni-dochazka-cistaDochazka-<?php echo $i; ?>"></td>        
+        <td id="oficialni-dochazka-dochazka-<?php echo $i; ?>"></td>
+        <td id="oficialni-dochazka-pauza-<?php echo $i; ?>"
+            class="dochazka-oficialni-sumaPauzy">
+        </td>
+        <td class="oficialni-dochazka-pauzaEdit">                          
+            <button               
+                class="dochazka-oficialni-pauzaEdit"
+                data-osoba="<?php echo $this->idOsoby; ?>"
+                data-cip="<?php echo $this->idCipu; ?>"
+                data-datum="<?php echo $zaznam['dbDatum']; ?>"
+                data-radek="<?php echo $i; ?>">&nbsp;
+            </button>
+        </td>
+        <td id="oficialni-dochazka-cistaDochazka-<?php echo $i; ?>"></td>        
     <?php 
         // projedeme všechny příplatky podle typu, pro každý vypíšeme buňku tabulky
         foreach ($this->typyPriplatku as $typPriplatku):
@@ -187,5 +363,12 @@ $(document).ready(function() {
 
 <div id="div-dochazka-officialSmazaniCasu"
      title="Smazání záznamu oficiální docházky">        
+
+</div>
+
+<!-- Dialogový DIV pro změnu sumy pauzy --------------------------------------->
+
+<div id="div-dochazka-officialSumaPauzy"
+     title="Změna sumy pauzy ve směmě">      
     
 </div>

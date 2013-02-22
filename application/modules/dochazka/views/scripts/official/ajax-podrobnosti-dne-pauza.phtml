@@ -1,0 +1,32 @@
+<h3>Záznamy z vybraného dne</h3>
+
+<table>
+    <tr>
+        <td class="padding-right-10">Datum</td>
+        <td><?php echo $this->data['datum']; ?></td>
+    </tr>
+    <tr>
+        <td class="padding-right-10">Průchody</td>
+        <td>
+            <?php if (count($this->data['pruchody'])>0):?>
+
+                <?php foreach ($this->data['pruchody'] as $pruchod): ?>
+                <?php echo $pruchod['casPrichod'].' - '.$pruchod['casOdchod'].'<br />'; ?>
+                <?php endforeach; ?>
+
+            <?php endif; ?>
+        </td>
+    </tr>
+    <tr>
+        <td class="padding-right-10">Suma pauzy</td>
+        <td>
+            <?php if (count($this->data['preruseni'])>0): ?>
+                <?php echo $this->data['preruseni'][0]['delka']; ?> h
+            <?php endif; ?>
+        </td>
+    </tr>
+</table>
+
+<h3>Změna sumy pauzy</h3>
+
+<?php echo $this->form; ?>

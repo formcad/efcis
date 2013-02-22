@@ -67,6 +67,8 @@ class Dochazka_Form_ParametryDochazky extends ZendX_JQuery_Form
                new Zend_Validate_Date(array('format' => 'dd. mm. yy'))
            ));
         
+        /**** Element - odeslání formuláře ************************************/
+        
         $submit = new Zend_Form_Element_Submit('submitParametry');
         $submit->setRequired(true)
                ->setIgnore(true)

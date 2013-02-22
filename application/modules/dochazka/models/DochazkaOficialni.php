@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Zákldní informace o oficiální docházce
+ * Informace o oficiální docházce
  */
 class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
 {
@@ -114,7 +114,14 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     protected $_datumSmeny = null;
 
     /**
+     * Proměnná pro nastavení časové doby trvání pauzy nebo příplatku
+     * @var float
+     */
+    protected $_trvani = null;
+    
+    /**
      * Ověří, zda už má zaměstnanec docházku pro konkrétní měsíc a rok
+     * 
      * @return array 
      */
     public function overExistenci() 
@@ -139,6 +146,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     
     /**
      * Pro kombinaci zaměstnance a čipu získá funkce všech zapsaných docházek
+     * 
      * @return array
      */
     public function getOficialniDochazka()
@@ -151,10 +159,11 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             ->order(array('rok DESC', 'mesic'));
         
         return $this->_adapter->fetchAll($select);
-    }
-
+    }   
+    
     /**
      * Založení záznamu o oficiální dozcházce, které vrátí ID nového řádku
+     * 
      * @return integer ID vloženého řádku
      */
     public function zalozDochazku()
@@ -172,6 +181,8 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Vytvoření vhodného tvaru z dat oficiální docházky pro uložení průchodů
      * v DB
+     * 
+     * @return void
      */
     public function ulozNoveOficialniPruchody()
     {
@@ -193,6 +204,8 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     
     /**
      * Zaslání dat _sqlUlozOficialniPruchod
+     * 
+     * @return void
      */
     public function ulozNovyOficialniPruchod()
     {
@@ -229,6 +242,8 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Vytvoření vhodného tvaru z dat oficiální docházky pro uložení přerušení
      * v DB
+     * 
+     * @return void
      */    
     public function ulozNoveOficialniPreruseni()
     {
@@ -254,6 +269,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      * Čas změny a smazáno = false jsou výchozí hodnoty přímo v databázi
      * 
      * @param array $preruseni Hodnoty patrné z SQL dotazu
+     * @return void
      */    
     protected function _sqlUlozOficialniPreruseni($preruseni)    
     {
@@ -270,6 +286,8 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Vytvoření vhodného tvaru z dat oficiální docházky pro uložení příplatků
      * v DB
+     * 
+     * @return void
      */    
     public function ulozNoveOficialniPriplatky()    
     {
@@ -298,6 +316,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      * Čas změny a smazáno = false jsou výchozí hodnoty přímo v databázi
      * 
      * @param array $priplatek Hodnoty patrné z SQL dotazu
+     * @return void
      */  
     protected function _sqlUlozOficialniPriplatek($priplatek)    
     {
@@ -313,6 +332,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     
     /**
      * Na základě konkrétního ID docházky získá její časový rozsah
+     * 
      * @return array
      */
     public function getRozsahDochazky()
@@ -326,7 +346,9 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     }
     
     /**
-     * Získání pole oficiální docházky
+     * Získání pole oficiální docházky mezi časovými limity $this->_datumOda a 
+     * $this->_datumDo
+     * 
      * @return array
      */
     public function getAkce()
@@ -412,6 +434,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      * Pro nastavené období, id člověka a jeho konkrétní čip vybere z oficiální
      * docházky časy průchodů, spočítá jejich rozdíl a v případě, že je průchodů
      * za den víc, sečte všechny průchody v dni do jedné sumy. Data funkce vrátí
+     * 
      * @return array
      */
     public function sumaCasuDochazky()
@@ -429,12 +452,21 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         foreach ($kalendar as $den)
         {
             $tempPruchody = 0;
+            $maxPruchod = 0;
+            
             foreach ($pruchody as $index => $zaznam) {
           
                 if ($zaznam['datum'] == $den['datum']) {
                
                     if (!empty($zaznam['odchod'])) {
-                        $tempPruchody += strtotime($zaznam['odchod']) - strtotime($zaznam['prichod']);
+                        
+                        $tempPruchod = strtotime($zaznam['odchod']) - strtotime($zaznam['prichod']);
+                        $tempPruchody += $tempPruchod;
+                        
+                        // nastavíme nejdelší zaznamenaný průchod
+                        if ($maxPruchod < $tempPruchod) {
+                            $maxPruchod = $tempPruchod;
+                        }
                     }
                     // ve zdrojovém poli dál tento záznam nebude potřeba
                     unset($pruchody[$index]);
@@ -453,15 +485,18 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             $result[] = array (
                 'dochazka' => round($tempPruchody/3600,2),
                 'pauza' => round($tempPreruseni/3600,2),
-                'cistaDochazka' => round(($tempPruchody - $tempPreruseni)/3600,2)
+                'cistaDochazka' => round(($tempPruchody - $tempPreruseni)/3600,2),
+                'nejdelsiPruchod' => round($maxPruchod/3600,2),
+                'datum' => $den['datum']
             );
         }
-        return json_encode($result);
+        return $result;
     }
     
     /**
      * Pomocná funkce, která provede SQL dotaz a vrátí oficiální průchody
      * docházky z databáze
+     * 
      * @return array
      */
     protected function _getOficialniPruchody()
@@ -486,6 +521,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Pomocná funkce, která provede SQL dotaz a vrátí oficiální přerušení
      * docházky z databáze
+     * 
      * @return array
      */
     protected function _getOficialniPreruseni()
@@ -512,6 +548,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Pomocná funkce, která provede SQL dotaz a vrátí oficiální příplatky
      * docházky z databáze
+     * 
      * @return array
      */
     protected function _getOficialniPriplatky()
@@ -539,6 +576,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Pomocná funkce, která provede SQL dotaz a vrátí poznámky k oficiální
      * docházce v databázi
+     * 
      * @return array
      */
     protected function _getOficialniPoznamky()
@@ -561,6 +599,8 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Projede časy oficiální docházky mezi _datumOd a _datumDo, přičemž
      * příchody mezi _casOd a _casDo změní na hodnotu _casCil
+     * 
+     * @return void
      */
     public function zaokrouhliPrichodyDochazky()
     {
@@ -584,13 +624,13 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
                 // čas změníme
                 $this->_zmenCasPrichodu($pruchod['id'],$datumPrichod.' '.$this->_casCil);
             }                                            
-        }
-         
+        }         
     }
     
     /**
      * Výběr příchodů docházky mezi limitními daty (v proměnných _datumOd a
      * _datumDo)
+     * 
      * @return array
      */
     protected function _vyberPrichodyDochazky() 
@@ -607,8 +647,10 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * Pomocná funkce provádějící změnu konkrétního času příchodu oficiální 
      * docházky
+     * 
      * @param integer $idZaznamu ID záznamu v tabulce oficialni_pruchody
      * @param string $casPrichodu Přesný datum a čas příchodu
+     * @return void
      */
     protected function _zmenCasPrichodu($idZaznamu,$casPrichodu) 
     {
@@ -621,6 +663,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     
     /**
      * Z databáze vybere řádek s id, které se rovná _idPruchodu
+     * 
      * @return array
      */
     public function ziskejPruchod()
@@ -643,6 +686,8 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     
     /**
      * V tabulce oficialni_dochazka změní řádek se zadaným _idPruchodu
+     * 
+     * @return void
      */
     public function zmenZaznam()
     {
@@ -663,6 +708,8 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     /**
      * V tabulce oficialni_dochazka změní řádek se zadaným _idPruchodu - nastaví
      * příznak smazano na hodnotu TRUE
+     * 
+     * @return void
      */
     public function smazZaznam()
     {
@@ -677,6 +724,100 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             )
         );
     }    
+    
+    /**
+     * Funkce zajití doplnění pauzy daného zaměstnance (_osoba, _cip)
+     * v daném dni (_datumSmeny) na požadovanou hodnotu (_trvani)
+     * 
+     * @return void
+     */
+    public function doplnPauzu()
+    {
+        // zjištění, jestli je pauza zapsaná
+        $idZaznamu = $this->_zjistiZapsanouPauzu($this->_osoba,$this->_cip,$this->_datumSmeny);
+        
+        // pauza není zapsaná - zapíšeme ji
+        if ($idZaznamu == null) {
+            $this->_zapisPauzu($this->_osoba,$this->_cip,$this->_uzivatel,$this->_datumSmeny,$this->_trvani);
+        }
+        // pauza je zapsaná - upravíme ji
+        else {
+            $this->_upravPauzu($idZaznamu,$this->_trvani,$this->_uzivatel);
+        }
+    }
+    
+    /**
+     * Funkci zjistí, zda už je v tabulce oficialni_preruseni zapsaná pauza
+     * pro danou kombinaci kritérií ze vstupních parametrů
+     * 
+     * @param integer $idOsoby
+     * @param integer $idCipu
+     * @param string $datum
+     * @return null|integer ID zapsané pauzy nebo null když pauza není zapsaná
+     */
+    protected function _zjistiZapsanouPauzu($idOsoby,$idCipu,$datum)
+    {
+        $select = $this->_adapter->select()
+            ->from(array('pu'=>'oficialni_preruseni'),
+                array('id'=>'id_zaznamu'))
+            ->where('id_osoby = ?', $idOsoby)
+            ->where('id_cipu = ?', $idCipu)
+            ->where('datum = ?', $datum);
+        
+        $result = $this->_adapter->fetchRow($select);
+        
+        if (!empty($result)) {
+            return $result;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Funkce vloží nový záznam do tabulky oficialni_preruseni - všechny potřebné
+     * podrobnosti pauzy jsou ve vstupních atributech funkce
+     * 
+     * @param integer $idOsoby
+     * @param integer $idCipu
+     * @param integer $idUzivatele
+     * @param string  $datum
+     * @param float   $trvani
+     * @return void
+     */
+    protected function _zapisPauzu($idOsoby,$idCipu,$idUzivatele,$datum,$trvani)
+    {
+        $this->_adapter->insert( 'oficialni_preruseni', array(
+            'id_preruseni' => 1,
+            'id_osoby' => $idOsoby,
+            'id_cipu' => $idCipu,
+            'datum' => $datum,
+            'delka' => $trvani,
+            'id_zmenil' => $idUzivatele
+        ));           
+    }
+
+    /**
+     * Funkce upraví již dříve zapsanou pauzu v tabulce oficialni_preruseni
+     * ($idZaznamu) na novou hodnotu trvání pauzy ($trvani)
+     * 
+     * @param integer $idZaznamu
+     * @param float   $trvani
+     * @param integer $idUzivatele
+     * @return void
+     */
+    protected function _upravPauzu($idZaznamu,$trvani,$idUzivatele)
+    {
+        $this->_adapter->update(
+            'oficialni_preruseni',
+            array(
+                'delka' => $trvani,
+                'id_zmenil' => $idUzivatele,
+            ),
+            array(
+                'id_zaznamu = ?' => $idZaznamu
+            )
+        );        
+    }
     
     public function getIdDochazky() {
         return $this->_idDochazky;
@@ -805,5 +946,13 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     public function setDatumSmeny($datumSmeny) {
         $this->_datumSmeny = $datumSmeny;
     }
+    
+    public function getTrvani() {
+        return $this->_trvani;
+    }
+
+    public function setTrvani($trvani) {
+        $this->_trvani = $trvani;
+    }    
     
 }

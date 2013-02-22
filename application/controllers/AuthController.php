@@ -11,6 +11,9 @@ class AuthController extends Zend_Controller_Action
        
     }
 
+    /**
+     * Akce přihlášení
+     */
     public function indexAction()
     {   
         $form = new Application_Form_Login();
@@ -40,7 +43,9 @@ class AuthController extends Zend_Controller_Action
         $this->view->form = $form;       
     }
 
-
+    /**
+     * Akce odhlášení
+     */
     public function logoutAction()
     {
         Zend_Auth::getInstance()->clearIdentity();
@@ -77,7 +82,7 @@ class AuthController extends Zend_Controller_Action
 
     /**
      * Vytvoření autentizačního adaptéru
-     * @return \Zend_Auth_Adapter_DbTable
+     * @return Zend_Auth_Adapter_DbTable
      */
     protected function _getAuthAdapter()
     {
@@ -95,6 +100,7 @@ class AuthController extends Zend_Controller_Action
     /**
      * Zápis uživatelovy identity pomocí Zend_Auth
      * @param string $username
+     * @return void
      */
     protected function _writeIdentity($username)
     {

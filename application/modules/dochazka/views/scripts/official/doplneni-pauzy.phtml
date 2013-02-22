@@ -1,0 +1,23 @@
+<?php $this->title = "Doplnění pauzy  docházky ($this->uzivatel)"; ?>
+
+<script type="text/javascript">
+//<![CDATA[    
+
+$(document).ready(function() {
+    
+    $('input:submit').button(); 
+  
+});
+//]]>    
+</script>
+
+<div class="ui-widget infoDiv">
+    <div class="ui-state-highlight ui-corner-all">
+        <p><span class="ui-icon ui-icon-info"></span>
+        Pokud zaměstnanec odpracoval bez přerušení víc než 6 hodin a suma pauzy
+        je menší než 0,5 hodiny, bude suma pauzy v daném dni doplněna na
+        0,5 hodiny</p>
+    </div>
+</div>      
+
+<?php echo $this->form; ?>

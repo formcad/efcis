@@ -2,6 +2,7 @@
 
 class Dochazka_OfficialController extends Zend_Controller_Action
 {
+
     /**
      * Session namespace formcad
      * @var
@@ -13,27 +14,27 @@ class Dochazka_OfficialController extends Zend_Controller_Action
      * @var
      */
     private static $_identity = null;
-    
+
     /**
      * Proměnná, kam se ukládá pauza vznikající při redkukci pole záznamů
      * příchodů a odchodů
      * @var float
      */
-    private $_tempPreruseni;
-    
+    private $_tempPreruseni = null;
+
     public function init()
     {
         self::$_session = new Zend_Session_Namespace('formcad');
         self::$_identity = Zend_Auth::getInstance()->getIdentity();     
     }
-    
+
     public function indexAction()
     {
         // action body
     }
 
     public function novyVykazAction()
-    {   
+    {
         // do view přidáme monthpicker JS
         $this->view->headScript()->appendFile(
             '/js/jquery/jquery-ui-monthpicker.js',
@@ -218,11 +219,10 @@ class Dochazka_OfficialController extends Zend_Controller_Action
                                              'action' => 'index')),
                     'text' => 'Docházka')
             );
-            $this->view->uzivatel = self::$_session->uzivatel;     
-        
+            $this->view->uzivatel = self::$_session->uzivatel;       
         }
     }
-    
+
     public function zmenaVykazuAction()
     {
         // zjistíme ID výkazu
@@ -252,6 +252,8 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         
         $this->view->data = $poleZaznamu;
         $this->view->idVykazu = $idVykazu;
+        $this->view->idOsoby = (self::$_session->idOsoby);
+        $this->view->idCipu = (self::$_session->idCipu);
         $this->view->typyPriplatku = $modelPriplatku->getTypy();  
  
         $url = $this->_helper->url;
@@ -266,7 +268,6 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $this->view->uzivatel = self::$_session->uzivatel;  
     }
 
-    
     public function vyberVykazuAction()
     {
         $poleDochazky = array();
@@ -299,9 +300,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         );    
         $this->view->uzivatel = self::$_session->uzivatel;          
     }
-    
-    
-    
+
     /**
      * Relativně hloupá, ale užitečná funkce. Pokud rozdíl příchodu a odchodu
      * v jednotlivých záznamech vstupního pole je < 1 hodina, potom se tyto dva 
@@ -310,11 +309,11 @@ class Dochazka_OfficialController extends Zend_Controller_Action
      * vstupních záznamů pole roven počtu výstupů z pole. Pauza, která vznikne
      * redukcí záznamů se ukládá do proměnné třídy, odkud k ní přistupuje
      * controller.
-     * 
+     *
      * @param array $poleDochazky
      * @return array 
      */
-    protected function _redukujPole($poleDochazky) 
+    protected function _redukujPole($poleDochazky)
     {
         $vyslednePole = array();              
         $hotovo = false;
@@ -354,21 +353,20 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         } 
         return $vyslednePole;   
     }
-    
+
     /**
      * Funkce spočítá rozdíly mezi příchody a odchody, v jednotlivých dnech
      * provede součty těchto rozdílů a vrátí je
      */
-    public function ajaxPocitaniCasuAction()
+    public function ajaxPocitaniCasuDochazkyAction()
     {
         $this->_helper->getHelper('layout')->disableLayout();
-        $idVykazu = $this->getRequest()->getParam('id');
         
         // získáme rok a měsíc výkazu
         $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
         $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
         $dochazkaOficialni->setCip(self::$_session->idCipu);
-        $dochazkaOficialni->setIdDochazky($idVykazu);
+        $dochazkaOficialni->setIdDochazky($this->getRequest()->getParam('id'));
         
         // měsíc a rok oficiální docházky
         $rozsah = $dochazkaOficialni->getRozsahDochazky();
@@ -377,13 +375,36 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
         $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
 
-        $this->view->dataCasu = $dochazkaOficialni->sumaCasuDochazky();
+        // získáme data
+        $this->view->dataCasu = json_encode($dochazkaOficialni->sumaCasuDochazky());
         
     }
 
     /**
-     * Smazání konkrétního záznamu oficiální docházky -> zobrazení podrobností
-     * o vybraném záznamu
+     * Funkce spočítá rozdíly mezi příchody a odchody, v daném dni
+     * provede součty těchto rozdílů a vrátí je
+     */
+    public function ajaxPocitaniCasuDneAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $datum = $this->getRequest()->getParam('datum');
+        
+        // získáme rok a měsíc výkazu
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
+        $dochazkaOficialni->setCip(self::$_session->idCipu);        
+        
+        // nastavíme časové limitní hodnoty docházky
+        $dochazkaOficialni->setDatumOd($datum);
+        $dochazkaOficialni->setDatumDo($datum);
+
+        // získáme data
+        $this->view->dataCasu = json_encode($dochazkaOficialni->sumaCasuDochazky());
+    }
+    
+    /**
+     * Smazání konkrétního záznamu oficiální docházky -> zobrazení
+     * podrobností o vybraném záznamu
      */
     public function ajaxMazaniZaznamuAction()
     {
@@ -394,7 +415,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $dochazkaOficialni->setIdPruchodu($id);
         $this->view->data = $dochazkaOficialni->ziskejPruchod();
     }
-    
+
     /**
      * Smazání konkrétního záznamu oficiální docházky -> provedení smazání
      */
@@ -409,7 +430,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         
         $dochazkaOficialni->smazZaznam();        
     }
-    
+
     /**
      * Změna konkrétního průchodu oficiální docházky
      */
@@ -476,7 +497,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $this->view->uzivatel = self::$_session->uzivatel;          
         
     }
-    
+
     /**
      *  přidání průchodu do požadovaného dne
      */
@@ -546,11 +567,11 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         );    
         $this->view->uzivatel = self::$_session->uzivatel;      
     }
-    
+
     /**
      * Funkce v dané oficiální docházce projede časy všech příchodů a podle
      * nastavených kritérií je zaokrouhlí a uloží
-     */    
+     */
     public function zaokrouhleniPrichoduAction()
     {
         $idVykazu = $this->getRequest()->getParam('id');
@@ -625,4 +646,184 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         );    
         $this->view->uzivatel = self::$_session->uzivatel;             
     }
+
+    /**
+     * Hromadné doplnění pauzy oficiální docházky
+     */
+    public function doplneniPauzyAction()
+    {
+        $idVykazu = $this->getRequest()->getParam('id');
+        $url = $this->_helper->url;
+        
+        $form = new Dochazka_Form_OfficialPauzy(); 
+        
+        $action = $url->url(array('module' => 'dochazka',
+                                  'controller'=>'official', 
+                                  'action'=>'doplneni-pauzy',
+                                  'id'=>$idVykazu),null, true); 
+        $form->setAction($action);         
+        
+        /**** ZPRACOVÁNÍ OBSAHU ***********************************************/
+        
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+                                  
+            // získáme rok a měsíc výkazu
+            $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+            $dochazkaOficialni->setIdDochazky($idVykazu);
+
+            // měsíc a rok oficiální docházky
+            $rozsah = $dochazkaOficialni->getRozsahDochazky();
+
+            // nastavíme časové limitní hodnoty docházky
+            $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
+            $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
+            
+            $data = $dochazkaOficialni->sumaCasuDochazky();
+            
+            foreach ($data as $den) {
+                
+                // pokud máme alespoň jeden průchod
+                if ($den['cistaDochazka'] > 0) {
+                    
+                    // a celková doba v práci aspoň u jednoho průchodu je větš než 6 hodin
+                    if ($den['nejdelsiPruchod'] > 6) {
+                        
+                        // a celková doba pauzy je menší než 0,5 hodiny
+                        if ($den['pauza'] < 0.5) {
+
+                            $dochazkaOficialni->setDatumSmeny($den['datum']);
+                            $dochazkaOficialni->setUzivatel(self::$_identity->id);  
+                            $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
+                            $dochazkaOficialni->setCip(self::$_session->idCipu);
+                            $dochazkaOficialni->setTrvani(0.5);
+                            
+                            // doplníme dobu pauzu na 0,5 hodiny     
+                            $dochazkaOficialni->doplnPauzu();
+                        }                     
+                    }                                        
+                }
+            }
+            
+            
+            
+            // skok zpátky na oficiální docházku
+            $this->_helper->redirector('zmena-vykazu', 'official', 'dochazka', array('id'=>$idVykazu));                   
+        }              
+        
+        /**** DATA DO VIEW ****************************************************/
+        
+        $this->view->form = $form;
+        $this->view->leftNavigation = array(
+            array(
+                'img' => 'clovek.png',
+                'url' => $url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'zmena-vykazu',
+                                         'id' => $idVykazu),null,true),
+                'text' => 'Výkaz docházky')
+        );    
+        $this->view->uzivatel = self::$_session->uzivatel;            
+    }
+
+    /**
+     * Hromadné doplnění příplatků oficiální docházky
+     */
+    public function doplneniPriplatkuAction()
+    {
+        $idVykazu = $this->getRequest()->getParam('id');
+        $url = $this->_helper->url;
+        
+        $this->view->leftNavigation = array(
+            array(
+                'img' => 'clovek.png',
+                'url' => $url->url(array('module' => 'dochazka',
+                                         'controller' => 'official',
+                                         'action' => 'zmena-vykazu',
+                                         'id' => $idVykazu),null,true),
+                'text' => 'Výkaz docházky')
+        );    
+        $this->view->uzivatel = self::$_session->uzivatel;            
+    }
+
+    /**
+     * Pro kombinaci dne směny a id výkazu docházky vypíše podrobnosti dne
+     */
+    public function ajaxPodrobnostiDnePauzaAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+
+        /**** Informační tabulka **********************************************/
+        
+        $datum = $this->getRequest()->getParam('datum');
+        $idOsoby = $this->getRequest()->getParam('osoba');
+        $idCipu = $this->getRequest()->getParam('cip');
+        
+        $dochazka = new Dochazka_Model_DochazkaOficialni();
+        $dochazka->setDatumOd($datum);
+        $dochazka->setDatumDo($datum);
+        $dochazka->setOsoba($idOsoby);
+        $dochazka->setCip($idCipu);
+        
+        $data = $dochazka->getAkce();
+  
+        /**** Změnový formulář ************************************************/
+        
+        $form = new Dochazka_Form_OfficialPauzaEdit();
+        
+        // pokud existuje nějaká suma přerušení, doplníme ji do formuláře
+        if (count($data[0]['preruseni'])>0) {            
+            $filter = new Zend_Filter_NormalizedToLocalized(); 
+            $delka = $form->getElement('delkaPauzy');
+            $delka->setValue($filter->filter($data[0]['preruseni'][0]['delka']));
+        }
+        
+        /**** Data do view ****************************************************/
+        
+        $this->view->data = $data[0];
+        $this->view->form = $form;        
+    }
+
+    /**
+     * Slouží pouze pro validaci číselného formátu doplňované délky pauzy,
+     * přičemž pokud není formát validní, vrátí funkce error div, který se
+     * pomocí Java Scriptu vypíše do stránky 
+     */
+    public function ajaxValidaceDelkyPauzyAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        
+        $data = array('delkaPauzy' => $this->getRequest()->getParam('delka'));
+
+        $form = new Dochazka_Form_OfficialPauzaEdit();
+
+        if ($form->isValid($data)) {
+            $this->view->chyba = false;
+        }
+        else {
+            $this->view->chyba = true;
+        }  
+    }
+    
+    /**
+     * Provede doplnění délky pauzy do databáze pro konkrétního člověka (ID
+     * osoby a ID čipu) v konkrétním dni směny. Délka pauzy už je předešlou
+     * funkcí zvalidována
+     */
+    public function ajaxZmenaPauzyAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $filter = new Zend_Filter_LocalizedToNormalized();
+        
+        $dochazka = new Dochazka_Model_DochazkaOficialni();
+        $dochazka->setOsoba($this->getRequest()->getParam('osoba'));
+        $dochazka->setCip($this->getRequest()->getParam('cip'));
+        $dochazka->setDatumSmeny($this->getRequest()->getParam('datum'));        
+        $dochazka->setUzivatel(self::$_identity->id);
+        $dochazka->setTrvani($filter->filter($this->getRequest()->getParam('delka')));
+                
+        $dochazka->doplnPauzu();
+    }
+    
 }
+
