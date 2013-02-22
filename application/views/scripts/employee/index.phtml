@@ -82,7 +82,9 @@ $(document).ready(function() {
         
         $.ajax({
             type: "POST",
-            url: "<?php echo $this->url(array('module'=>'default','controller'=>'employee','action'=>'ajax-datum')); ?>",
+            url: "<?php echo $this->url(array('module'=>'default',
+                                              'controller'=>'employee',
+                                              'action'=>'ajax-datum')); ?>",
             data: ({datum: $("#limitFrom").val(),
                     typ: 'od'}),       
             success: function() {},            
@@ -96,7 +98,9 @@ $(document).ready(function() {
         
         $.ajax({
             type: "POST",
-            url: "<?php echo $this->url(array('module'=>'default','controller'=>'employee','action'=>'ajax-datum')); ?>",
+            url: "<?php echo $this->url(array('module'=>'default',
+                                              'controller'=>'employee',
+                                              'action'=>'ajax-datum')); ?>",
             data: ({datum: $("#limitTo").val(),
                     typ: 'do'}),       
             success: function() {},            

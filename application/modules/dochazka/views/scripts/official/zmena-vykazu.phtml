@@ -180,6 +180,10 @@ $(document).ready(function() {
     /***************************************************************************
      * Modální dialog pro změnu sumy pauzy
      */
+     
+    // nebude realizován odesláním formuláře, což je zajištěno JavaScriptem
+    // přímo ve view s formulářem (ajax-podrobnosti-dne-pauza.phtml), ale pouze
+    // klikem na změnové tlačítko 
     $('.dochazka-oficialni-pauzaEdit').click(function(event){
     
         // hack, aby se stránka neodscrollovala nahoru
@@ -233,9 +237,7 @@ $(document).ready(function() {
             }               
         });        
             
-    })
-    
-    
+    });
     
 });
 //]]>    

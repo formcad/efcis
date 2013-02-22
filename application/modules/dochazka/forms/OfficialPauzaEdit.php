@@ -7,7 +7,7 @@ class Dochazka_Form_OfficialPauzaEdit extends Zend_Form
         /**** Inicializace formuláře ******************************************/
         
         $this->setName("parametryDochazky");
-        $this->setAttrib('id','form-dochazka-zapisOficialniPauzy');                
+        $this->setAttrib('id','form-dochazka-zapisOficialniPauzy');               
         $this->setMethod("post");                
         
         /**** Element - délka pauzy *******************************************/

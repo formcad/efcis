@@ -737,7 +737,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         $idZaznamu = $this->_zjistiZapsanouPauzu($this->_osoba,$this->_cip,$this->_datumSmeny);
         
         // pauza není zapsaná - zapíšeme ji
-        if ($idZaznamu == null) {
+        if (null == $idZaznamu) {
             $this->_zapisPauzu($this->_osoba,$this->_cip,$this->_uzivatel,$this->_datumSmeny,$this->_trvani);
         }
         // pauza je zapsaná - upravíme ji

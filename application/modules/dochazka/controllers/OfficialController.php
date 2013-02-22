@@ -678,7 +678,9 @@ class Dochazka_OfficialController extends Zend_Controller_Action
             // nastavíme časové limitní hodnoty docházky
             $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
             $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
-            
+            $dochazkaOficialni->setCip(self::$_session->idCipu);
+            $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
+                        
             $data = $dochazkaOficialni->sumaCasuDochazky();
             
             foreach ($data as $den) {
@@ -704,9 +706,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
                     }                                        
                 }
             }
-            
-            
-            
+                                    
             // skok zpátky na oficiální docházku
             $this->_helper->redirector('zmena-vykazu', 'official', 'dochazka', array('id'=>$idVykazu));                   
         }              
