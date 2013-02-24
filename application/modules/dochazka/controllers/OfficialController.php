@@ -30,7 +30,7 @@ class Dochazka_OfficialController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        // action body
+
     }
 
     public function novyVykazAction()
@@ -68,16 +68,13 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         /*** VÝJIMKY **********************************************************/
         
         try {
-            // zjistíme, zda pro tento měsíc už výkaz není vytvořen
-            $dochazka = new Dochazka_Model_DochazkaOficialni();
-            $dochazka->setOsoba(self::$_session->idOsoby);
-            $dochazka->setCip(self::$_session->idCipu);
-            $dochazka->setUzivatel(self::$_identity->id);
-            $dochazka->setMesic($mesic);
-            $dochazka->setRok($rok);
+            // zjistíme, zda pro tento měsíc už výkaz není vytvořen            
+            $vykazy = new Dochazka_Model_VykazyDochazky( null,
+                    self::$_session->idOsoby, self::$_session->idCipu,
+                    self::$_identity->id, $mesic, $rok);
 
             // výjimka v případě, že už je pro měsíc vytvořená oficiální docházka
-            if ($dochazka->overExistenci() == true) {
+            if ($vykazy->overExistenci() == true) {
                 throw new Exception('Pro daný měsíc je už oficiální docházka zaměstnance vytvořená');        
             }
 
@@ -186,7 +183,14 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         /**** ULOŽENÍ DO DATABÁZE *********************************************/
         
         // zapíšeme do oficialni_dochazka založení docházky
-        $idDochazky = $dochazka->zalozDochazku();        
+        $idDochazky = $vykazy->zalozDochazku();        
+        
+        $dochazka = new Dochazka_Model_DochazkaOficialni();
+        $dochazka->setOsoba(self::$_session->idOsoby);
+        $dochazka->setCip(self::$_session->idCipu);
+        $dochazka->setUzivatel(self::$_identity->id);
+        $dochazka->setMesic($mesic);
+        $dochazka->setRok($rok);                
         
         // do modelu přehrajeme data
         $dochazka->setNovaOficialniData($data);
@@ -228,15 +232,14 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         // zjistíme ID výkazu
         $idVykazu = $this->getRequest()->getParam('id');
         
-        // získáme rok a měsíc výkazu
+        // měsíc a rok oficiální docházky
+        $vykazy = new Dochazka_Model_VykazyDochazky( $idVykazu );
+        $rozsah = $vykazy->zjistiRozsahDochazky();
+
         $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
         $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-        $dochazkaOficialni->setCip(self::$_session->idCipu);
-        $dochazkaOficialni->setIdDochazky($idVykazu);
+        $dochazkaOficialni->setCip(self::$_session->idCipu);                
         
-        // měsíc a rok oficiální docházky
-        $rozsah = $dochazkaOficialni->getRozsahDochazky();
-
         // nastavíme časové limitní hodnoty docházky
         $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
         $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
@@ -272,11 +275,11 @@ class Dochazka_OfficialController extends Zend_Controller_Action
     {
         $poleDochazky = array();
         
-        $dochazka = new Dochazka_Model_DochazkaOficialni();
-        $dochazka->setOsoba(self::$_session->idOsoby);
-        $dochazka->setCip(self::$_session->idCipu);
+        $vykazy = new Dochazka_Model_VykazyDochazky(null,
+                self::$_session->idOsoby, self::$_session->idCipu,
+                self::$_identity->id);        
         
-        $poleZaznamu = $dochazka->getOficialniDochazka();
+        $poleZaznamu = $vykazy->ziskejDochazku();
         
         // pole záznamů musíme přeskupit do jiné podoby
         foreach ($poleZaznamu as $zaznam) {
@@ -310,8 +313,8 @@ class Dochazka_OfficialController extends Zend_Controller_Action
      * redukcí záznamů se ukládá do proměnné třídy, odkud k ní přistupuje
      * controller.
      *
-     * @param array $poleDochazky
-     * @return array 
+     * @param  array $poleDochazky Vstupní pole
+     * @return array               Redukované výstupní pole
      */
     protected function _redukujPole($poleDochazky)
     {
@@ -361,16 +364,16 @@ class Dochazka_OfficialController extends Zend_Controller_Action
     public function ajaxPocitaniCasuDochazkyAction()
     {
         $this->_helper->getHelper('layout')->disableLayout();
-        
-        // získáme rok a měsíc výkazu
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-        $dochazkaOficialni->setCip(self::$_session->idCipu);
-        $dochazkaOficialni->setIdDochazky($this->getRequest()->getParam('id'));
+        $idVykazu = $this->getRequest()->getParam('id');
         
         // měsíc a rok oficiální docházky
-        $rozsah = $dochazkaOficialni->getRozsahDochazky();
+        $vykazy = new Dochazka_Model_VykazyDochazky( $idVykazu );
+        $rozsah = $vykazy->zjistiRozsahDochazky();
 
+        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
+        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
+        $dochazkaOficialni->setCip(self::$_session->idCipu);        
+        
         // nastavíme časové limitní hodnoty docházky
         $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
         $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
@@ -594,15 +597,13 @@ class Dochazka_OfficialController extends Zend_Controller_Action
             // v případě odeslaného a zvalidovaného formuláře zapíšeme data
             // partial validace je kvůli možným disabled inputům
             if ($form->isValidPartial($request->getPost())) {                  
-        
-                // získáme rok a měsíc výkazu
-                $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-                $dochazkaOficialni->setIdDochazky($idVykazu);
 
                 // měsíc a rok oficiální docházky
-                $rozsah = $dochazkaOficialni->getRozsahDochazky();
+                $vykazy = new Dochazka_Model_VykazyDochazky( $idVykazu );
+                $rozsah = $vykazy->zjistiRozsahDochazky();
 
                 // nastavíme časové limitní hodnoty docházky
+                $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
                 $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
                 $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
 
@@ -667,15 +668,13 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         
         $request = $this->getRequest();
         if ($request->isPost()) {
-                                  
-            // získáme rok a měsíc výkazu
-            $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-            $dochazkaOficialni->setIdDochazky($idVykazu);
 
             // měsíc a rok oficiální docházky
-            $rozsah = $dochazkaOficialni->getRozsahDochazky();
+            $vykazy = new Dochazka_Model_VykazyDochazky( $idVykazu );
+            $rozsah = $vykazy->zjistiRozsahDochazky();
 
             // nastavíme časové limitní hodnoty docházky
+            $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
             $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
             $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
             $dochazkaOficialni->setCip(self::$_session->idCipu);

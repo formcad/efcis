@@ -12,12 +12,6 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     protected static $_polePruchodu = array();
     
     /**
-     * ID výkazu docházky
-     * @var integer
-     */
-    protected $_idDochazky = null;
-    
-    /**
      * ID zaměstnance
      * @var integer 
      */
@@ -118,66 +112,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      * @var float
      */
     protected $_trvani = null;
-    
-    /**
-     * Ověří, zda už má zaměstnanec docházku pro konkrétní měsíc a rok
-     * 
-     * @return array 
-     */
-    public function overExistenci() 
-    {
-        $select = $this->_adapter->select()
-            ->from('oficialni_dochazka',
-                   array('id' => 'id_dochazky'))
-            ->where('id_osoby = ?', $this->_osoba)
-            ->where('id_cipu = ?', $this->_cip)
-            ->where('mesic = ?', $this->_mesic)
-            ->where('rok = ?', $this->_rok);
         
-        // výsledek dotazu by měl být jenom jeden řádek nebo nic
-        $vysledek = $this->_adapter->fetchAll($select);
-        
-        if (count($vysledek) > 0) {
-            return true; 
-        } else {
-            return false;
-        }
-    }      
-    
-    /**
-     * Pro kombinaci zaměstnance a čipu získá funkce všech zapsaných docházek
-     * 
-     * @return array
-     */
-    public function getOficialniDochazka()
-    {
-        $select = $this->_adapter->select()
-            ->from(array('oficialni_dochazka'),
-                array('id'=>'id_dochazky','mesic','rok'))
-            ->where('id_osoby = ?', $this->_osoba)
-            ->where('id_cipu = ?', $this->_cip)
-            ->order(array('rok DESC', 'mesic'));
-        
-        return $this->_adapter->fetchAll($select);
-    }   
-    
-    /**
-     * Založení záznamu o oficiální dozcházce, které vrátí ID nového řádku
-     * 
-     * @return integer ID vloženého řádku
-     */
-    public function zalozDochazku()
-    {
-        $this->_adapter->insert( 'oficialni_dochazka', array(
-            'id_cipu' => $this->_cip,
-            'id_osoby' => $this->_osoba,
-            'mesic' => $this->_mesic,
-            'rok' => $this->_rok
-        ));  
-        
-        return $this->_adapter->lastInsertId('oficialni_dochazka','id_dochazky');
-    }
-    
     /**
      * Vytvoření vhodného tvaru z dat oficiální docházky pro uložení průchodů
      * v DB
@@ -328,22 +263,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             'delka' => $priplatek['delka'],
             'id_zmenil' => $priplatek['zmenil']
         ));             
-    }
-    
-    /**
-     * Na základě konkrétního ID docházky získá její časový rozsah
-     * 
-     * @return array
-     */
-    public function getRozsahDochazky()
-    {
-        $select = $this->_adapter->select()
-            ->from(array('oficialni_dochazka'),
-                array('mesic','rok'))
-            ->where('id_dochazky = ?', $this->_idDochazky);
-        
-        return $this->_adapter->fetchRow($select);
-    }
+    }   
     
     /**
      * Získání pole oficiální docházky mezi časovými limity $this->_datumOda a 
@@ -817,14 +737,6 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
                 'id_zaznamu = ?' => $idZaznamu
             )
         );        
-    }
-    
-    public function getIdDochazky() {
-        return $this->_idDochazky;
-    }
-
-    public function setIdDochazky($idDochazky) {
-        $this->_idDochazky = $idDochazky;
     }
 
     public function getOsoba() {
