@@ -11,10 +11,10 @@ abstract class Fc_Model_DatabaseAbstract
     protected static $_adapter;
     
     /**
-     * Konstruktor - vytvoření databázového adaptéru
+     * Konstruktor - vytvoření databázového adaptéru          
      */
-    public function __construct() {
-        
+    public function __construct()
+    {        
         $this->_adapter = Zend_Db_Table::getDefaultAdapter();
     }
 }
