@@ -14,16 +14,30 @@ class Application_Model_Kalendar extends Fc_Model_DatabaseAbstract
      */
     protected $_dateTo = '2111-01-01';        
     
+    /**
+     * Konstruktor třídy
+     * 
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @return void
+     */
+    function __construct($dateFrom = null, $dateTo = null) {
+        $this->setDateFrom($dateFrom);
+        $this->setDateTo($dateTo);
+        
+        self::$_adapter = Zend_Db_Table::getDefaultAdapter();     
+    }
+    
     public function getKalendar()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( 'kalendar',
                     array('datum', 'svatek') )     
             ->where( 'datum >= ?', $this->_dateFrom)
             ->where( 'datum <= ?', $this->_dateTo)
             ->order( array('datum') );          
         
-        return $this->_adapter->fetchAll($select);          
+        return self::$_adapter->fetchAll($select);          
     }    
     
     public function getVikendovyKalendar() {

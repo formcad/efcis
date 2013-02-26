@@ -388,7 +388,16 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
 
         // získáme data
-        $this->view->dataCasu = json_encode($dochazkaOficialni->sumaCasuDochazky());        
+        $poleDochazky = $dochazkaOficialni->sumaCasuDochazky();
+        
+        // upravíme formát dat
+        foreach ($poleDochazky as $index=>$zaznam) {
+            if ($zaznam['dochazka'] == 0) {$poleDochazky[$index]['dochazka'] = '';}
+            if ($zaznam['pauza'] == 0) {$poleDochazky[$index]['pauza'] = '';}
+            if ($zaznam['cistaDochazka'] == 0) {$poleDochazky[$index]['cistaDochazka'] = '';}
+        }
+                
+        $this->view->dataCasu = json_encode($poleDochazky);        
     }
 
     /**

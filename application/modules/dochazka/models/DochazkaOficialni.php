@@ -351,19 +351,19 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     }
     
     /**
-     * Pro nastavené období, id člověka a jeho konkrétní čip vybere z oficiální
-     * docházky časy průchodů, spočítá jejich rozdíl a v případě, že je průchodů
-     * za den víc, sečte všechny průchody v dni do jedné sumy. Data funkce vrátí
+     * Pro nastavené období (_datumOd až _datumDo), id člověka (_osoba) a jeho 
+     * konkrétní čip (_cip) vybere z oficiální docházky časy průchodů, spočítá
+     * jejich rozdíl a v případě, že je průchodů za den víc, sečte všechny
+     * průchody v dni do jedné sumy.
      * 
      * @return array
      */
     public function sumaCasuDochazky()
     {
         $result = array();
-        
-        $kalendarInstance = new Application_Model_Kalendar();
-        $kalendarInstance->setDateFrom($this->_datumOd);
-        $kalendarInstance->setDateTo($this->_datumDo);
+       
+        $kalendarInstance = new Application_Model_Kalendar(
+                                            $this->_datumOd,$this->_datumDo);
     
         $kalendar = $kalendarInstance->getKalendar();        
         $pruchody = $this->_getOficialniPruchody();

@@ -2,7 +2,7 @@
 <?php $this->obrazekStredni = "clovek.png"; ?>
 
 <script type="text/javascript">
-//<![CDATA[    
+//<![CDATA[
 
 /**
  * Ajaxové nahrání časů docházky, pauzy a čisté docházky do stránky - provádí
@@ -10,56 +10,56 @@
  */
 function spocitejCasyDochazky()
 {
-    $.ajax({      
+    $.ajax({
         type: "POST",
         url: "<?php echo $this->url(array('module'=>'dochazka',
                                           'controller'=>'official',
                                           'action' => 'ajax-pocitani-casu-dochazky'),
                                           null,true);?>",
-        data: ({id: <?php echo $this->idVykazu; ?>}),        
+        data: ({id: <?php echo $this->idVykazu; ?>}),
         dataType: 'json',
-        success: function(data) { 
-       
+        success: function(data) {
+
             var i = 0;
             for ( i == 0; i <= (data.length -1); i++) {
-                
+
                 $('#oficialni-dochazka-dochazka-'+i).html(data[i]['dochazka']);
                 $('#oficialni-dochazka-pauza-'+i).html(data[i]['pauza']);
-                $('#oficialni-dochazka-cistaDochazka-'+i).html(data[i]['cistaDochazka']);                
+                $('#oficialni-dochazka-cistaDochazka-'+i).html(data[i]['cistaDochazka']);
             }
         }
-    });  
+    });
 }
 
 /**
  * Ajaxové nahrání časů docházky, pauzy a čisté docházky pro konkrétní den
  * docházky při změně sumy pauzy nebo příplatků
- * 
+ *
  * @param string  datum Datum, pro které hodnoty počítáme
  * @param integer radek Číslo řádku, který počítáme
  */
 function spocitejCasyDne(datum,radek)
-{ 
-    $.ajax({      
+{
+    $.ajax({
         type: "POST",
         url: "<?php echo $this->url(array('module'=>'dochazka',
                                           'controller'=>'official',
                                           'action' => 'ajax-pocitani-casu-dne'),
                                           null,true);?>",
-        data: ({datum: datum}),        
+        data: ({datum: datum}),
         dataType: 'json',
-        success: function(data) { 
-       
+        success: function(data) {
+
             $('#oficialni-dochazka-dochazka-'+radek).html(data[0]['dochazka']);
             $('#oficialni-dochazka-pauza-'+radek).html(data[0]['pauza']);
-            $('#oficialni-dochazka-cistaDochazka-'+radek).html(data[0]['cistaDochazka']);                        
+            $('#oficialni-dochazka-cistaDochazka-'+radek).html(data[0]['cistaDochazka']);
         }
-    });     
+    });
 }
 
 /**
  * Ajaxová změna záznamu sumy pauzy v konkrétním dni docházky
- * 
+ *
  * @param string  datum Datum dne docházky
  * @param integer osoby ID osoby, pro kterou pauzu měníme
  * @param integer cip   ID čipu, pro který pauzu měníme
@@ -68,30 +68,30 @@ function spocitejCasyDne(datum,radek)
 function pauzaEdit(datum,osoba,cip,radek)
 {
     // do DIVu zobrazíme data o upravovaném záznamu a formulář změny
-    $.ajax({      
+    $.ajax({
         type: "POST",
         url: "<?php echo $this->url(array('module'=>'dochazka',
                                           'controller'=>'official',
                                           'action' => 'ajax-podrobnosti-dne-pauza'),
                                           null,true);?>",
-        data: ({datum: datum, osoba: osoba, cip: cip}),          
-        success: function(data) { 
+        data: ({datum: datum, osoba: osoba, cip: cip}),
+        success: function(data) {
             $("#div-dochazka-officialSumaPauzy").html(data);
         }
-    });     
+    });
 
     // vykreslíme dialogové okno
-    $("#div-dochazka-officialSumaPauzy").dialog({            
+    $("#div-dochazka-officialSumaPauzy").dialog({
         modal: true,
         width: 600,
-        height: 360,        
+        height: 360,
         buttons: {
-            "Změnit": function() {   
+            "Změnit": function() {
 
                 // provedení odeslání formuláře - validace
                 var chyba = null;
-   
-                $.ajax({      
+
+                $.ajax({
                     type: "POST",
                     url: "<?php echo $this->url(array('module'=>'dochazka',
                                                       'controller'=>'official',
@@ -100,101 +100,101 @@ function pauzaEdit(datum,osoba,cip,radek)
                     data: ({delka: $('#delkaPauzy').val() }),
                     async: false,
                     success: function(data) { chyba = data; }
-                });   
-                    
+                });
+
                 // nic nebrání provedení změny
                 if (chyba.length == 0) {
-                  
-                    // změníme pauzu                    
-                    $.ajax({      
+
+                    // změníme pauzu
+                    $.ajax({
                         type: "POST",
                         url: "<?php echo $this->url(array('module'=>'dochazka',
                                                           'controller'=>'official',
                                                           'action' => 'ajax-zmena-pauzy'),
                                                           null,true);?>",
-                        data: ({datum: datum, osoba: osoba, cip: cip, 
+                        data: ({datum: datum, osoba: osoba, cip: cip,
                             delka: $('#delkaPauzy').val()}),
                         success: function() {}
-                    });                                                                
+                    });
 
                     // znovu načteme změněný řádek
                     spocitejCasyDne(datum,radek);
 
                     // zavřeme dialog
                     $( this ).dialog( "close" );
-                } 
+                }
                 // změna není možná kvůli špatně vyplněnému formuláři
                 else {
                     $("#div-dochazka-officialSumaPauzyChyba").html(chyba);
-                }                                                                                   
+                }
             },
             "Zrušit": function() {
                 $( this ).dialog( "close" );
             }
-        }               
-    });                  
+        }
+    });
 }
 
 /**
  * Ajaxové smazání vybraného průchodu (dvojice příchod-odchod)
- * 
+ *
  * @param integer id Id vybrané dvojice průchodů
  */
 function smazaniPruchodu(id)
 {
     // do DIVu zobrazíme data o mazaném záznamu
-    $.ajax({      
+    $.ajax({
         type: "POST",
         url: "<?php echo $this->url(array('module'=>'dochazka',
                                           'controller'=>'official',
                                           'action' => 'ajax-mazani-zaznamu'),
                                           null,true);?>",
-        data: ({id: id}),          
-        success: function(data) { 
+        data: ({id: id}),
+        success: function(data) {
             $("#div-dochazka-officialSmazaniCasu").html(data);
         }
-    });            
+    });
 
     // vykreslíme dialogové okno
-    $("#div-dochazka-officialSmazaniCasu").dialog({            
+    $("#div-dochazka-officialSmazaniCasu").dialog({
         modal: true,
         width: 600,
-        height: 400,        
+        height: 400,
         buttons: {
-            "Smazat": function() {   
+            "Smazat": function() {
 
                 // provedení smazání času příchodu a odchodu
-                $.ajax({      
+                $.ajax({
                     type: "POST",
                     url: "<?php echo $this->url(array('module'=>'dochazka',
                                                       'controller'=>'official',
                                                       'action' => 'ajax-mazani-pruchodu'),
                                                       null,true);?>",
-                    data: ({id: id}),        
-                    success: function() {   
+                    data: ({id: id}),
+                    success: function() {
                         // znovu načteme stránku
                         location.reload();
                     }
-                });                                         
-                $( this ).dialog( "close" );               
+                });
+                $( this ).dialog( "close" );
             },
             "Zrušit": function() {
                 $( this ).dialog( "close" );
             }
-        }               
-    }); 
+        }
+    });
 }
 
 /**
  * Ajaxová validace vyplněného formuláře přidání nebo změny průchodu
- * 
+ *
  * @param array data Formulář s daty
  */
 function validacePruchodu(data)
 {
     var chyba = null;
-    
-    $.ajax({      
+
+    $.ajax({
         type: "POST",
         url: "<?php echo $this->url(array('module'=>'dochazka',
                                           'controller'=>'official',
@@ -202,15 +202,15 @@ function validacePruchodu(data)
                                           null,true); ?>",
         data: ({data: data}),
         async: false,
-        success: function(data) { chyba = data; }        
-    });            
-    
+        success: function(data) { chyba = data; }
+    });
+
     return chyba;
 }
 
 /**
  * Ajaxová změna vybraného průchodu oficiální docházky
- * 
+ *
  * @param integer idZaznamu
  */
 function zmenaPruchodu(idZaznamu)
@@ -218,8 +218,8 @@ function zmenaPruchodu(idZaznamu)
     // hack, aby se neotevíraly datepickery po otevření dialogu
     $("#form-dochazka-zmenaCasu-datumSmeny").datepicker("disable");
     $("#form-dochazka-zmenaCasu-prichodDen").datepicker("disable");
-    $("#form-dochazka-zmenaCasu-odchodDen").datepicker("disable");       
-    
+    $("#form-dochazka-zmenaCasu-odchodDen").datepicker("disable");
+
     // vyplníme data do změnového formuláře
     $.ajax({
         type: "POST",
@@ -237,22 +237,22 @@ function zmenaPruchodu(idZaznamu)
             $('#form-dochazka-zmenaCasu-prichodCas').val(data['prichodCas']);
             $('#form-dochazka-zmenaCasu-odchodDen').val(data['odchodDen']);
             $('#form-dochazka-zmenaCasu-odchodCas').val(data['odchodCas']);
-            $('#form-dochazka-zmenaCasu-idZaznamu').val(data['id']);                      
+            $('#form-dochazka-zmenaCasu-idZaznamu').val(data['id']);
         }
-    });     
+    });
 
     // vykreslíme dialogové okno
-    $("#div-dochazka-officialZmenaPruchodu").dialog({               
+    $("#div-dochazka-officialZmenaPruchodu").dialog({
         width: 600,
-        height: 450,        
-        open: function() {          
+        height: 450,
+        open: function() {
             // hack, aby vůbec datepickery šly otevřít
             $("#form-dochazka-zmenaCasu-datumSmeny").datepicker("enable");
             $("#form-dochazka-zmenaCasu-prichodDen").datepicker("enable");
-            $("#form-dochazka-zmenaCasu-odchodDen").datepicker("enable");          
+            $("#form-dochazka-zmenaCasu-odchodDen").datepicker("enable");
         },
         buttons: {
-            "Změnit": function() {   
+            "Změnit": function() {
 
                 // provedení odeslání formuláře - validace
                 var chyba = validacePruchodu( $('#form-dochazka-zmenaCasu').serializeArray() );
@@ -260,7 +260,7 @@ function zmenaPruchodu(idZaznamu)
                 // nic nebrání provedení změny
                 if (chyba.length == 0) {
                     // změníme průchod
-                    $.ajax({      
+                    $.ajax({
                         type: "POST",
                         url: "<?php echo $this->url(array('module'=>'dochazka',
                                                           'controller'=>'official',
@@ -271,26 +271,26 @@ function zmenaPruchodu(idZaznamu)
                             // znovu načteme stránku
                             location.reload();
                         }
-                    });            
-                } 
+                    });
+                }
                 // změna není možná kvůli špatně vyplněnému formuláři
                 else {
                     $("#div-dochazka-officialZmenaPruchoduChyba").html(chyba);
-                }                                                                                   
+                }
             },
             "Zrušit": function() {
                 $( this ).dialog( "close" );
             }
-        }               
-    });            
+        }
+    });
 }
 
 /**
  * Ajaxové přidání průchodu oficiální docházky (dvojice příchod-odchod)
- * 
+ *
  * @param string  datum
  */
-function pridaniPruchodu(datum) 
+function pridaniPruchodu(datum)
 {
     var date = new Date(datum);
     var den = date.getDate();
@@ -300,27 +300,27 @@ function pridaniPruchodu(datum)
     // hack, aby se neotevíraly datepickery po otevření dialogu
     $("#form-dochazka-pridaniCasu-datumSmeny").datepicker("disable");
     $("#form-dochazka-pridaniCasu-prichodDen").datepicker("disable");
-    $("#form-dochazka-pridaniCasu-odchodDen").datepicker("disable");    
+    $("#form-dochazka-pridaniCasu-odchodDen").datepicker("disable");
 
     // vyplnění defaultních hodnot
     $('#form-dochazka-pridaniCasu-datumSmeny').val(den+'. '+mesic+'. '+rok);
     $('#form-dochazka-pridaniCasu-prichodDen').val(den+'. '+mesic+'. '+rok);
     $('#form-dochazka-pridaniCasu-prichodCas').val('06:00');
     $('#form-dochazka-pridaniCasu-odchodDen').val(den+'. '+mesic+'. '+rok);
-    $('#form-dochazka-pridaniCasu-odchodCas').val('14:00');    
- 
+    $('#form-dochazka-pridaniCasu-odchodCas').val('14:00');
+
     // vykreslíme dialogové okno
-    $("#div-dochazka-officialPridaniPruchodu").dialog({            
-        open: function() {          
+    $("#div-dochazka-officialPridaniPruchodu").dialog({
+        open: function() {
             // hack, aby vůbec datepickery šly otevřít
             $("#form-dochazka-pridaniCasu-datumSmeny").datepicker("enable");
             $("#form-dochazka-pridaniCasu-prichodDen").datepicker("enable");
-            $("#form-dochazka-pridaniCasu-odchodDen").datepicker("enable");          
+            $("#form-dochazka-pridaniCasu-odchodDen").datepicker("enable");
         },
         width: 600,
-        height: 450,        
+        height: 450,
         buttons: {
-            "Přidat": function() {   
+            "Přidat": function() {
 
                 // provedení odeslání formuláře - validace
                 var chyba = validacePruchodu( $('#form-dochazka-pridaniCasu').serializeArray() );
@@ -328,7 +328,7 @@ function pridaniPruchodu(datum)
                 // nic nebrání provedení změny
                 if (chyba.length == 0) {
                     // změníme průchod
-                    $.ajax({      
+                    $.ajax({
                         type: "POST",
                         url: "<?php echo $this->url(array('module'=>'dochazka',
                                                           'controller'=>'official',
@@ -339,76 +339,76 @@ function pridaniPruchodu(datum)
                             // znovu načteme stránku
                             location.reload();
                         }
-                    });            
-                } 
+                    });
+                }
                 // změna není možná kvůli špatně vyplněnému formuláři
                 else {
                     $("#div-dochazka-officialPridaniPruchoduChyba").html(chyba);
-                }                                                                                   
+                }
             },
             "Zrušit": function() {
                 $( this ).dialog( "close" );
             }
-        }               
-    });   
+        }
+    });
 }
 
 $(document).ready(function() {
-    
+
     /***************************************************************************
      * Obecné záležitosti při načítání stránky
-     */    
+     */
     $('#dochazka-officialZakorouhleniCasu').button({
         icons: {primary: 'ui-icon-clock'}
-    }); 
-    
+    });
+
     $('#dochazka-officialDoplneniPauzy').button({
         icons: {primary: 'ui-icon-star'}
-    });    
-    
+    });
+
     $('#dochazka-officialDoplneniPriplatku').button({
         icons: {primary: 'ui-icon-script'}
-    });        
-    
+    });
+
     $('.dochazka-oficialni-zmenaPruchodu').button({
         icons: {primary: 'ui-icon-search'},
         text: false
     });
-    
+
     $('.dochazka-oficialni-pauzaEdit').button({
         icons: {primary: 'ui-icon-wrench'},
         text: false
-    });            
-    
+    });
+
     $('.dochazka-oficialni-smazaniPruchodu').button({
         icons: {primary: 'ui-icon-trash'},
         text: false
     });
-    
+
     $('.dochazka-oficialni-pridaniPruchodu').button({
         icons: {primary: 'ui-icon-plus'},
         text: false
     });
-    
+
     /***************************************************************************
      * Ajaxové doplnění časů docházky, pauzy a čisté docházky
      */
     spocitejCasyDochazky();
-    
+
     /***************************************************************************
      * Modální dialog pro mazání jednotlivých časů z oficiální docházky
      */
      $('.dochazka-oficialni-smazaniPruchodu').click(function(event){
-    
+
         // hack, aby se stránka neodscrollovala nahoru
-        event.preventDefault();    
-    
+        event.preventDefault();
+
         // id mazaného záznamu
         var id = $(this).data('id');
-    
+
         smazaniPruchodu(id);
-    });           
-    
+    });
+
     /***************************************************************************
      * Modální dialog pro změnu sumy pauzy
      *
@@ -417,45 +417,45 @@ $(document).ready(function() {
      * ale pouzeklikem na změnové tlačítko
      */
     $('.dochazka-oficialni-pauzaEdit').click(function(event){
-    
+
         // hack, aby se stránka neodscrollovala nahoru
-        event.preventDefault();    
-    
+        event.preventDefault();
+
         var datum = $(this).data('datum');
         var osoba = $(this).data('osoba');
         var cip   = $(this).data('cip');
         var radek = $(this).data('radek');
-        
-        pauzaEdit(datum,osoba,cip,radek);        
+
+        pauzaEdit(datum,osoba,cip,radek);
     });
-    
+
     /***************************************************************************
      * Modální dialog pro změnu průchodu (dvojice příchod - odchod)
      */
     $('.dochazka-oficialni-zmenaPruchodu').click(function(event){
-        
+
         // hack, aby se stránka neodscrollovala nahoru
-        event.preventDefault();  
-        
+        event.preventDefault();
+
         var idZaznamu = $(this).data('zaznam');
-        
+
         zmenaPruchodu(idZaznamu);
     });
-    
+
     /***************************************************************************
      * Modální dialog pro přidání průchodu (dvojice příchod - odchod)
      */
     $('.dochazka-oficialni-pridaniPruchodu').click(function(event){
-        
+
         // hack, aby se stránka neodscrollovala nahoru
-        event.preventDefault();  
+        event.preventDefault();
 
         var datum  = $(this).data('datum');
-                
+
         pridaniPruchodu(datum);
-    });    
+    });
 });
-//]]>    
+//]]>
 </script>
 
 <a href ="<?php echo $this->url(array('module' => 'dochazka',
@@ -501,26 +501,26 @@ $(document).ready(function() {
     <tr>
         <td>
             <?php echo $zaznam['datum']; ?>
-            <button               
+            <button
                 class="dochazka-oficialni-pridaniPruchodu"
                 data-datum="<?php echo $zaznam['dbDatum']; ?>">&nbsp;
-            </button>             
+            </button>
         </td>
         <td>
             <table style="padding: 0; margin: 0;">
-            <?php foreach ($zaznam['pruchody'] as $pruchod): ?>         
+            <?php foreach ($zaznam['pruchody'] as $pruchod): ?>
                 <tr>
-                    <td> 
-                        <?php echo $pruchod['shortCasPrichod']; ?> - 
+                    <td>
+                        <?php echo $pruchod['shortCasPrichod']; ?> -
                         <?php echo $pruchod['shortCasOdchod']; ?>
-                        <button               
+                        <button
                             class="dochazka-oficialni-zmenaPruchodu"
                             data-zaznam="<?php echo $pruchod['id']; ?>">&nbsp;
-                        </button>                        
-                        <button               
+                        </button>
+                        <button
                             class="dochazka-oficialni-smazaniPruchodu"
                             data-id="<?php echo $pruchod['id']; ?>">&nbsp;
-                        </button>                                                
+                        </button>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -530,17 +530,19 @@ $(document).ready(function() {
         <td id="oficialni-dochazka-pauza-<?php echo $i; ?>"
             class="dochazka-oficialni-sumaPauzy">
         </td>
-        <td class="oficialni-dochazka-pauzaEdit">                          
-            <button               
+        <td class="oficialni-dochazka-pauzaEdit">
+            <?php if (count($zaznam['pruchody'])> 0 ): ?>
+            <button
                 class="dochazka-oficialni-pauzaEdit"
                 data-osoba="<?php echo $this->idOsoby; ?>"
                 data-cip="<?php echo $this->idCipu; ?>"
                 data-datum="<?php echo $zaznam['dbDatum']; ?>"
                 data-radek="<?php echo $i; ?>">&nbsp;
             </button>
+            <?php endif; ?>
         </td>
-        <td id="oficialni-dochazka-cistaDochazka-<?php echo $i; ?>"></td>        
-    <?php 
+        <td id="oficialni-dochazka-cistaDochazka-<?php echo $i; ?>"></td>
+    <?php
         // projedeme všechny příplatky podle typu, pro každý vypíšeme buňku tabulky
         foreach ($this->typyPriplatku as $typPriplatku):
     ?>
@@ -549,17 +551,17 @@ $(document).ready(function() {
             // pokud máme nějaký zapsaný příplatek, časem ho vypíšeme
             if (!empty($zaznam['priplatky'])) {
                 foreach ($zaznam['priplatky'] as $priplatek) {
-              
+
                     // pokud se shoduje typ příplatku se zapsaným příplatkem, vypíšeme jej právě teď
-                    if ($typPriplatku['id'] == $priplatek['idPriplatku']) {           
-                        echo $priplatek['delka']; 
+                    if ($typPriplatku['id'] == $priplatek['idPriplatku']) {
+                        echo $priplatek['delka'];
                     }
                 }
             } ?>
         </td>
     <?php endforeach; ?>
         <td>
-            <?php 
+            <?php
             // poznámka bude z proncipu věci jenom jedna
             if (!empty($zaznam['poznamka'])) {
                 echo $zaznam['poznamka'][0]['text'];
@@ -572,31 +574,31 @@ $(document).ready(function() {
 <!-- Dialogový DIV pro mazání záznamů docházky -------------------------------->
 
 <div id="div-dochazka-officialSmazaniCasu"
-     title="Smazání záznamu oficiální docházky">        
+     title="Smazání záznamu oficiální docházky">
 
 </div>
 
 <!-- Dialogový DIV pro změnu sumy pauzy --------------------------------------->
 
 <div id="div-dochazka-officialSumaPauzy"
-     title="Změna sumy pauzy ve směně">    
-       
+     title="Změna sumy pauzy ve směně">
+
 </div>
 
 <!-- Dialogový DIV pro změnu průchodu ----------------------------------------->
 
 <div id="div-dochazka-officialZmenaPruchodu"
-     title="Změna průchodu docházky">    
-        
+     title="Změna průchodu docházky">
+
     <?php echo $this->zmenaPruchoduForm; ?>
-    <div id="div-dochazka-officialZmenaPruchoduChyba"></div>    
+    <div id="div-dochazka-officialZmenaPruchoduChyba"></div>
 </div>
 
 <!-- Dialogový DIV pro přidání průchodu --------------------------------------->
 
 <div id="div-dochazka-officialPridaniPruchodu"
-     title="Přidání průchodu docházky">    
-    
+     title="Přidání průchodu docházky">
+
     <?php echo $this->pridaniPruchoduForm; ?>
-    <div id="div-dochazka-officialPridaniPruchoduChyba"></div>    
+    <div id="div-dochazka-officialPridaniPruchoduChyba"></div>
 </div>
