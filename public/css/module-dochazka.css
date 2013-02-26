@@ -86,6 +86,8 @@
 
 #div-dochazka-officialSmazaniCasu,
 #div-dochazka-officialSumaPauzy,
+#div-dochazka-officialZmenaPruchodu,
+#div-dochazka-officialPridaniPruchodu,
 #officialSmazaniCasu {
     display: none;
 }
@@ -109,7 +111,8 @@
 }
 
 #form-dochazka-zaokrouhleniCasu fieldset,
-#form-dochazka-zmenaCasu fieldset {
+#form-dochazka-zmenaCasu fieldset,
+#form-dochazka-pridaniCasu fieldset {
     border: 0;
 }
 
@@ -117,7 +120,8 @@
     width: 60px;
 }
 
-#form-dochazka-zmenaCasu input[type="text"] {
+#form-dochazka-zmenaCasu input[type="text"],
+#form-dochazka-pridaniCasu input[type="text"] {
     width: 120px;
 }
 
@@ -126,7 +130,8 @@
     display: inline-block;
 }
 
-#form-dochazka-zmenaCasu label {
+#form-dochazka-zmenaCasu label,
+#form-dochazka-pridaniCasu label{
     width: 130px;
     display: inline-block;    
 }
