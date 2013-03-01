@@ -296,37 +296,5 @@ $(document).ready(function() {
     </tr>           
     <?php endif; ?>
  
-<?php endforeach; ?>    
-  <!--  <tr> -->
-        
-        
-  <!--  </tr> -->
-    
+<?php endforeach; ?>       
 </table>
-
-
-
-<!-- Dočasná tabulka -->
-
-<?php foreach ($this->zaznamy as $index => $den): ?>
-
-    <?php if (!empty($den['pruchody'])): ?>
-   
-    <?php foreach ($den['pruchody'] as $index => $zaznam): ?>
-                          
-            
-    <?php echo str_replace('.',':',substr($zaznam['casAkce'],-5)); ?>
-        <?php if ($index % 2): ?>
-            <?php echo '<br />'; ?>
-
-        <?php else: ?>
-            <?php echo ','; ?>
-
-        <?php endif; ?>
-
-    <?php endforeach; ?>
-                           
-    <?php endif; ?>                        
-
-<?php  endforeach; ?>    
-
