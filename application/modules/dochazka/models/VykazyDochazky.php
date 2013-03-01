@@ -68,9 +68,10 @@ class Dochazka_Model_VykazyDochazky extends Fc_Model_DatabaseAbstract
     
     /**
      * Ověří, zda už má zaměstnanec docházku pro konkrétní měsíc a rok (nutné
-     * vyplněné _osoba, _cip, _mesic a _rok)
+     * vyplněné _osoba, _cip, _mesic a _rok). True vrátí v případě, že oficiální
+     * docházka pro kombinaci proměnných existuje
      * 
-     * @return array 
+     * @return boolean
      */
     public function overExistenci() 
     {   
@@ -86,8 +87,8 @@ class Dochazka_Model_VykazyDochazky extends Fc_Model_DatabaseAbstract
         $vysledek = self::$_adapter->fetchAll($select);
         
         switch (count($vysledek)) {
-            case 0:  return true; break;
-            default: return false; break;
+            case 0:  return false; break;
+            default: return true; break;
         }
     }      
     
