@@ -39,15 +39,24 @@ echo $this->doctype()."\n";
 <div id="horni">
 
     <div id="horni-img-levy">
-        <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekLevy); ?>" alt="" />
+        <?php if (null !== $this->obrazekLevy): ?>
+            <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekLevy); ?>" alt="" />
+        <?php endif; ?>
     </div>
     <div id="horni-img-stredni">
-        <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekStredni); ?>" alt="" />
+        <?php if (null !== $this->obrazekStredni): ?>
+            <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekStredni); ?>" alt="" />
+        <?php endif; ?>
     </div>
     <div id="horni-img-pravy">
-        <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekPravy); ?>" alt="" />
+        <?php if (null !== $this->obrazekPravy): ?>
+            <img src="<?php echo $this->baseUrl('images/ico48/'.$this->obrazekPravy); ?>" alt="" />
+        <?php endif; ?>
     </div>
-    <div id="horni-text"><h1><?php echo $this->escape($this->title); ?></h1></div>
+    <div id="horni-text">
+        <h1><?php echo $this->escape($this->title); ?></h1>
+    </div>
+    
 </div>    
 
 <div id="levy">
@@ -61,7 +70,9 @@ echo $this->doctype()."\n";
                 <?php foreach ($this->leftNavigation as $link):?>
                 <tr>
                     <td>
-                        <img src="<?php echo $this->baseUrl('images/ico48/'.$link['img']); ?>" alt="" />
+                        <?php if (null !== $link['img']): ?>
+                            <img src="<?php echo $this->baseUrl('images/ico48/'.$link['img']); ?>" alt="" />
+                        <?php endif; ?>
                     </td>
                     <td>                    
                         <a href="<?php echo $link['url']; ?>">
@@ -76,8 +87,7 @@ echo $this->doctype()."\n";
 </div>
     
 <div id="pravy">    
-    <?php echo $this->layout()->content; ?>
-    <p></p>
+    <?php echo $this->layout()->content; ?>    
 </div>    
     
 </body>
