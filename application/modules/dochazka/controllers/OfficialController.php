@@ -258,6 +258,10 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         Dochazka_Form_ZmenaCasu::$typ = 'pridani';
         $pridaniPrucoduForm = new Dochazka_Form_ZmenaCasu();
    
+        // formulář pro změnu poznámky
+        $poznamkaForm = new Dochazka_Form_OfficialPoznamka();
+        $this->view->zmenaPoznamkyForm = $poznamkaForm;
+        
         /**** DATA DO VIEW ****************************************************/
                                        
         $this->view->data = $poleZaznamu;
@@ -517,7 +521,36 @@ class Dochazka_OfficialController extends Zend_Controller_Action
     }    
     
     /**
-     *  přidání průchodu do požadovaného dne
+     * Získání zapsané poznámky u dne oficiální docházky
+     */
+    public function ajaxZjistiPoznamkuAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $datum = $this->getRequest()->getParam('datum');
+ 
+        $poznamky = new Dochazka_Model_OficialniPoznamky(
+            self::$_session->idOsoby, self::$_session->idCipu, $datum);
+        
+        $this->view->poznamka = $poznamky->ziskejPoznamku();        
+    }    
+        
+    /**
+     * Změna zapsané poznámky u dne oficiální docházky
+     */
+    public function ajaxZmenaPoznamkyAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $datum = $this->getRequest()->getParam('datum');
+        $poznamka = $this->getRequest()->getParam('poznamka');
+        
+        $poznamky = new Dochazka_Model_OficialniPoznamky(
+            self::$_session->idOsoby, self::$_session->idCipu, $datum, $poznamka);
+        
+        $poznamky->zapisPoznamku();
+    }
+    
+    /**
+     *  Přidání průchodu do požadovaného dne
      */
     public function ajaxPridaniPruchoduAction()
     {

@@ -24,7 +24,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     protected $_cip = null;
     
     /**
-     * ID osoby měnící a zapisujíc data
+     * ID osoby měnící a zapisující data
      * @var type 
      */
     protected $_uzivatel = null;
@@ -603,7 +603,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
         
         return $data;
     }
-    
+
     /**
      * V tabulce oficialni_dochazka změní řádek se zadaným _idPruchodu
      * 

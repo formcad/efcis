@@ -88,6 +88,7 @@
 #div-dochazka-officialSumaPauzy,
 #div-dochazka-officialZmenaPruchodu,
 #div-dochazka-officialPridaniPruchodu,
+#div-dochazka-officialZmenaPoznamky,
 #officialSmazaniCasu {
     display: none;
 }
@@ -142,6 +143,10 @@
 
 #form-dochazka-zapisOficialniPauzy input[type="text"] {
     width: 50px;
+}
+
+#form-dochazka-oficialniPoznamka input[type="text"] {
+    width: 400px;
 }
 
 /**** TABULKY *****************************************************************/

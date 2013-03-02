@@ -288,7 +288,7 @@ function zmenaPruchodu(idZaznamu)
 /**
  * Ajaxové přidání průchodu oficiální docházky (dvojice příchod-odchod)
  *
- * @param string  datum
+ * @param string datum
  */
 function pridaniPruchodu(datum)
 {
@@ -353,6 +353,61 @@ function pridaniPruchodu(datum)
     });
 }
 
+/**
+ * Ajaxové přidání nebo změna poznámky ke konkrétnímu dni oficiální docházky
+ *
+ * @param string datum
+ */
+function zmenaPoznamky(datum)
+{ 
+    // získáme z databáze poznámku a nahrajeme ji do formuláře
+    $.ajax({
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka',
+                                          'controller'=>'official',
+                                          'action' => 'ajax-zjisti-poznamku'),
+                                          null,true); ?>",
+        data: ({datum: datum}),
+        async: false,
+        success: function(poznamka) {
+            // vyplnění dat z databáze na správné místo formuláře
+            $('#form-dochazka-oficialniPoznamka-poznamka').val(poznamka);   
+        }
+    });   
+    
+    
+    
+    $('#div-dochazka-officialZmenaPoznamky').dialog({
+        modal: true,
+        width: 600,
+        height: 300,
+        buttons: {
+            "Zapsat": function() {
+
+                var poznamka = $('#form-dochazka-oficialniPoznamka-poznamka').val();
+
+                // změníme poznámku
+                $.ajax({
+                    type: "POST",
+                    url: "<?php  echo $this->url(array('module'=>'dochazka',
+                                                      'controller'=>'official',
+                                                      'action' => 'ajax-zmena-poznamky'),
+                                                      null,true); ?>",
+                    data: ({datum: datum, poznamka: poznamka}),
+                    success: function() {
+                        // znovu načteme stránku
+                        location.reload();
+                    }
+                });
+                $( this ).dialog( "close" );           
+            },
+            "Zrušit": function() {
+                $( this ).dialog( "close" );
+            }
+        }        
+    });
+}
+
 $(document).ready(function() {
 
     /***************************************************************************
@@ -389,6 +444,18 @@ $(document).ready(function() {
         icons: {primary: 'ui-icon-plus'},
         text: false
     });
+    
+    $('.dochazka-oficialni-poznamkaEdit').button({
+        icons: {primary: 'ui-icon-comment'},
+        text: false
+    });
+
+    /***************************************************************************
+     * Předcházení nechtěnému odeslání formuláře stlačením enteru
+     */
+    $('#form-dochazka-oficialniPoznamka').submit(function(){
+        return false;
+    })
 
     /***************************************************************************
      * Ajaxové doplnění časů docházky, pauzy a čisté docházky
@@ -454,6 +521,19 @@ $(document).ready(function() {
 
         pridaniPruchodu(datum);
     });
+    
+    /***************************************************************************
+     * Modální dialog přidání nebo změny poznámky ke dni docházky
+     */
+    $('.dochazka-oficialni-poznamkaEdit').click(function(event){
+
+        // hack, aby se stránka neodscrollovala nahoru
+        event.preventDefault();
+
+        var datum  = $(this).data('datum');
+  
+        zmenaPoznamky(datum);
+    });    
 });
 //]]>
 </script>
@@ -494,7 +574,7 @@ $(document).ready(function() {
         <?php foreach ($this->typyPriplatku as $typPriplatku): ?>
         <th><?php echo $typPriplatku['zkratka']; ?></th>
         <?php endforeach; ?>
-        <th>Poznámka</th>
+        <th colspan="2">Poznámka</th>
     </tr>
 
 <?php foreach ($this->data as $i => $zaznam): ?>
@@ -567,6 +647,12 @@ $(document).ready(function() {
                 echo $zaznam['poznamka'][0]['text'];
             } ?>
         </td>
+        <td>
+            <button
+                class="dochazka-oficialni-poznamkaEdit"
+                data-datum="<?php echo $zaznam['dbDatum']; ?>">&nbsp;
+            </button>
+        </td>
     </tr>
 <?php endforeach; ?>
 </table>
@@ -602,3 +688,28 @@ $(document).ready(function() {
     <?php echo $this->pridaniPruchoduForm; ?>
     <div id="div-dochazka-officialPridaniPruchoduChyba"></div>
 </div>
+
+<!-- Dialogový DIV změny poznámky --------------------------------------------->
+
+<div id="div-dochazka-officialZmenaPoznamky"
+     title="Změna poznámky k docházce">
+
+    <?php echo $this->zmenaPoznamkyForm; ?>
+</div>
+
+
+
+
+
+<!-- Dočasné řešení tvorby oficiální docházky :) ------------------------------>
+
+<?php foreach ($this->data as $i => $zaznam): ?>
+<table>
+    <tr>
+        <?php foreach ($zaznam['pruchody'] as $pruchod): ?>           
+        <td><?php echo $pruchod['shortCasPrichod']; ?></td>
+        <td><?php echo $pruchod['shortCasOdchod']; ?></td>         
+        <?php endforeach; ?>  
+    </tr>
+</table>
+<?php endforeach; ?>
