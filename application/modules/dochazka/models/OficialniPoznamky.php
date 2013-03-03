@@ -3,20 +3,8 @@
 /**
  * Informace o poznámkách oficiální docházky
  */
-class Dochazka_Model_OficialniPoznamky extends Fc_Model_DatabaseAbstract
-{
-    /**
-     * ID zaměstnance
-     * @var integer 
-     */
-    protected $_osoba = null; 
-    
-    /**
-     * ID čipu
-     * @var integer
-     */
-    protected $_cip = null;
-    
+class Dochazka_Model_OficialniPoznamky extends Dochazka_Model_DochazkaOficialni
+{    
     /**
      * Datum směny
      * @var string
@@ -28,13 +16,7 @@ class Dochazka_Model_OficialniPoznamky extends Fc_Model_DatabaseAbstract
      * @var string
      */
     protected $_text = null;
-    
-    /**
-     * ID osoby měnící a zapisující data
-     * @var type 
-     */
-    protected $_uzivatel = null;
-    
+     
     /**
      * Konctruktor třídy
      * 
@@ -44,14 +26,12 @@ class Dochazka_Model_OficialniPoznamky extends Fc_Model_DatabaseAbstract
      * @param string|null  $text
      * @param ingeger|null $uzivatel     
      */
-    function __construct($osoba, $cip, $datumSmeny, $text = null, $uzivatel = null) {
-        $this->setOsoba($osoba);
-        $this->setCip($cip);
-        $this->setDatumSmeny($datumSmeny);
-        $this->setText($text);
-        $this->setUzivatel($uzivatel);
+    function __construct($osoba, $cip, $uzivatel, $datumSmeny, $text = null) 
+    {
+        parent::__construct($osoba, $cip, $uzivatel);
         
-        self::$_adapter = Zend_Db_Table::getDefaultAdapter();
+        $this->setDatumSmeny($datumSmeny);
+        $this->setText($text);            
     }
  
     /**
@@ -61,7 +41,7 @@ class Dochazka_Model_OficialniPoznamky extends Fc_Model_DatabaseAbstract
      * @return null|string
      */
     public function ziskejPoznamku()
-    {
+    {   
         $select = self::$_adapter->select()
             ->from(array('po' => 'oficialni_poznamky'),
                 array('poznamka'=>'text'))
@@ -160,22 +140,6 @@ class Dochazka_Model_OficialniPoznamky extends Fc_Model_DatabaseAbstract
         }
     }
 
-    public function getOsoba() {
-        return $this->_osoba;
-    }
-
-    public function setOsoba($osoba) {
-        $this->_osoba = $osoba;
-    }
-
-    public function getCip() {
-        return $this->_cip;
-    }
-
-    public function setCip($cip) {
-        $this->_cip = $cip;
-    }
-
     public function getDatumSmeny() {
         return $this->_datumSmeny;
     }
@@ -191,13 +155,4 @@ class Dochazka_Model_OficialniPoznamky extends Fc_Model_DatabaseAbstract
     public function setText($text) {
         $this->_text = $text;
     }
-    
-    public function getUzivatel() {
-        return $this->_uzivatel;
-    }
-
-    public function setUzivatel($uzivatel) {
-        $this->_uzivatel = $uzivatel;
-    }
-    
 }
