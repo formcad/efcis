@@ -89,6 +89,7 @@
 #div-dochazka-officialZmenaPruchodu,
 #div-dochazka-officialPridaniPruchodu,
 #div-dochazka-officialZmenaPoznamky,
+#div-dochazka-officialZmenaPriplatku,
 #officialSmazaniCasu {
     display: none;
 }
@@ -148,6 +149,16 @@
 #form-dochazka-oficialniPoznamka input[type="text"] {
     width: 400px;
 }
+
+#form-dochazka-oficialniPriplatky label {
+    width: 160px;
+    display: inline-block;
+}
+
+#form-dochazka-oficialniPriplatky input[type="text"] {
+    width: 70px;    
+}
+
 
 /**** TABULKY *****************************************************************/
 

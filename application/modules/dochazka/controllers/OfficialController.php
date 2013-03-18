@@ -242,35 +242,42 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         
         // nastavíme časové limitní hodnoty docházky
         $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
-        $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
+        $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'
+            .cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
 
         // získáme pole oficiální docházky
         $poleZaznamu = $dochazkaOficialni->getAkce();
        
         // získáme typy příplatků
-        $modelPriplatku = new Dochazka_Model_TypyPriplatku();       
-        $modelPriplatku->setPlatnost($rozsah['rok'].'-'.$rozsah['mesic'].'-01');  
+        $priplatky = new Dochazka_Model_TypyPriplatku();       
+        $priplatky->setPlatnost($rozsah['rok'].'-'.$rozsah['mesic'].'-01');  
+        $typyPriplatku = $priplatky->getTypy();
 
         // formuláře pro změnu a přidání průcodu (dvojice příchod-odchod)
         Dochazka_Form_ZmenaCasu::$typ = 'zmena';
         $zmenaPruchoduForm = new Dochazka_Form_ZmenaCasu();
         
         Dochazka_Form_ZmenaCasu::$typ = 'pridani';
-        $pridaniPrucoduForm = new Dochazka_Form_ZmenaCasu();
+        $pridaniPruchoduForm = new Dochazka_Form_ZmenaCasu();
    
         // formulář pro změnu poznámky
         $poznamkaForm = new Dochazka_Form_OfficialPoznamka();
-        $this->view->zmenaPoznamkyForm = $poznamkaForm;
+        
+        // formulář pro změnu příplatků
+        Dochazka_Form_OfficialPriplatky::$polePriplatku = $typyPriplatku;        
+        $priplatkyForm = new Dochazka_Form_OfficialPriplatky();
         
         /**** DATA DO VIEW ****************************************************/
                                        
         $this->view->data = $poleZaznamu;
         $this->view->idVykazu = $idVykazu;
-        $this->view->idOsoby = (self::$_session->idOsoby);
-        $this->view->idCipu = (self::$_session->idCipu);
-        $this->view->typyPriplatku = $modelPriplatku->getTypy();  
-        $this->view->pridaniPruchoduForm = $pridaniPrucoduForm;
+        $this->view->idOsoby = self::$_session->idOsoby;
+        $this->view->idCipu = self::$_session->idCipu;
+        $this->view->typyPriplatku = $typyPriplatku;
+        $this->view->pridaniPruchoduForm = $pridaniPruchoduForm;
         $this->view->zmenaPruchoduForm = $zmenaPruchoduForm;
+        $this->view->zmenaPoznamkyForm = $poznamkaForm;
+        $this->view->zmenaPriplatkuForm = $priplatkyForm;
  
         $url = $this->_helper->url;
         $this->view->leftNavigation = array(
@@ -529,7 +536,8 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $datum = $this->getRequest()->getParam('datum');
  
         $poznamky = new Dochazka_Model_OficialniPoznamky(
-            self::$_session->idOsoby, self::$_session->idCipu, $datum);
+            self::$_session->idOsoby, self::$_session->idCipu,
+            self::$_identity->id, $datum);
         
         $this->view->poznamka = $poznamky->ziskejPoznamku();        
     }    
@@ -544,7 +552,8 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $poznamka = $this->getRequest()->getParam('poznamka');
         
         $poznamky = new Dochazka_Model_OficialniPoznamky(
-            self::$_session->idOsoby, self::$_session->idCipu, $datum, $poznamka);
+            self::$_session->idOsoby, self::$_session->idCipu, 
+            self::$_identity->id, $datum, $poznamka);
         
         $poznamky->zapisPoznamku();
     }
@@ -830,5 +839,81 @@ class Dochazka_OfficialController extends Zend_Controller_Action
                 
         $dochazka->doplnPauzu();
     }   
-}
+    
+    /**
+     * Pro danou kombinaci faktorů jednoznačně určujících pracovníka a den
+     * oficiální docházky vypíše jednotlivé příplatky z databáze
+     */
+    public function ajaxPodrobnostiPriplatkuAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $datum = $this->getRequest()->getParam('datum');
+ 
+        $priplatky = new Dochazka_Model_OficialniPriplatky(
+            self::$_session->idOsoby, self::$_session->idCipu,
+            self::$_identity->id, $datum);
+        
+        $this->view->data = json_encode($priplatky->ziskejPriplatky());
+    }
+    
+    /**
+     * Pouhá validace formuláře AJAXem - nevypisuje se přesná informace o chybě,
+     * ale pouze sdělení, že k chybě došlo
+     */
+    public function ajaxValidaceZmenyPriplatkuAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+        $data = $this->getRequest()->getParam('data');
+        $datum = $this->getRequest()->getParam('datum');
+        
+        // uzpůsobíme data pro použití ve formuláři - formát z JS není totožný 
+        // s tím, co očekává validační funkce
+        $formData = array();
+        foreach ($data as $radek) {
+            // formát pruchod[1] změníme na 1 (tedy vlastně ID příplatku)
+            $radek['name'] = str_replace('priplatek[','',$radek['name']);
+            $radek['name'] = str_replace(']','',$radek['name']);
+   
+            $formData['priplatek'][$radek['name']] = $radek['value'];
+        } 
+        $priplatky = new Dochazka_Model_TypyPriplatku(); 
+        $priplatky->setPlatnost($datum);  
 
+        Dochazka_Form_OfficialPriplatky::$polePriplatku = $priplatky->getTypy();               
+        $form = new Dochazka_Form_OfficialPriplatky();
+    
+        switch ($form->isValid($formData)) {
+            case true:  $this->view->chyba = false; break;
+            case false: $this->view->chyba = true;  break;            
+        }   
+    }
+    
+    /**
+     * Provedení změny přílatku konkrétní osoby v konkrétním dni po zvalidování
+     * formuláře zvláštní validační funkcí
+     */
+    public function ajaxZmenaPriplatkuAction()
+    {
+        $this->_helper->getHelper('layout')->disableLayout();
+       
+        $data = $this->getRequest()->getParam('data');
+        $datum = $this->getRequest()->getParam('datum');
+        
+        // formulář procházíme po jednotlivých řádcích
+        foreach ($data as $radek) {
+            // formát pruchod[1] změníme na 1 (tedy vlastně ID příplatku)
+            $radek['name'] = str_replace('priplatek[','',$radek['name']);
+            $idPriplatku = str_replace(']','',$radek['name']);
+            
+            $filter = new Zend_Filter_LocalizedToNormalized(); 
+            $delka = $filter->filter($radek['value']);
+            
+            // délku příplatku uložíme do databáze
+            $priplatky = new Dochazka_Model_OficialniPriplatky(
+                self::$_session->idOsoby, self::$_session->idCipu,
+                self::$_identity->id, $datum, $idPriplatku, $delka);
+            
+            $priplatky->zapisPriplatek();
+        } 
+    }
+}

@@ -56,14 +56,14 @@ class Dochazka_Model_VykazyDochazky extends Fc_Model_DatabaseAbstract
     function __construct($idDochazky = null, $osoba = null, $cip = null,
         $uzivatel = null, $mesic = null, $rok = null) 
     {
+        parent::__construct();
+        
         $this->setIdDochazky($idDochazky);
         $this->setOsoba($osoba);
         $this->setCip($cip);
         $this->setUzivatel($uzivatel);
         $this->setMesic($mesic);
-        $this->setRok($rok);
-
-        self::$_adapter = Zend_Db_Table::getDefaultAdapter();        
+        $this->setRok($rok);     
     }
     
     /**

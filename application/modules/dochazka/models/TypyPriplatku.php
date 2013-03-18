@@ -12,7 +12,8 @@ class Dochazka_Model_TypyPriplatku extends Fc_Model_DatabaseAbstract
     protected $_platnost = null;
 
     /**
-     * Získá seznam všech typů příplatků docházky
+     * Získá seznam všech typů příplatků docházky pro určité datum (_platnost)
+     * 
      * @return array 
      */        
     public function getTypy() 

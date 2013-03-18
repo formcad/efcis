@@ -21,7 +21,7 @@ function spocitejCasyDochazky()
         success: function(data) {
 
             var i = 0;
-            for ( i == 0; i <= (data.length -1); i++) {
+            for ( i = 0; i <= (data.length -1); i++) {
 
                 $('#oficialni-dochazka-dochazka-'+i).html(data[i]['dochazka']);
                 $('#oficialni-dochazka-pauza-'+i).html(data[i]['pauza']);
@@ -35,8 +35,9 @@ function spocitejCasyDochazky()
  * Ajaxové nahrání časů docházky, pauzy a čisté docházky pro konkrétní den
  * docházky při změně sumy pauzy nebo příplatků
  *
- * @param string  datum Datum, pro které hodnoty počítáme
- * @param integer radek Číslo řádku, který počítáme
+ * @param {string} datum Datum, pro které hodnoty počítáme
+ * @param {integer} radek Číslo řádku, který počítáme
+ * @returns {void}  
  */
 function spocitejCasyDne(datum,radek)
 {
@@ -60,10 +61,11 @@ function spocitejCasyDne(datum,radek)
 /**
  * Ajaxová změna záznamu sumy pauzy v konkrétním dni docházky
  *
- * @param string  datum Datum dne docházky
- * @param integer osoby ID osoby, pro kterou pauzu měníme
- * @param integer cip   ID čipu, pro který pauzu měníme
- * @param integer radek Číslo řádku, který měníme
+ * @param {string} datum
+ * @param {integer} osoba  ID osoby, pro kterou pauzu měníme
+ * @param {integer} cip    ID čipu, pro který pauzu měníme
+ * @param {integer} radek  Číslo řádku, který měníme
+ * @returns {void}
  */
 function pauzaEdit(datum,osoba,cip,radek)
 {
@@ -103,7 +105,7 @@ function pauzaEdit(datum,osoba,cip,radek)
                 });
 
                 // nic nebrání provedení změny
-                if (chyba.length == 0) {
+                if (chyba.length === 0) {
 
                     // změníme pauzu
                     $.ajax({
@@ -138,7 +140,8 @@ function pauzaEdit(datum,osoba,cip,radek)
 /**
  * Ajaxové smazání vybraného průchodu (dvojice příchod-odchod)
  *
- * @param integer id Id vybrané dvojice průchodů
+ * @param {integer} id Id vybrané dvojice průchodů
+ * @returns {void} 
  */
 function smazaniPruchodu(id)
 {
@@ -188,7 +191,7 @@ function smazaniPruchodu(id)
 /**
  * Ajaxová validace vyplněného formuláře přidání nebo změny průchodu
  *
- * @param array data Formulář s daty
+ * @param {array} data Formulář s daty
  */
 function validacePruchodu(data)
 {
@@ -211,7 +214,7 @@ function validacePruchodu(data)
 /**
  * Ajaxová změna vybraného průchodu oficiální docházky
  *
- * @param integer idZaznamu
+ * @param {integer} idZaznamu
  */
 function zmenaPruchodu(idZaznamu)
 {
@@ -258,7 +261,7 @@ function zmenaPruchodu(idZaznamu)
                 var chyba = validacePruchodu( $('#form-dochazka-zmenaCasu').serializeArray() );
 
                 // nic nebrání provedení změny
-                if (chyba.length == 0) {
+                if (chyba.length === 0) {
                     // změníme průchod
                     $.ajax({
                         type: "POST",
@@ -288,7 +291,7 @@ function zmenaPruchodu(idZaznamu)
 /**
  * Ajaxové přidání průchodu oficiální docházky (dvojice příchod-odchod)
  *
- * @param string datum
+ * @param {string} datum
  */
 function pridaniPruchodu(datum)
 {
@@ -326,7 +329,7 @@ function pridaniPruchodu(datum)
                 var chyba = validacePruchodu( $('#form-dochazka-pridaniCasu').serializeArray() );
 
                 // nic nebrání provedení změny
-                if (chyba.length == 0) {
+                if (chyba.length === 0) {
                     // změníme průchod
                     $.ajax({
                         type: "POST",
@@ -356,7 +359,7 @@ function pridaniPruchodu(datum)
 /**
  * Ajaxové přidání nebo změna poznámky ke konkrétnímu dni oficiální docházky
  *
- * @param string datum
+ * @param {string} datum
  */
 function zmenaPoznamky(datum)
 { 
@@ -408,6 +411,105 @@ function zmenaPoznamky(datum)
     });
 }
 
+/**
+ * Ajaxová validace vyplněného formuláře změny příplatků dne ofic. docházky
+ *
+ * @param {array} data Formulář s daty
+ * @param {string} datum Datum dne směny - platnost pole příplatků
+ */
+function validacePriplatku(data,datum)
+{
+    var chyba = null;
+
+    $.ajax({
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka',
+                                          'controller'=>'official',
+                                          'action' => 'ajax-validace-zmeny-priplatku'),
+                                          null,true); ?>",
+        data: ({data: data, datum: datum}),
+        async: false,
+        success: function(data) { chyba = data; }
+    });
+
+    return chyba;
+}
+
+/**
+ * Ajaxová změna všech příplatků dne oficiální docházky
+ *
+ * @param {string} datum
+ */
+function zmenaPriplatku(datum) 
+{
+    // vyčistíme původní formulářová data
+    $('.priplatekElement').val('');
+    $('#div-dochazka-officialZmenaPriplatkuChyba').html('');
+
+    // vyplníme data do změnového formuláře
+    $.ajax({
+        type: "POST",
+        url: "<?php echo $this->url(array('module'=>'dochazka',
+                                          'controller'=>'official',
+                                          'action' => 'ajax-podrobnosti-priplatku'),
+                                          null,true); ?>",
+        data: ({datum: datum}),
+        dataType: 'json',
+        async: false,
+        success: function(data) {
+            
+            // vyplnění dat z databáze na správné místo formuláře            
+            for(var i=0;i<data.length;i++){
+                var obj = data[i];
+                $("#priplatek-" + obj['idPriplatku']).val(obj['delka']);     
+            }            
+        }
+    });
+
+    // vykreslíme dialogové okno
+    $("#div-dochazka-officialZmenaPriplatku").dialog({
+        width: 600,
+        height: 450,
+        modal: true,
+        buttons: {
+            "Změnit": function() {
+
+                // provedení odeslání formuláře - validace
+                var chyba = validacePriplatku(
+                    $('#form-dochazka-oficialniPriplatky').serializeArray(),datum);
+
+                // nic nebrání provedení změny
+                if (chyba.length === 0) {
+                    // změníme příplatek
+                    $.ajax({
+                        type: "POST",
+                        url: "<?php echo $this->url(array('module'=>'dochazka',
+                                                          'controller'=>'official',
+                                                          'action' => 'ajax-zmena-priplatku'),
+                                                          null,true); ?>",
+                        data: ({
+                            data: $('#form-dochazka-oficialniPriplatky').serializeArray(),
+                            datum: datum
+                        }),
+                        success: function() {                            
+                            // znovu načteme stránku
+                            $( this ).dialog( "close" );
+                            location.reload();
+                        }
+                    });
+                }
+                // změna není možná kvůli špatně vyplněnému formuláři
+                else {
+                    $("#div-dochazka-officialZmenaPriplatkuChyba").html(chyba);
+                }
+            },
+            "Zrušit": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });    
+}
+
 $(document).ready(function() {
 
     /***************************************************************************
@@ -450,12 +552,16 @@ $(document).ready(function() {
         text: false
     });
 
+    $('.dochazka-oficialni-priplatkyEdit').button({
+        icons: {primary: 'ui-icon-wrench'},
+        text: false
+    });
     /***************************************************************************
      * Předcházení nechtěnému odeslání formuláře stlačením enteru
      */
     $('#form-dochazka-oficialniPoznamka').submit(function(){
         return false;
-    })
+    });
 
     /***************************************************************************
      * Ajaxové doplnění časů docházky, pauzy a čisté docházky
@@ -464,6 +570,7 @@ $(document).ready(function() {
 
     /***************************************************************************
      * Modální dialog pro mazání jednotlivých časů z oficiální docházky
+     * @param {event} event
      */
      $('.dochazka-oficialni-smazaniPruchodu').click(function(event){
 
@@ -482,6 +589,8 @@ $(document).ready(function() {
      * Změna nabude realizována odesláním formuláře, což je zajištěno
      * JavaScriptem přímo ve view s formulářem (ajax-podrobnosti-dne-pauza.phtml),
      * ale pouzeklikem na změnové tlačítko
+     * 
+     * @param {event} event
      */
     $('.dochazka-oficialni-pauzaEdit').click(function(event){
 
@@ -498,6 +607,7 @@ $(document).ready(function() {
 
     /***************************************************************************
      * Modální dialog pro změnu průchodu (dvojice příchod - odchod)
+     * @param {event} event
      */
     $('.dochazka-oficialni-zmenaPruchodu').click(function(event){
 
@@ -511,6 +621,7 @@ $(document).ready(function() {
 
     /***************************************************************************
      * Modální dialog pro přidání průchodu (dvojice příchod - odchod)
+     * @param {event} event
      */
     $('.dochazka-oficialni-pridaniPruchodu').click(function(event){
 
@@ -524,6 +635,7 @@ $(document).ready(function() {
     
     /***************************************************************************
      * Modální dialog přidání nebo změny poznámky ke dni docházky
+     * @param {event} event
      */
     $('.dochazka-oficialni-poznamkaEdit').click(function(event){
 
@@ -533,6 +645,20 @@ $(document).ready(function() {
         var datum  = $(this).data('datum');
   
         zmenaPoznamky(datum);
+    });   
+    
+    /***************************************************************************
+     * Modální dialog pro změnu příplatků dne oficiální docházky
+     * @param {event} event
+     */
+    $('.dochazka-oficialni-priplatkyEdit').click(function(event){
+
+        // hack, aby se stránka neodscrollovala nahoru
+        event.preventDefault();
+
+        var datum  = $(this).data('datum');
+
+        zmenaPriplatku(datum);
     });    
 });
 //]]>
@@ -568,12 +694,13 @@ $(document).ready(function() {
     <tr>
         <th>Datum</th>
         <th>Docházka</th>
-        <th>Suma<br />práce</th>
+        <th>Suma<br />doch.</th>
         <th colspan="2">Suma<br />pauzy</th>
-        <th>Čistá<br />práce</th>
+        <th>Čistá<br />doch.</th>
         <?php foreach ($this->typyPriplatku as $typPriplatku): ?>
         <th><?php echo $typPriplatku['zkratka']; ?></th>
         <?php endforeach; ?>
+        <th></th>
         <th colspan="2">Poznámka</th>
     </tr>
 
@@ -610,16 +737,14 @@ $(document).ready(function() {
         <td id="oficialni-dochazka-pauza-<?php echo $i; ?>"
             class="dochazka-oficialni-sumaPauzy">
         </td>
-        <td class="oficialni-dochazka-pauzaEdit">
-            <?php if (count($zaznam['pruchody'])> 0 ): ?>
+        <td class="oficialni-dochazka-pauzaEdit">       
             <button
                 class="dochazka-oficialni-pauzaEdit"
                 data-osoba="<?php echo $this->idOsoby; ?>"
                 data-cip="<?php echo $this->idCipu; ?>"
                 data-datum="<?php echo $zaznam['dbDatum']; ?>"
                 data-radek="<?php echo $i; ?>">&nbsp;
-            </button>
-            <?php endif; ?>
+            </button>           
         </td>
         <td id="oficialni-dochazka-cistaDochazka-<?php echo $i; ?>"></td>
     <?php
@@ -640,6 +765,12 @@ $(document).ready(function() {
             } ?>
         </td>
     <?php endforeach; ?>
+        <td>
+            <button
+                class="dochazka-oficialni-priplatkyEdit"
+                data-datum="<?php echo $zaznam['dbDatum']; ?>">&nbsp;
+            </button>            
+        </td>        
         <td>
             <?php
             // poznámka bude z proncipu věci jenom jedna
@@ -697,7 +828,14 @@ $(document).ready(function() {
     <?php echo $this->zmenaPoznamkyForm; ?>
 </div>
 
+<!-- Dialogový DIV pro změnu záznamů o příplatcích ---------------------------->
 
+<div id="div-dochazka-officialZmenaPriplatku"
+     title="Změna příplatků docházky">
+
+    <?php echo $this->zmenaPriplatkuForm; ?>
+    <div id="div-dochazka-officialZmenaPriplatkuChyba"></div>
+</div>
 
 
 

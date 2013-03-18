@@ -27,4 +27,3 @@ class Dochazka_Form_OfficialPoznamka extends Zend_Form
         $this->addElements(array($poznamka));         
     }
 }
-

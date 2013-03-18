@@ -114,6 +114,21 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
     protected $_trvani = null;
         
     /**
+     * Konstruktor třídy
+     * 
+     * @param integer $osoba
+     * @param integer $cip
+     * @param integer $uzivatel
+     */
+    function __construct($osoba = null, $cip = null, $uzivatel = null)
+    {
+        parent::__construct();
+        
+        $this->setOsoba($osoba);
+        $this->setCip($cip);
+        $this->setUzivatel($uzivatel);
+    }
+    /**
      * Vytvoření vhodného tvaru z dat oficiální docházky pro uložení průchodů
      * v DB
      * 

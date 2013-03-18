@@ -16,5 +16,6 @@ abstract class Fc_Model_DatabaseAbstract
     public function __construct()
     {        
         $this->_adapter = Zend_Db_Table::getDefaultAdapter();
+        self::$_adapter = Zend_Db_Table::getDefaultAdapter();
     }
 }
