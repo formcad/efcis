@@ -22,7 +22,7 @@ class Dochazka_Model_TempPruchod extends Fc_Model_DatabaseAbstract
             throw new Exception('Nemáte dostatečné oprávnění k prohlížení stránky');    
         }
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('dt' => 'dochazka_temp'),
                    array('casPrichodu' => 'cas_akce'))
             ->join(array('o' => 'osoby'),
@@ -30,7 +30,7 @@ class Dochazka_Model_TempPruchod extends Fc_Model_DatabaseAbstract
                    array('jmeno','prijmeni'))
             ->order(array('o.prijmeni'));
         
-        return $this->_adapter->fetchAll($select);
+        return self::$_adapter->fetchAll($select);
     }
     
     public function getRole() {

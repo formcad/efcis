@@ -39,7 +39,7 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
     {
         $akce = array();
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('o' => 'odpracovane_rezie'),
                     array('id'=>'id_zaznamu', 'timeStart'=>'time_start',
                         'timeEnd'=>'time_end', 'timeUpdate'=>'time_update',
@@ -55,7 +55,7 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
             ->where( 'o.id_osoby = ?', $this->_idUser)
             ->order( array('time_start'));        
                         
-        $data = $this->_adapter->fetchAll($select);        
+        $data = self::$_adapter->fetchAll($select);        
       
         if (empty($data)) {
             
@@ -125,7 +125,7 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
      */
     public function getPosledniZaznamy()
     {
-        $select = $this->_adapter->select();
+        $select = self::$_adapter->select();
         $select->from(array('r' => 'odpracovane_rezie'),
                 array('start' => 'time_start','end' => 'time_end', 
                     'idZaznamu' => 'id_zaznamu','poznamka'))           
@@ -141,7 +141,7 @@ class Vyroba_Model_AkceRezie extends Fc_Model_DatabaseAbstract
             ->order(array('r.id_zaznamu DESC'))
             ->limit(10);
         
-        return $this->_adapter->fetchAll($select);
+        return self::$_adapter->fetchAll($select);
     }
     
     public function getIdAction() {

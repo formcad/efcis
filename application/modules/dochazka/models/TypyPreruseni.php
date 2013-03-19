@@ -11,12 +11,12 @@ class Dochazka_Model_TypyPreruseni extends Fc_Model_DatabaseAbstract
      */    
    public function getTypy() 
    {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from('preruseni',
                    array('id' => 'id_preruseni','nazev'))
             ->where('aktivni IS TRUE')
             ->order(array('poradi'));
         
-        return $this->_adapter->fetchAll($select);        
+        return self::$_adapter->fetchAll($select);        
    }
 }

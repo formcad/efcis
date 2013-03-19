@@ -51,12 +51,12 @@ class Application_Model_UserData extends Fc_Model_DatabaseAbstract
                 break;                        
         }
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('o'=>'osoby'),
                 array('heslo'))
             ->where('o.id_osoby = ?',$this->_dataUserId);
         
-        $row = $this->_adapter->fetchRow($select);
+        $row = self::$_adapter->fetchRow($select);
         
         return $row['heslo'];
     }
@@ -80,7 +80,7 @@ class Application_Model_UserData extends Fc_Model_DatabaseAbstract
                 break;                        
         }
         
-        $this->_adapter->update(
+        self::$_adapter->update(
             'osoby',
             array(
                 'heslo' => $this->_hashHesla

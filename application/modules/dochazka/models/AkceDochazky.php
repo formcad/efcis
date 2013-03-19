@@ -104,7 +104,7 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
    
     protected function _getPruchody()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_pruchody'),
                     array('id' => 'id_zaznamu', 'cas_akce') )
             ->join( array('k' => 'kalendar'),
@@ -120,12 +120,12 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
             ->where( 'pr.id_osoby = ?', $this->_idUser )
             ->order( array('k.datum', 'pr.cas_akce') );          
         
-        return $this->_adapter->fetchAll($select);  
+        return self::$_adapter->fetchAll($select);  
     }
     
     protected function _getPriplatky()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_priplatky'),
                     array('id' => 'id_zaznamu', 'delka',
                         'idPriplatku' => 'id_priplatku') )
@@ -142,12 +142,12 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
             ->where( 'pr.id_osoby = ?', $this->_idUser )
             ->order( array('k.datum') );          
         
-        return $this->_adapter->fetchAll($select);          
+        return self::$_adapter->fetchAll($select);          
     }
 
     protected function _getPreruseni()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_preruseni'),
                     array('id' => 'id_zaznamu', 'delka') )
             ->join( array('k' => 'kalendar'),
@@ -163,7 +163,7 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
             ->where( 'pr.id_osoby = ?', $this->_idUser )
             ->order( array('k.datum') );          
         
-        return $this->_adapter->fetchAll($select);          
+        return self::$_adapter->fetchAll($select);          
     }
 
     /**
@@ -175,12 +175,12 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
             throw new Exception('Není nastaveno ID akce');
         }
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( 'dochazka',
                     array('nazev'=>'nazev_akce','idTypu'=>'id_typu'))
             ->where( 'id_akce = ?', $this->_idAction);
         
-        return $this->_adapter->fetchRow($select);
+        return self::$_adapter->fetchRow($select);
     }
     
     /**
@@ -190,7 +190,7 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
      */
     public function getTempAkce()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('t' => 'dochazka_temp'),
                     array('id_zaznamu', 'cas_akce'))
             ->join( array('d' => 'dochazka'),
@@ -200,7 +200,7 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
             ->where( 't.id_cipu = ?', $this->_idChip)
             ->order( array('cas_akce') );          
         
-        $data = $this->_adapter->fetchRow($select);  
+        $data = self::$_adapter->fetchRow($select);  
         
         if (!empty($data)) {
             
@@ -222,7 +222,7 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
     {
         $result = null;
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('t' => 'dochazka_error'),
                     array('id_zaznamu', 'cas_akce'))
             ->join( array('d' => 'dochazka'),
@@ -234,7 +234,7 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
             ->where( 't.cas_akce < ?', $this->_dateTo)
             ->order( array('cas_akce') );          
         
-        $data = $this->_adapter->fetchAll($select);  
+        $data = self::$_adapter->fetchAll($select);  
         
         if (!empty($data)) {
             
@@ -256,7 +256,7 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
      */
     public function deleteTempActions() {
         
-        $this->_adapter->delete('dochazka_temp', array(
+        self::$_adapter->delete('dochazka_temp', array(
             'id_osoby = ?' => $this->_idUser,
             'id_cipu = ?' => $this->_idChip
         ));           

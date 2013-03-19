@@ -66,7 +66,7 @@ class Dochazka_Model_PreruseniDochazky extends Fc_Model_DatabaseAbstract
      */
     public function addPreruseni() 
     {
-        $this->_adapter->insert( 'dochazka_preruseni', array(
+        self::$_adapter->insert( 'dochazka_preruseni', array(
             'id_cipu' => $this->_idCipu,
             'id_osoby' => $this->_idOsoby,
             'id_preruseni' => $this->_idPreruseni,
@@ -84,7 +84,7 @@ class Dochazka_Model_PreruseniDochazky extends Fc_Model_DatabaseAbstract
      */
     public function getPreruseni() 
     {    
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_preruseni'),
                     array('id_zaznamu', 'id_osoby', 'id_cipu', 'id_preruseni',
                         'datum', 'delka', 'id_zmenil', 'cas_zmeny', 'smazano'))
@@ -93,7 +93,7 @@ class Dochazka_Model_PreruseniDochazky extends Fc_Model_DatabaseAbstract
                     array('nazev','id_preruseni') )                 
             ->where( 'pr.id_zaznamu = ?', $this->_idZaznamu);     
         
-        $data = $this->_adapter->fetchRow($select);  
+        $data = self::$_adapter->fetchRow($select);  
  
         if ($data['cas_zmeny'] == null) {               
             $casZmeny = null;
@@ -122,7 +122,7 @@ class Dochazka_Model_PreruseniDochazky extends Fc_Model_DatabaseAbstract
      */
     public function editPreruseni()
     {              
-        $this->_adapter->update(
+        self::$_adapter->update(
             'dochazka_preruseni',
             array(
                 'cas_zmeny' => date('Y-m-d H:i'),
@@ -141,7 +141,7 @@ class Dochazka_Model_PreruseniDochazky extends Fc_Model_DatabaseAbstract
      */
     public function deletePreruseni() 
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'dochazka_preruseni',
             array(
                 'cas_zmeny' => date('Y-m-d H:i'),

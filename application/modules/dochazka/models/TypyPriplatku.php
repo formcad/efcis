@@ -18,14 +18,14 @@ class Dochazka_Model_TypyPriplatku extends Fc_Model_DatabaseAbstract
      */        
     public function getTypy() 
     {
-         $select = $this->_adapter->select()
+         $select = self::$_adapter->select()
              ->from('priplatky',
                     array('id' => 'id_priplatku','nazev','zkratka'))
              ->where('platnost_od <= ?', $this->_platnost)
              ->where('platnost_do >= ? OR platnost_do IS NULL', $this->_platnost)
              ->order(array('poradi'));
 
-         return $this->_adapter->fetchAll($select);        
+         return self::$_adapter->fetchAll($select);        
     }    
 
     public function getPlatnost() {

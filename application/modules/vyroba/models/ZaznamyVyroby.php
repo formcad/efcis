@@ -64,7 +64,7 @@ class Vyroba_Model_ZaznamyVyroby extends Fc_Model_DatabaseAbstract
      */
     public function ulozZaznam()
     {
-        $this->_adapter->insert('odpracovane_casy',array(
+        self::$_adapter->insert('odpracovane_casy',array(
             'id_pozice' => $this->_idPozice,
             'cislo_technologie' => $this->_idOperace,
             'id_typu' => $this->_idKarty,
@@ -80,7 +80,7 @@ class Vyroba_Model_ZaznamyVyroby extends Fc_Model_DatabaseAbstract
      */
     public function zmenZaznam()
     {
-        $this->_adapter->update('odpracovane_casy',array(
+        self::$_adapter->update('odpracovane_casy',array(
             'id_pozice' => $this->_idPozice,
             'cislo_technologie' => $this->_idOperace,
             'id_typu' => $this->_idKarty,
@@ -102,7 +102,7 @@ class Vyroba_Model_ZaznamyVyroby extends Fc_Model_DatabaseAbstract
         if ($this->_idZaznamu == null) {
             throw new Exception('Není zadáno ID záznamu');
         } else {            
-            $select = $this->_adapter->select()
+            $select = self::$_adapter->select()
                 ->from(array('vyr'=>'odpracovane_casy'),
                     array('idZaznamu'=>'id_zaznamu', 'idPozice'=>'id_pozice',
                         'idOsoby'=>'id_osoby','karta'=>'id_typu',
@@ -114,7 +114,7 @@ class Vyroba_Model_ZaznamyVyroby extends Fc_Model_DatabaseAbstract
                 ->where('io.id_typu = vyr.id_typu')
                 ->where('vyr.id_zaznamu = ?', $this->_idZaznamu);
             
-            return $this->_adapter->fetchRow($select);
+            return self::$_adapter->fetchRow($select);
         }
     }
     

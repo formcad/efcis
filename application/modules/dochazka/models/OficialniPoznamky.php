@@ -41,7 +41,7 @@ class Dochazka_Model_OficialniPoznamky extends Dochazka_Model_DochazkaOficialni
      * @return null|string
      */
     public function ziskejPoznamku()
-    {   
+    {
         $select = self::$_adapter->select()
             ->from(array('po' => 'oficialni_poznamky'),
                 array('poznamka'=>'text'))

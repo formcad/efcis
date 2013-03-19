@@ -17,14 +17,14 @@ class Dochazka_Model_TypyPruchodu extends Fc_Model_DatabaseAbstract
      */
     public function getTypy() 
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from('dochazka',
                    array('id' => 'id_akce','nazev' => 'nazev_akce',
                        'zkratka' => 'zkratka_akce','ikona'))
             ->where('platna IS TRUE')
             ->order(array('poradi_terminal'));
         
-        return $this->_adapter->fetchAll($select);        
+        return self::$_adapter->fetchAll($select);        
     }      
    
     /**
@@ -38,14 +38,14 @@ class Dochazka_Model_TypyPruchodu extends Fc_Model_DatabaseAbstract
             case 'odchod':  $typ = 2; break;
         }
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('d' => 'dochazka'),
                    array('id' => 'id_akce','nazev' => 'nazev_akce'))
             ->where('d.id_typu = ?', $typ)
             ->where('d.platna IS TRUE')
             ->order(array('d.poradi_software'));
         
-        return $this->_adapter->fetchAll($select);    
+        return self::$_adapter->fetchAll($select);    
    }
 
    public function getTyp() {

@@ -28,7 +28,7 @@ class Vyroba_Model_Poznamky extends Fc_Model_DatabaseAbstract
 
     public function addPoznamka() 
     {
-        $this->_adapter->insert( 'vyrobni_poznamky', array(
+        self::$_adapter->insert( 'vyrobni_poznamky', array(
             'id_pozice' => $this->_idPozice,
             'id_osoby' => $this->_idUser,
             'ulozeno' => date('Y-m-d H:i:s'),
@@ -41,12 +41,12 @@ class Vyroba_Model_Poznamky extends Fc_Model_DatabaseAbstract
      */
     public function getPoznamka() 
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( 'vyrobni_poznamky',
                     array('text','id_pozice'))
             ->where( 'id_poznamky = ?',$this->_id);
         
-        return $this->_adapter->fetchRow($select);
+        return self::$_adapter->fetchRow($select);
     }
     
     /**
@@ -54,7 +54,7 @@ class Vyroba_Model_Poznamky extends Fc_Model_DatabaseAbstract
      */
     public function changePoznamka()
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'vyrobni_poznamky',
             array(
                 'ulozeno' => date('Y-m-d H:i:s'),
@@ -72,7 +72,7 @@ class Vyroba_Model_Poznamky extends Fc_Model_DatabaseAbstract
      */
     public function getNedavnePoznamky() 
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('vp' => 'vyrobni_poznamky'),
                     array('ulozeno','id'=>'id_poznamky','text'))
             ->joinLeft( array('pz' => 'pozice'),
@@ -85,7 +85,7 @@ class Vyroba_Model_Poznamky extends Fc_Model_DatabaseAbstract
             ->order( array('vp.id_poznamky DESC') )
             ->limit( 5 );          
         
-        return $this->_adapter->fetchAll($select);               
+        return self::$_adapter->fetchAll($select);               
     }
 
 

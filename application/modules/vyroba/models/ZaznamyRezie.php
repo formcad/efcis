@@ -58,7 +58,7 @@ class Vyroba_Model_ZaznamyRezie extends Fc_Model_DatabaseAbstract
      */    
     public function ulozZaznam()
     {
-        $this->_adapter->insert('odpracovane_rezie',array(
+        self::$_adapter->insert('odpracovane_rezie',array(
             'id_operace' => $this->_idOperace,            
             'time_start' => $this->_timeStart,
             'time_end' => $this->_timeEnd,
@@ -74,7 +74,7 @@ class Vyroba_Model_ZaznamyRezie extends Fc_Model_DatabaseAbstract
      */    
     public function zmenZaznam()
     {
-        $this->_adapter->update('odpracovane_rezie',array(
+        self::$_adapter->update('odpracovane_rezie',array(
             'id_operace' => $this->_idOperace,            
             'time_start' => $this->_timeStart,
             'time_end' => $this->_timeEnd,
@@ -96,7 +96,7 @@ class Vyroba_Model_ZaznamyRezie extends Fc_Model_DatabaseAbstract
         if ($this->_idZaznamu == null) {
             throw new Exception('Není zadáno ID záznamu');
         } else {            
-            $select = $this->_adapter->select()
+            $select = self::$_adapter->select()
                 ->from(array('rez'=>'odpracovane_rezie'),
                     array('idZaznamu'=>'id_zaznamu','idOsoby'=>'id_osoby',
                         'start'=>'time_start','end'=>'time_end',
@@ -107,7 +107,7 @@ class Vyroba_Model_ZaznamyRezie extends Fc_Model_DatabaseAbstract
                 ->where('io.id_typu = 3')
                 ->where('rez.id_zaznamu = ?', $this->_idZaznamu);
  
-            return $this->_adapter->fetchRow($select);
+            return self::$_adapter->fetchRow($select);
         }
     }    
  

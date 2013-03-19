@@ -71,7 +71,7 @@ class Dochazka_Model_PruchodyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function addPruchod() 
     {
-        $this->_adapter->insert( 'dochazka_pruchody', array(
+        self::$_adapter->insert( 'dochazka_pruchody', array(
             'id_cipu' => $this->_idCipu,
             'id_osoby' => $this->_idOsoby,
             'id_akce' => $this->_idAkce,
@@ -89,7 +89,7 @@ class Dochazka_Model_PruchodyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function getPruchod() 
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_pruchody'),
                     array('id_zaznamu', 'id_osoby', 'id_cipu', 'id_akce',
                         'datum', 'cas_akce', 'id_zmenil', 'cas_zmeny', 'smazano'))
@@ -98,7 +98,7 @@ class Dochazka_Model_PruchodyDochazky extends Fc_Model_DatabaseAbstract
                     array('nazev_akce','id_typu') )                 
             ->where( 'pr.id_zaznamu = ?', $this->_idZaznamu);     
         
-        $data = $this->_adapter->fetchRow($select);  
+        $data = self::$_adapter->fetchRow($select);  
  
         if ($data['cas_zmeny'] == null) {               
             $casZmeny = null;
@@ -133,7 +133,7 @@ class Dochazka_Model_PruchodyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function editPruchod() 
     {       
-        $this->_adapter->update(
+        self::$_adapter->update(
             'dochazka_pruchody',
             array(
                 'cas_zmeny' => date('Y-m-d H:i'),
@@ -152,7 +152,7 @@ class Dochazka_Model_PruchodyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function deletePruchod() 
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'dochazka_pruchody',
             array(
                 'cas_zmeny' => date('Y-m-d H:i'),
@@ -169,7 +169,7 @@ class Dochazka_Model_PruchodyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function getPosledniAkce() 
     {       
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_pruchody'),
                     array('datum', 'cas_akce','id_akce'))
             ->join( array('d' => 'dochazka'),
@@ -182,7 +182,7 @@ class Dochazka_Model_PruchodyDochazky extends Fc_Model_DatabaseAbstract
             ->where( 'd.id_typu = ?', $this->_idTypu)
             ->order( array('pr.cas_akce DESC'));
         
-        return $this->_adapter->fetchRow($select);                
+        return self::$_adapter->fetchRow($select);                
     }
     
 //== GETTERS AND SETTERS =======================================================    

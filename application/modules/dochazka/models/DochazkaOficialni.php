@@ -121,9 +121,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      * @param integer $uzivatel
      */
     function __construct($osoba = null, $cip = null, $uzivatel = null)
-    {
-        parent::__construct();
-        
+    {        
         $this->setOsoba($osoba);
         $this->setCip($cip);
         $this->setUzivatel($uzivatel);
@@ -149,7 +147,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
                 );
                 $this->_sqlUlozOficialniPruchod($data);
             }            
-        } 
+        }
     }
     
     /**
@@ -179,7 +177,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _sqlUlozOficialniPruchod($pruchod)
     {       
-        $this->_adapter->insert( 'oficialni_pruchody', array(
+        self::$_adapter->insert( 'oficialni_pruchody', array(
             'id_osoby' => $pruchod['osoba'],
             'id_cipu' => $pruchod['cip'],
             'datum' => $pruchod['datum'],
@@ -223,7 +221,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */    
     protected function _sqlUlozOficialniPreruseni($preruseni)    
     {
-        $this->_adapter->insert( 'oficialni_preruseni', array(
+        self::$_adapter->insert( 'oficialni_preruseni', array(
             'id_preruseni' => $preruseni['idPreruseni'],
             'id_osoby' => $preruseni['osoba'],
             'id_cipu' => $preruseni['cip'],
@@ -270,7 +268,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */  
     protected function _sqlUlozOficialniPriplatek($priplatek)    
     {
-        $this->_adapter->insert( 'oficialni_priplatky', array(
+        self::$_adapter->insert( 'oficialni_priplatky', array(
             'id_priplatku' => $priplatek['idPriplatku'],
             'id_osoby' => $priplatek['osoba'],
             'id_cipu' => $priplatek['cip'],
@@ -436,7 +434,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _getOficialniPruchody()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'oficialni_pruchody'),
                     array('id' => 'id_zaznamu', 'prichod' => 'cas_prichod',
                         'odchod' => 'cas_odchod') )
@@ -450,7 +448,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             ->where( 'pr.id_osoby = ?', $this->_osoba )
             ->order( array('k.datum', 'pr.cas_prichod') );          
         
-        return $this->_adapter->fetchAll($select);          
+        return self::$_adapter->fetchAll($select);          
     }
     
     /**
@@ -461,7 +459,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _getOficialniPreruseni()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'oficialni_preruseni'),
                     array('id' => 'id_zaznamu', 'delka') )
             ->join( array('k' => 'kalendar'),
@@ -477,7 +475,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             ->where( 'pr.id_osoby = ?', $this->_osoba )
             ->order( array('k.datum') );          
         
-        return $this->_adapter->fetchAll($select);           
+        return self::$_adapter->fetchAll($select);           
     }
     
     /**
@@ -488,7 +486,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _getOficialniPriplatky()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'oficialni_priplatky'),
                     array('id' => 'id_zaznamu', 'delka',
                         'idPriplatku' => 'id_priplatku') )
@@ -505,7 +503,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             ->where( 'pr.id_osoby = ?', $this->_osoba )
             ->order( array('k.datum') );          
         
-        return $this->_adapter->fetchAll($select);         
+        return self::$_adapter->fetchAll($select);         
     }
     
     /**
@@ -516,7 +514,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _getOficialniPoznamky()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('po' => 'oficialni_poznamky'),
                     array('id' => 'id_zaznamu', 'text') )
             ->join( array('k' => 'kalendar'),
@@ -528,7 +526,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
             ->where( 'po.id_osoby = ?', $this->_osoba )
             ->order( array('k.datum') );          
         
-        return $this->_adapter->fetchAll($select);            
+        return self::$_adapter->fetchAll($select);            
     }
     
     /**
@@ -570,13 +568,13 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _vyberPrichodyDochazky() 
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('op'=>'oficialni_pruchody'),
                     array('prichod'=>'cas_prichod','id'=>'id_zaznamu'))
             ->where( 'op.datum >= ?', $this->_datumOd)
             ->where( 'op.datum <= ?', $this->_datumDo);       
         
-        return $this->_adapter->fetchAll($select);             
+        return self::$_adapter->fetchAll($select);             
     }
    
     /**
@@ -589,7 +587,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _zmenCasPrichodu($idZaznamu,$casPrichodu) 
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'oficialni_pruchody',
             array('cas_prichod' => $casPrichodu),
             array('id_zaznamu = ?' => $idZaznamu)
@@ -603,13 +601,13 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     public function ziskejPruchod()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('pr' => 'oficialni_pruchody'),
                 array('prichod'=>'cas_prichod','odchod'=>'cas_odchod','datum',
                     'id'=>'id_zaznamu'))
             ->where('id_zaznamu = ?',$this->_idPruchodu);
         
-        $data = $this->_adapter->fetchRow($select);
+        $data = self::$_adapter->fetchRow($select);
         $data['datumSmeny'] = date('d. m. Y',strtotime($data['datum']));
         $data['prichodDen'] = date('d. m. Y',strtotime($data['prichod']));
         $data['odchodDen']  = date('d. m. Y',strtotime($data['odchod']));
@@ -626,7 +624,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     public function zmenZaznam()
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'oficialni_pruchody',
             array(
                 'cas_prichod' => $this->_casPrichod,
@@ -648,7 +646,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     public function smazZaznam()
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'oficialni_pruchody',
             array(
                 'smazano' => true,
@@ -692,14 +690,14 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _zjistiZapsanouPauzu($idOsoby,$idCipu,$datum)
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('pu'=>'oficialni_preruseni'),
                 array('id'=>'id_zaznamu'))
             ->where('id_osoby = ?', $idOsoby)
             ->where('id_cipu = ?', $idCipu)
             ->where('datum = ?', $datum);
         
-        $result = $this->_adapter->fetchRow($select);
+        $result = self::$_adapter->fetchRow($select);
         
         if (!empty($result)) {
             return $result;
@@ -721,7 +719,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _zapisPauzu($idOsoby,$idCipu,$idUzivatele,$datum,$trvani)
     {
-        $this->_adapter->insert( 'oficialni_preruseni', array(
+        self::$_adapter->insert( 'oficialni_preruseni', array(
             'id_preruseni' => 1,
             'id_osoby' => $idOsoby,
             'id_cipu' => $idCipu,
@@ -742,7 +740,7 @@ class Dochazka_Model_DochazkaOficialni extends Fc_Model_DatabaseAbstract
      */
     protected function _upravPauzu($idZaznamu,$trvani,$idUzivatele)
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'oficialni_preruseni',
             array(
                 'delka' => $trvani,

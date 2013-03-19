@@ -28,7 +28,7 @@ class Dochazka_Model_ErroryDochazky extends Fc_Model_DatabaseAbstract {
      */
     public function getError() 
     {   
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('e' => 'dochazka_error'),
                     array('cas_akce'))
             ->join( array('d' => 'dochazka'),
@@ -36,7 +36,7 @@ class Dochazka_Model_ErroryDochazky extends Fc_Model_DatabaseAbstract {
                     array('nazev_akce') )                 
             ->where( 'e.id_zaznamu = ?', $this->_idZaznamu);     
         
-        $data = $this->_adapter->fetchRow($select);  
+        $data = self::$_adapter->fetchRow($select);  
 
         $timestamp = strtotime($data['cas_akce']);
         return array(           
@@ -51,7 +51,7 @@ class Dochazka_Model_ErroryDochazky extends Fc_Model_DatabaseAbstract {
      */
     public function deleteError()
     {
-        $this->_adapter->delete('dochazka_error', array(
+        self::$_adapter->delete('dochazka_error', array(
             'id_zaznamu = ?' => $this->_idZaznamu
         ));              
     }
@@ -62,7 +62,7 @@ class Dochazka_Model_ErroryDochazky extends Fc_Model_DatabaseAbstract {
      */
     public function deleteUserErrors()
     {
-        $this->_adapter->delete('dochazka_error', array(
+        self::$_adapter->delete('dochazka_error', array(
             'id_osoby = ?' => $this->_idUser,
             'id_cipu = ?' => $this->_idChip
         ));             
@@ -70,7 +70,7 @@ class Dochazka_Model_ErroryDochazky extends Fc_Model_DatabaseAbstract {
     
     public function getAllErrors()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('ch' => 'dochazka_error'),
                 array('id'=>'id_zaznamu','datum','cas'=>'cas_akce'))
             ->join(array('o' => 'osoby'),
@@ -84,7 +84,7 @@ class Dochazka_Model_ErroryDochazky extends Fc_Model_DatabaseAbstract {
                 array('akce'=>'nazev_akce'))
             ->order(array('o.prijmeni','c.id_cipu','id_zaznamu'));
         
-        return $this->_adapter->fetchAll($select);
+        return self::$_adapter->fetchAll($select);
     }
 
     public function setIdZaznamu($_idZaznamu) {

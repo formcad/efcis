@@ -44,7 +44,7 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
     {
         $poleZaznamu = array();
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('o' => 'operace'),
                     array('id_pozice','cas'))
             ->join( array('pz' => 'pozice'),
@@ -59,7 +59,7 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
             ->where( 'o.id_osoby = ?', $this->_idUser)
             ->order( array('cas') );          
         
-        $data = $this->_adapter->fetchAll($select);        
+        $data = self::$_adapter->fetchAll($select);        
        
         if (!empty($data)) {
             foreach ($data as $zaznam) {
@@ -86,7 +86,7 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
     {
         $akce = array();
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('o' => 'odpracovane_casy'),
                     array('id'=>'id_zaznamu', 'timeStart'=>'time_start',
                         'timeEnd'=>'time_end', 'timeUpdate'=>'time_update',
@@ -124,7 +124,7 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
                 break;
         }       
                         
-        $data = $this->_adapter->fetchAll($select);        
+        $data = self::$_adapter->fetchAll($select);        
       
         if (!empty($data)) {
             
@@ -226,7 +226,7 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
      */
     public function getPosledniZaznamy()
     {
-        $select = $this->_adapter->select();
+        $select = self::$_adapter->select();
         $select->from(array('c' => 'odpracovane_casy'),
                 array('start' => 'time_start','end' => 'time_end', 
                     'idPozice' => 'id_pozice', 'idZaznamu' => 'id_zaznamu'))
@@ -248,7 +248,7 @@ class Vyroba_Model_AkceVyroby extends Fc_Model_DatabaseAbstract
             ->order(array('c.id_zaznamu DESC'))
             ->limit(10);
         
-        return $this->_adapter->fetchAll($select);
+        return self::$_adapter->fetchAll($select);
     }
     
     public function getIdAction() {

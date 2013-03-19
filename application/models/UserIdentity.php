@@ -55,12 +55,12 @@ class Application_Model_UserIdentity extends Fc_Model_DatabaseAbstract
         }
         else {
             
-            $select = $this->_adapter->select();
+            $select = self::$_adapter->select();
             $select->from('identifikace_osoby',
                     array('idKarty' => 'id_typu','idZamestnance' => 'id_osoby'))
                 ->where('hodnota = ?', $this->_kodKarty);
             
-            return $this->_adapter->fetchRow($select);
+            return self::$_adapter->fetchRow($select);
         }
     }
     
@@ -70,12 +70,12 @@ class Application_Model_UserIdentity extends Fc_Model_DatabaseAbstract
      */
     protected function _getUserData()
     {    
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( 'osoby',
                     array('id_osoby', 'jmeno', 'prijmeni') )
             ->where('oznaceni = ?', $this->_username);
 
-        return $this->_adapter->fetchRow($select);         
+        return self::$_adapter->fetchRow($select);         
     }
     
     /**
@@ -85,7 +85,7 @@ class Application_Model_UserIdentity extends Fc_Model_DatabaseAbstract
      */
     protected function _getUserRoles($idUser)
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('r' => 'role'),
                     array('role' => 'nazev') )
             ->join( array('rm' => 'role_osob'),
@@ -95,7 +95,7 @@ class Application_Model_UserIdentity extends Fc_Model_DatabaseAbstract
                     array('modul' => 'nazev'))
             ->where( 'rm.id_osoby = ?', $idUser);
         
-        $roles = $this->_adapter->fetchAll($select);
+        $roles = self::$_adapter->fetchAll($select);
                                 
         if (!empty($roles)) {
             foreach ($roles as $role) {                

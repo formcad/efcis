@@ -18,7 +18,7 @@ class Application_Model_OperationList extends Fc_Model_DatabaseAbstract
      */
     public function getVyrobniOperace() 
     {                   
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array( 't' => 'technologie'),
                     array( 'id' => 'cislo_technologie', 
                         'nazev' => 'nazev_technologie',
@@ -28,7 +28,7 @@ class Application_Model_OperationList extends Fc_Model_DatabaseAbstract
                     't.cislo_technologie = pt.cislo_technologie' )      
             ->where( 'pt.id_poradi = ?', $this->_vyrobaOrder)
             ->where( 'pt.platnost_od >= (?)', new Zend_Db_Expr(
-                        $this->_adapter->select()
+                        self::$_adapter->select()
                             ->from('poradi_technologii',array(
                                 'max(platnost_od)'))
                             ->where('cislo_technologie = t.cislo_technologie')
@@ -36,7 +36,7 @@ class Application_Model_OperationList extends Fc_Model_DatabaseAbstract
             ->where( 'pt.poradi IS NOT NULL' )
             ->order( 'pt.poradi' );         
 
-        return $this->_adapter->fetchAll($select);  
+        return self::$_adapter->fetchAll($select);  
     }    
     
     /**
@@ -46,7 +46,7 @@ class Application_Model_OperationList extends Fc_Model_DatabaseAbstract
      */
     public function getRezijniOperace()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array( 't' => 'rezijni_technologie'),
                     array( 'id' => 'id_operace', 
                         'nazev' => 'nazev_operace') )                       
@@ -54,7 +54,7 @@ class Application_Model_OperationList extends Fc_Model_DatabaseAbstract
             ->where( 't.viditelne IS TRUE' )
             ->order( 't.poradi' );         
 
-        return $this->_adapter->fetchAll($select);          
+        return self::$_adapter->fetchAll($select);          
     }
     
     public function setVyrobaOrder($vyrobaOrder) {

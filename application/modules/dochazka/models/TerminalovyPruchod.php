@@ -42,13 +42,13 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
      */
     public function dekodujCip() 
     { 
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( 'cipy_osob',
                     array('idCipu'=>'id_cipu','idOsoby'=>'id_osoby'))
             ->where( 'kod = ?', $this->_kodCipu)
             ->where( 'aktivni = TRUE');
 
-        $data = $this->_adapter->fetchRow($select);
+        $data = self::$_adapter->fetchRow($select);
         
         $this->_idCipu = $data['idCipu'];
         $this->_idOsoby = $data['idOsoby'];
@@ -100,7 +100,7 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
         
         $data = $this->vyberTempPrichod();
         
-        $this->_adapter->insert( 'dochazka_error', array(
+        self::$_adapter->insert( 'dochazka_error', array(
             'id_cipu' => $this->_idCipu,
             'id_osoby' => $this->_idOsoby,
             'id_akce' => $data['id_akce'],
@@ -116,7 +116,7 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
      */
     public function ulozPrichod() 
     {
-        $this->_adapter->insert( 'dochazka_temp', array(
+        self::$_adapter->insert( 'dochazka_temp', array(
             'id_cipu' => $this->_idCipu,
             'id_osoby' => $this->_idOsoby,
             'id_akce' => $this->_idAkce,
@@ -130,7 +130,7 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
      */
     public function ulozError()
     {   
-        $this->_adapter->insert( 'dochazka_error', array(
+        self::$_adapter->insert( 'dochazka_error', array(
             'id_cipu' => $this->_idCipu,
             'id_osoby' => $this->_idOsoby,
             'id_akce' => $this->_idAkce,
@@ -147,14 +147,14 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
      */
     public function vyberTempPrichod() 
     { 
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( 'dochazka_temp',
                     array('id_zaznamu','datum','id_akce','cas_akce','id_osoby',
                         'id_cipu'))
             ->where( 'id_osoby = ?', $this->_idOsoby)
             ->where( 'id_cipu = ?', $this->_idCipu);
         
-        $data = $this->_adapter->fetchRow($select);
+        $data = self::$_adapter->fetchRow($select);
         
         // řádek se vrátí pouze v případě, že vůbec nějaký je
         if ($data)
@@ -168,7 +168,7 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
      */
     public function smazTempPrichod() 
     {
-        $this->_adapter->delete( 'dochazka_temp', array(
+        self::$_adapter->delete( 'dochazka_temp', array(
             'id_cipu = ?' => $this->_idCipu,
             'id_osoby = ?' => $this->_idOsoby
         ));
@@ -180,7 +180,7 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
      */
     public function vyberPermPrichod()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_pruchody'),
                     array('datum','cas_akce','id_akce'))
             ->join( array('d' => 'dochazka'),
@@ -191,7 +191,7 @@ class Dochazka_Model_TerminalovyPruchod extends Fc_Model_DatabaseAbstract
             ->where( 'pr.smazano IS FALSE')
             ->order( array('pr.cas_akce DESC'));
         
-        $data = $this->_adapter->fetchRow($select);
+        $data = self::$_adapter->fetchRow($select);
 
         // pokud v DB vůbec nějaký záznanm existue
         if (!empty($data)) {

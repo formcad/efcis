@@ -20,11 +20,11 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
      */
     public function overExistenci()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from('pozice',array('pocet' => 'count(id_pozice)'))
             ->where('id_pozice = ?', $this->_id);
         
-        $data = $this->_adapter->fetchRow($select);
+        $data = self::$_adapter->fetchRow($select);
         
         if ( $data['pocet'] == 1)
             return true;
@@ -42,14 +42,14 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
         
         // pomocný subselect pro $subselectStavPozice
         // výběr data poslední změny stavu pozice
-        $subselectDatumStavuPozice = $this->_adapter->select()
+        $subselectDatumStavuPozice = self::$_adapter->select()
             ->from(array('st_poz'=>'stav_pozice'),
                 array('max(datum_prirazeni)'))
             ->where('st_poz.id_pozice = s_poz.id_pozice');
         
         // pomocný subselect pro $select
         // zjištění aktuálního stavu pozice
-        $subselectStavPozice = $this->_adapter->select()
+        $subselectStavPozice = self::$_adapter->select()
             ->from(array('s_poz'=>'stav_pozice'),
                 array('id_pozice','id_stavu'))
             ->where('datum_prirazeni = (?)',new Zend_Db_Expr($subselectDatumStavuPozice));  // pouze nejaktuálnější stav
@@ -58,14 +58,14 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
         
         // pomocný subselect pro $subselectStavPolozky
         // výběr data poslední změny stavu položky
-        $subselectDatumStavuPolozky = $this->_adapter->select()
+        $subselectDatumStavuPolozky = self::$_adapter->select()
             ->from(array('st_pol'=>'stav_polozky'),
                 array('max(datum_prirazeni)'))
             ->where('st_pol.id_polozky = s_pol.id_polozky');
         
         // pomocný subselect pro $select
         // zjištění aktuálního stavu zakázky
-        $subselectStavPolozky = $this->_adapter->select()
+        $subselectStavPolozky = self::$_adapter->select()
             ->from(array('s_pol'=>'stav_polozky'),
                 array('id_polozky','id_stavu'))
             ->where('id_typu = ?', 201)                                                      // typ položky je zakázka
@@ -73,7 +73,7 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
                 
         /**** Celkový select **************************************************/
         
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('pz'=>'pozice'),
                 array('id'=>'id_pozice', 'nazev'))
             ->join(array('po'=>'polozky'),
@@ -93,7 +93,7 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
                 new Zend_Db_Expr( "CAST(split_part(po.cislo_zakazky, '-', 1) AS INTEGER) DESC" )   // seřaď sestupně podle čísla zakázky
             ));
         
-        return $this->_adapter->fetchAll($select);
+        return self::$_adapter->fetchAll($select);
     }
 
     /**
@@ -108,7 +108,7 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
      */
     public function zjistiSkutecneTechnologie()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('t'=>'technologie'),
                 array('id'=>'cislo_technologie','nazev'=>'nazev_technologie'))
             ->join(array('oc'=>'odpracovane_casy'),
@@ -118,7 +118,7 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
             ->group('t.cislo_technologie')
             ->order('t.cislo_technologie');
         
-        return $this->_adapter->fetchAll($select);
+        return self::$_adapter->fetchAll($select);
     }
     
     /**
@@ -129,7 +129,7 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
      */
     public function zjistiSkutecnouVyrobu()
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from(array('oc'=>'odpracovane_casy'),
                 array('id'=>'id_zaznamu','start'=>'time_start','end'=>'time_end',
                     'update'=>'time_update'))
@@ -151,7 +151,7 @@ class Vyroba_Model_Pozice extends Fc_Model_DatabaseAbstract
             ->where('oc.id_pozice = ?',$this->_id)
             ->order(array('oc.time_start'));
         
-        $data = $this->_adapter->fetchAll($select);
+        $data = self::$_adapter->fetchAll($select);
         
         // dopočítáme trvání operací
         if (count($data)>0) {

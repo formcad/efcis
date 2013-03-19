@@ -28,19 +28,19 @@ class Application_Model_PoziceList extends Fc_Model_DatabaseAbstract
         } else {        
             /**** SUBSELECT  **************************************************/
 
-            $subSubselect = $this->_adapter->select()
+            $subSubselect = self::$_adapter->select()
                 ->from('stav_pozice',
                     array('max(datum_prirazeni)'))
                 ->where('id_pozice = st.id_pozice');
 
-            $subselect = $this->_adapter->select()
+            $subselect = self::$_adapter->select()
                 ->from(array('st'=>'stav_pozice'),
                         array('id'=>'id_pozice','stav'=>'id_stavu'))
                 ->where( 'datum_prirazeni = ?', new Zend_Db_Expr('('.$subSubselect.')'));
 
             /**** SELECT ******************************************************/
 
-            $select = $this->_adapter->select()
+            $select = self::$_adapter->select()
                 ->from(array('p'=>'pozice'),
                     array('id'=>'id_pozice','nazev','idTypu'=>'id_typu',))
                 ->join(array('s'=>new Zend_Db_Expr('('.$subselect.')')),'p.id_pozice = s.id',array())            
@@ -49,7 +49,7 @@ class Application_Model_PoziceList extends Fc_Model_DatabaseAbstract
                 ->where('p.id_rodice IS NULL')
                 ->order('p.nazev');
 
-            return $this->_adapter->fetchAll($select);
+            return self::$_adapter->fetchAll($select);
         }
     }
 

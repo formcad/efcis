@@ -66,7 +66,7 @@ class Dochazka_Model_PriplatkyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function addPriplatek() 
     {
-        $this->_adapter->insert( 'dochazka_priplatky', array(
+        self::$_adapter->insert( 'dochazka_priplatky', array(
             'id_cipu' => $this->_idCipu,
             'id_osoby' => $this->_idOsoby,
             'id_priplatku' => $this->_idTypuPriplatku,
@@ -84,7 +84,7 @@ class Dochazka_Model_PriplatkyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function getPriplatek() 
     {
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array('pr' => 'dochazka_priplatky'),
                     array('id_zaznamu', 'id_osoby', 'id_cipu', 'id_priplatku',
                         'datum', 'delka', 'id_zmenil', 'cas_zmeny', 'smazano'))
@@ -93,7 +93,7 @@ class Dochazka_Model_PriplatkyDochazky extends Fc_Model_DatabaseAbstract
                     array('nazev') )                 
             ->where( 'pr.id_zaznamu = ?', $this->_idZaznamu);     
         
-        $data = $this->_adapter->fetchRow($select);  
+        $data = self::$_adapter->fetchRow($select);  
  
         if ($data['cas_zmeny'] == null) {               
             $casZmeny = null;
@@ -122,7 +122,7 @@ class Dochazka_Model_PriplatkyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function editPriplatek() 
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'dochazka_priplatky',
             array(
                 'cas_zmeny' => date('Y-m-d H:i'),
@@ -141,7 +141,7 @@ class Dochazka_Model_PriplatkyDochazky extends Fc_Model_DatabaseAbstract
      */
     public function deletePriplatek() 
     {
-        $this->_adapter->update(
+        self::$_adapter->update(
             'dochazka_priplatky',
             array(
                 'cas_zmeny' => date('Y-m-d H:i'),

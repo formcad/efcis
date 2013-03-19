@@ -26,7 +26,7 @@ class Application_Model_UserList extends Fc_Model_DatabaseAbstract
     public function getUsers() 
     {                    
         // obecný dotaz
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array( 'o' => 'osoby'),
                     array( 'id' => 'id_osoby', 'jmeno', 'prijmeni') )
             ->join( array('co' => 'cipy_osob'),
@@ -56,7 +56,7 @@ class Application_Model_UserList extends Fc_Model_DatabaseAbstract
                 return array();
                 break;
         }  
-        return $this->_adapter->fetchAll($select);  
+        return self::$_adapter->fetchAll($select);  
     }    
     
     /**
@@ -87,7 +87,7 @@ class Application_Model_UserList extends Fc_Model_DatabaseAbstract
     private function _getKartyUzivatelu($typ)
     {
         // obecný dotaz
-        $select = $this->_adapter->select()
+        $select = self::$_adapter->select()
             ->from( array( 'o' => 'osoby'),
                     array( 'id' => 'id_osoby', 'jmeno', 'prijmeni') )
             ->join( array('io' => 'identifikace_osoby'),
@@ -128,7 +128,7 @@ class Application_Model_UserList extends Fc_Model_DatabaseAbstract
                 break;
         }
         
-        return $this->_adapter->fetchAll($select);
+        return self::$_adapter->fetchAll($select);
     }
     
     public function getRole() {
