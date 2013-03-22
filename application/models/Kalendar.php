@@ -4,46 +4,53 @@ class Application_Model_Kalendar extends Fc_Model_DatabaseAbstract
 {
     /**
      * Počáteční datum
-     * @var string 
+     * @var String 
      */
-    protected $_dateFrom = '2011-01-01';
+    protected $_datumOd = '2011-01-01';
     
     /**
      * Koncové datum
-     * @var string 
+     * @var String 
      */
-    protected $_dateTo = '2111-01-01';        
+    protected $_datumDo = '2111-01-01';        
     
     /**
      * Konstruktor třídy
      * 
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @return void
+     * @param  String $datumOd
+     * @param  String $datumDo
      */
-    function __construct($dateFrom = null, $dateTo = null) {
-        $this->setDateFrom($dateFrom);
-        $this->setDateTo($dateTo);
-        
-        self::$_adapter = Zend_Db_Table::getDefaultAdapter();     
+    public function __construct($datumOd = null, $datumDo = null) 
+    {
+        $this->setDatumOd($datumOd);
+        $this->setDatumDo($datumDo);
     }
     
-    public function getKalendar()
+    /**
+     * Na základě nastaveného _datumOd a _datumDo vrátí kalendář
+     * @return Array
+     */
+    public function ziskejKalendar()
     {
         $select = self::$_adapter->select()
             ->from( 'kalendar',
                     array('datum', 'svatek') )     
-            ->where( 'datum >= ?', $this->_dateFrom)
-            ->where( 'datum <= ?', $this->_dateTo)
+            ->where( 'datum >= ?', $this->_datumOd)
+            ->where( 'datum <= ?', $this->_datumDo)
             ->order( array('datum') );          
         
         return self::$_adapter->fetchAll($select);          
     }    
     
-    public function getVikendovyKalendar() {
-
+    /**
+     * Na základě nastaveného _datumOd a _datumDo vrátí kalendář včetně svátků
+     * a víkendů
+     * @return Array
+     */
+    public function ziskejVikendovyKalendar() 
+    {
         $kalendar = array();
-        $dny = $this->getKalendar();
+        $dny = $this->ziskejKalendar();
         
         foreach ($dny as $den) {
             
@@ -63,12 +70,12 @@ class Application_Model_Kalendar extends Fc_Model_DatabaseAbstract
         return $kalendar;
     }
     
-    public function setDateFrom($dateFrom) {
-        $this->_dateFrom = $dateFrom;
+    public function setDatumOd($datumOd) {
+        $this->_datumOd = $datumOd;
     }
 
-    public function setDateTo($dateTo) {
-        $this->_dateTo = $dateTo;
+    public function setDatumDo($datumDo) {
+        $this->_datumDo = $datumDo;
     }
     
 }
