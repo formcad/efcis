@@ -1,53 +1,27 @@
 <?php
 
 /**
- * Informace o příplatcích oficiální docházky
+ * Třída příplatků oficiální docházky
  */
-class Dochazka_Model_OficialniPriplatky extends Dochazka_Model_DochazkaOficialni
+class Dochazka_Model_OficialniPriplatky extends Dochazka_Model_OficialniAbstract
 {
     /**
-     * Datum směny
-     * @var string
-     */
-    protected $_datumSmeny = null;    
-    
-    /**
      * ID typu příplatku
-     * @var integer     
+     * @var Integer     
      */
     protected $_idPriplatku = null;
     
     /**
      * Číslená hodnota příplatku
-     * @var float
+     * @var Float
      */
     protected $_hodnota = null;
 
     /**
-     * Konctruktor třídy
-     * 
-     * @param integer $osoba            ID zaměstnance
-     * @param integer $cip              ID typu čipu zaměstnance
-     * @param ingeger $uzivatel         ID uživatele IS
-     * @param string|null  $datumSmeny  Datum směny
-     * @param integer|null $idPriplatku ID typu příplatku
-     * @param float|null   $hodnota     Číslená hodnota příplatku
-     */
-    function __construct($osoba, $cip, $uzivatel, $datumSmeny = null,
-        $idPriplatku = null, $hodnota = null) 
-    {
-        parent::__construct($osoba, $cip, $uzivatel);
-        
-        $this->setDatumSmeny($datumSmeny);
-        $this->setIdPriplatku($idPriplatku);
-        $this->setHodnota($hodnota);
-    }
- 
-    /**
      * Pro kombinaci _osoba, _cip a _datumSmeny získá z oficiální docházky
      * zapsané příplatky
      * 
-     * @return array
+     * @return Array
      */
     public function ziskejPriplatky()
     {  
@@ -62,22 +36,28 @@ class Dochazka_Model_OficialniPriplatky extends Dochazka_Model_DochazkaOficialni
     }
 
     /**
-     * Zápis poznámky _text pro kombinaci _osoba, _cip a _datumSmeny do
+     * Zápis příplatku pro kombinaci _osoba, _cip a _datumSmeny do
      * oficiální docházky
      * 
-     * @return void
+     * @param  Integer $typ     Id typu příplatku
+     * @param  Float   $hodnota Doba, za kterou je příplatek vyměřen
+     * @return Void
      */
-    public function zapisPriplatek()
+    public function zapisPriplatek($typ, $hodnota)
     {
+        // umožníme kontrolu parametrů
+        $this->setIdPriplatku($typ);
+        $this->setHodnota($hodnota);
+        
         // už je pro toto datum zapsaný teno typ příplatku?
-        $existuje = $this->_overPriplatek();
+        $existuje = $this->_overPriplatek($this->_idPriplatku);
         
         if ($existuje) {
-            $this->_zmenaPriplatku();
+            $this->_zmenaPriplatku($this->_idPriplatku,$this->_hodnota);
         } else {
             // pokud je co zapsat, zapíšeme to
             if ($this->_hodnota > 0) {
-                $this->_novyPriplatek();
+                $this->novyPriplatek($this->_idPriplatku,$this->_hodnota);
             }
         }
     }
@@ -86,9 +66,10 @@ class Dochazka_Model_OficialniPriplatky extends Dochazka_Model_DochazkaOficialni
      * Ověření, že pro _datumSmeny, _osoba, _cip, _idPriplatku existuje zapsaný
      * příplatek
      * 
-     * @rerurn boolean
+     * @param  Integer $typ Id typu příplatku
+     * @rerurn Boolean
      */
-    private function _overPriplatek()
+    private function _overPriplatek($typ)
     {
         $select = self::$_adapter->select()
             ->from(array('pp' => 'oficialni_priplatky'),
@@ -96,7 +77,7 @@ class Dochazka_Model_OficialniPriplatky extends Dochazka_Model_DochazkaOficialni
             ->where('datum = ?', $this->_datumSmeny)
             ->where('id_osoby = ?', $this->_osoba)
             ->where('id_cipu = ?', $this->_cip)
-            ->where('id_priplatku = ?', $this->_idPriplatku);
+            ->where('id_priplatku = ?', $typ);
         
         switch (count(self::$_adapter->fetchAll($select))) {
             case 0:  return false; break;
@@ -107,28 +88,30 @@ class Dochazka_Model_OficialniPriplatky extends Dochazka_Model_DochazkaOficialni
     /**
      * Pro kombinaci _osoba, _cip, _datumuSmeny a idPriplatku v databázi změní
      * hodnotu příplatku na _hodnota
-     * 
-     * @return void
+     *
+     * @param  Integer $typ     Id typu příplatku
+     * @param  Float   $hodnota Doba, za kterou je příplatek vyměřen
+     * @return Void
      */
-    private function _zmenaPriplatku()
+    private function _zmenaPriplatku($typ, $hodnota)
     {
         // null hodnota není prázdný řetězec
-        switch (strlen($this->_hodnota)) {
-            case 0:  $text = null;         break;
-            default: $text = $this->_hodnota; break;
+        switch (strlen($hodnota)) {
+            case 0:  $text = null;     break;
+            default: $text = $hodnota; break;
         }
         
         self::$_adapter->update(
             'oficialni_priplatky',
             array(
-                'delka' => $this->_hodnota,
+                'delka' => $hodnota,
                 'id_zmenil' => $this->_uzivatel
             ),
             array(
                 'id_osoby = ?' => $this->_osoba,
                 'id_cipu = ?' => $this->_cip,
                 'datum = ?' => $this->_datumSmeny,
-                'id_priplatku = ?' => $this->_idPriplatku
+                'id_priplatku = ?' => $typ
             )
         );        
     }
@@ -136,29 +119,61 @@ class Dochazka_Model_OficialniPriplatky extends Dochazka_Model_DochazkaOficialni
     /**
      * Do databáze uloží novoý příplatek _hodnota pro kombinaci _osoba, _cip,
      * _datumSmeny a _idPriplatku
-     * 
-     * @return void
-     */
-    private function _novyPriplatek()
+     *     
+     * @param  Integer $typ     Id typu příplatku
+     * @param  Float   $hodnota Doba, za kterou je příplatek vyměřen
+     * @return Void
+     */ 
+    public function novyPriplatek($typ, $hodnota)
     {
+        // umožníme kontrolu parametrů
+        $this->setIdPriplatku($typ);
+        $this->setHodnota($hodnota);        
+        
         self::$_adapter->insert( 'oficialni_priplatky', array(            
             'id_osoby' => $this->_osoba,
             'id_cipu' => $this->_cip,
-            'id_priplatku' => $this->_idPriplatku,
+            'id_priplatku' => $typ,
             'datum' => $this->_datumSmeny,
-            'delka' => $this->_hodnota,
+            'delka' => $hodnota,
             'id_zmenil' => $this->_uzivatel
         ));                       
     }
 
-    public function getDatumSmeny() {
-        return $this->_datumSmeny;
+    /**
+     * SQL dotaz vrátí oficiální příplatky docházky mezi nastavenými časovými
+     * hodnotami
+     *
+     * @param  String $od Počáteční datum
+     * @param  String $do Koncové datum
+     * @return Array 
+     */
+    public function ziskejPriplatkyObdobi($od, $do)
+    {
+        // umožníme kontrolu parametrů
+        $this->setDatumOd($od);
+        $this->setDatumDo($do);         
+        
+        $select = self::$_adapter->select()
+            ->from( array('pr' => 'oficialni_priplatky'),
+                    array('id' => 'id_zaznamu', 'delka',
+                        'idPriplatku' => 'id_priplatku') )
+            ->join( array('k' => 'kalendar'),
+                    'k.datum = pr.datum',
+                    array('datum') )
+            ->join( array('p' => 'priplatky'),
+                    'p.id_priplatku = pr.id_priplatku',
+                    array('nazev') )
+            ->where( 'k.datum >= ?', $this->_datumOd)
+            ->where( 'k.datum <= ?', $this->_datumDo)
+            ->where( 'pr.smazano IS FALSE' )
+            ->where( 'pr.id_cipu = ?', $this->_cip )
+            ->where( 'pr.id_osoby = ?', $this->_osoba )
+            ->order( array('k.datum') );            
+        
+        return self::$_adapter->fetchAll($select); 
     }
-
-    public function setDatumSmeny($datumSmeny) {
-        $this->_datumSmeny = $datumSmeny;
-    }
-
+    
     public function getIdPriplatku() {
         return $this->_idPriplatku;
     }

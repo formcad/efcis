@@ -46,11 +46,9 @@ class Dochazka_Model_AkceDochazky extends Fc_Model_DatabaseAbstract
     {                           
         $result = array();
 
-        $kalendarInstance = new Application_Model_Kalendar();
-        $kalendarInstance->setDateFrom($this->_dateFrom);
-        $kalendarInstance->setDateTo($this->_dateTo);
-        
-        $kalendar = $kalendarInstance->getKalendar();
+        $kalendarInstance = new Application_Model_Kalendar($this->_dateFrom,$this->_dateTo);
+
+        $kalendar = $kalendarInstance->ziskejKalendar();
         $pruchody = $this->_getPruchody();
         $preruseni = $this->_getPreruseni();
         $priplatky = $this->_getPriplatky();        

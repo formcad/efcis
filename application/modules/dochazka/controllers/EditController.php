@@ -705,7 +705,7 @@ class Dochazka_EditController extends Zend_Controller_Action
                 $kalendar->setDateFrom($datumOd);
                 $kalendar->setDateTo($datumDo);                
                 
-                $dny = $kalendar->getVikendovyKalendar();       
+                $dny = $kalendar->ziskejVikendovyKalendar();       
                 foreach ($dny as $den) {
 
                     $zapiseme = $this->_rozhodniZapsani($den,$request->getPost('opakovani'));
@@ -776,7 +776,7 @@ class Dochazka_EditController extends Zend_Controller_Action
                 $kalendar->setDateFrom($datumOd);
                 $kalendar->setDateTo($datumDo);                
                 
-                $dny = $kalendar->getVikendovyKalendar();       
+                $dny = $kalendar->ziskejVikendovyKalendar();       
                 foreach ($dny as $den) {
 
                     $zapiseme = $this->_rozhodniZapsani($den,$request->getPost('opakovani'));
@@ -852,7 +852,7 @@ class Dochazka_EditController extends Zend_Controller_Action
                 $kalendar->setDateFrom($datumOd);
                 $kalendar->setDateTo($datumDo);                
                 
-                $dny = $kalendar->getVikendovyKalendar();       
+                $dny = $kalendar->ziskejVikendovyKalendar();       
                 foreach ($dny as $den) {
 
                     $zapiseme = $this->_rozhodniZapsani($den,$request->getPost('opakovani'));

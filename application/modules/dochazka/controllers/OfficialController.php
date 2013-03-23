@@ -185,24 +185,46 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         // zapíšeme do oficialni_dochazka založení docházky
         $idDochazky = $vykazy->zalozDochazku();        
         
-        $dochazka = new Dochazka_Model_DochazkaOficialni();
-        $dochazka->setOsoba(self::$_session->idOsoby);
-        $dochazka->setCip(self::$_session->idCipu);
-        $dochazka->setUzivatel(self::$_identity->id);
-        $dochazka->setMesic($mesic);
-        $dochazka->setRok($rok);                
+        // instance průchodů
+        $pruchod = new Dochazka_Model_OficialniPruchody(self::$_session->idOsoby,
+            self::$_session->idCipu, self::$_identity->id);              
         
-        // do modelu přehrajeme data
-        $dochazka->setNovaOficialniData($data);
+        // instance přerušení
+        $preruseni = new Dochazka_Model_OficialniPreruseni(self::$_session->idOsoby,
+            self::$_session->idCipu, self::$_identity->id);           
+
+        // instance příplatků
+        $priplatek = new Dochazka_Model_OficialniPriplatky(self::$_session->idOsoby,
+                self::$_session->idCipu, self::$_identity->id);         
         
         // uložíme oficiální průchody
-        $dochazka->ulozNoveOficialniPruchody();
+        foreach ($data as $den) {
+              
+            foreach($den['polePruchodu'] as $zaznam) {
+                $pruchod->setDatumSmeny($den['datum']);
+                $pruchod->novyPruchod($zaznam['prichod'],$zaznam['odchod']);
+            }            
+        }
         
         // uložíme oficiální přerušení
-        $dochazka->ulozNoveOficialniPreruseni();
+        foreach ($data as $den) {
+
+            if ($den['sumaPreruseni'] > 0) {
+                $preruseni->setDatumSmeny($den['datum']);
+                $preruseni->zapisPreruseni(1, $den['sumaPreruseni']);
+            }
+        }
         
         // uložíme oficiální příplatky
-        $dochazka->ulozNoveOficialniPriplatky();
+        foreach ($data as $den) { 
+            
+            if (!empty($den['sumaPriplatku'])) {
+                foreach ($den['sumaPriplatku'] as $idPriplatku => $hodnota) {
+                    $priplatek->setDatumSmeny($den['datum']);
+                    $priplatek->novyPriplatek($idPriplatku, $hodnota);
+                }
+            }
+        }
         
         // a přesměrujeme pryč
         $redirector = Zend_Controller_Action_HelperBroker::getStaticHelper('Redirector');
@@ -235,16 +257,17 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         // měsíc a rok oficiální docházky
         $vykazy = new Dochazka_Model_VykazyDochazky( $idVykazu );
         $rozsah = $vykazy->zjistiRozsahDochazky();
+        $denKonec = cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']);
 
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-        $dochazkaOficialni->setCip(self::$_session->idCipu);                
-        
-        // nastavíme časové limitní hodnoty docházky
-        $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
-        $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'
-            .cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
-
+        // vytvoříme instanci oficiální docházky
+        $dochazkaOficialni = new Dochazka_Model_OficialniDochazka(
+                self::$_session->idOsoby,
+                self::$_session->idCipu,
+                self::$_identity->id,
+                $rozsah['rok'].'-'.$rozsah['mesic'].'-01',
+                $rozsah['rok'].'-'.$rozsah['mesic'].'-'.$denKonec
+        );
+                   
         // získáme pole oficiální docházky
         $poleZaznamu = $dochazkaOficialni->getAkce();
        
@@ -389,15 +412,18 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         // měsíc a rok oficiální docházky
         $vykazy = new Dochazka_Model_VykazyDochazky( $idVykazu );
         $rozsah = $vykazy->zjistiRozsahDochazky();
+        $denKonec = cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']);
 
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-        $dochazkaOficialni->setCip(self::$_session->idCipu);        
+        // vytvoříme instanci oficiální docházky
+        $dochazkaOficialni = new Dochazka_Model_OficialniDochazka(
+                self::$_session->idOsoby,
+                self::$_session->idCipu,
+                self::$_identity->id,
+                $rozsah['rok'].'-'.$rozsah['mesic'].'-01',
+                $rozsah['rok'].'-'.$rozsah['mesic'].'-'.$denKonec
+        );        
         
-        // nastavíme časové limitní hodnoty docházky
-        $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
-        $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
-
+        
         // získáme data
         $poleDochazky = $dochazkaOficialni->sumaCasuDochazky();
         
@@ -419,16 +445,16 @@ class Dochazka_OfficialController extends Zend_Controller_Action
     {
         $this->_helper->getHelper('layout')->disableLayout();
         $datum = $this->getRequest()->getParam('datum');
+               
+        // vytvoříme instanci oficiální docházky
+        $dochazkaOficialni = new Dochazka_Model_OficialniDochazka(
+                self::$_session->idOsoby,
+                self::$_session->idCipu,
+                self::$_identity->id,
+                $datum,
+                $datum
+        );                
         
-        // získáme rok a měsíc výkazu
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-        $dochazkaOficialni->setCip(self::$_session->idCipu);        
-        
-        // nastavíme časové limitní hodnoty docházky
-        $dochazkaOficialni->setDatumOd($datum);
-        $dochazkaOficialni->setDatumDo($datum);
-
         // získáme data
         $this->view->dataCasu = json_encode($dochazkaOficialni->sumaCasuDochazky());
     }
@@ -440,11 +466,11 @@ class Dochazka_OfficialController extends Zend_Controller_Action
     public function ajaxMazaniZaznamuAction()
     {
         $this->_helper->getHelper('layout')->disableLayout();
-        $id = $this->getRequest()->getParam('id');
          
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setIdPruchodu($id);
-        $this->view->data = $dochazkaOficialni->ziskejPruchod();
+        $pruchody = new Dochazka_Model_OficialniPruchody(self::$_session->idOsoby, 
+            self::$_session->idCipu, self::$_identity->id);
+        
+        $this->view->data = $pruchody->ziskejPruchod($this->getRequest()->getParam('id'));
     }
 
     /**
@@ -453,13 +479,11 @@ class Dochazka_OfficialController extends Zend_Controller_Action
     public function ajaxMazaniPruchoduAction()
     {
         $this->_helper->getHelper('layout')->disableLayout();
-        $id = $this->getRequest()->getParam('id');
 
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setUzivatel(self::$_identity->id);
-        $dochazkaOficialni->setIdPruchodu($id);    
+        $pruchody = new Dochazka_Model_OficialniPruchody(self::$_session->idOsoby, 
+            self::$_session->idCipu, self::$_identity->id);
         
-        $dochazkaOficialni->smazZaznam();        
+        $pruchody->smazPruchod($this->getRequest()->getParam('id'));             
     }
 
     /**
@@ -479,16 +503,11 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $datum = date('Y-m-d',strtotime(str_replace(' ','',$formData['datumSmeny'])));
         $prichod = date('Y-m-d H:i',strtotime(str_replace(' ','',$formData['prichodDen']).' '.$formData['prichodCas']));
         $odchod = date('Y-m-d H:i',strtotime(str_replace(' ','',$formData['odchodDen']).' '.$formData['odchodCas']));        
-        
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
 
-        $dochazkaOficialni->setDatumSmeny($datum);
-        $dochazkaOficialni->setCasPrichod($prichod);
-        $dochazkaOficialni->setCasOdchod($odchod);
-        $dochazkaOficialni->setIdPruchodu($formData['idZaznamu']);    
-        $dochazkaOficialni->setUzivatel(self::$_identity->id);
+        $pruchody = new Dochazka_Model_OficialniPruchody(self::$_session->idOsoby, 
+            self::$_session->idCipu, self::$_identity->id, $datum);
 
-        $dochazkaOficialni->zmenZaznam();
+        $pruchody->zmenPruchod($formData['idZaznamu'], $prichod, $odchod);        
     }
     
     /**
@@ -518,13 +537,13 @@ class Dochazka_OfficialController extends Zend_Controller_Action
      * Získání podrobností záznamu konkrétní dvojice průchodů
      */
     public function ajaxPodrobnostiZaznamuAction()
-    {
+    {   
         $this->_helper->getHelper('layout')->disableLayout();
-        $idZaznamu = $this->getRequest()->getParam('idZaznamu');
- 
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-        $dochazkaOficialni->setIdPruchodu($idZaznamu);
-        $this->view->data = json_encode($dochazkaOficialni->ziskejPruchod());
+        
+        $pruchody = new Dochazka_Model_OficialniPruchody(self::$_session->idOsoby, 
+            self::$_session->idCipu, self::$_identity->id);
+
+        $this->view->data = json_encode($pruchody->ziskejPruchod($this->getRequest()->getParam('idZaznamu')));
     }    
     
     /**
@@ -553,9 +572,9 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         
         $poznamky = new Dochazka_Model_OficialniPoznamky(
             self::$_session->idOsoby, self::$_session->idCipu, 
-            self::$_identity->id, $datum, $poznamka);
+            self::$_identity->id, $datum);
         
-        $poznamky->zapisPoznamku();
+        $poznamky->zapisPoznamku($poznamka);
     }
     
     /**
@@ -575,16 +594,10 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $datum = date('Y-m-d',strtotime(str_replace(' ','',$formData['datumSmeny'])));
         $prichod = date('Y-m-d H:i',strtotime(str_replace(' ','',$formData['prichodDen']).' '.$formData['prichodCas']));
         $odchod = date('Y-m-d H:i',strtotime(str_replace(' ','',$formData['odchodDen']).' '.$formData['odchodCas']));        
-        
-        $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
 
-        $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-        $dochazkaOficialni->setCip(self::$_session->idCipu);
-        $dochazkaOficialni->setDatumSmeny($datum);
-        $dochazkaOficialni->setCasPrichod($prichod);
-        $dochazkaOficialni->setCasOdchod($odchod);
-
-        $dochazkaOficialni->ulozNovyOficialniPruchod();
+        $pruchod = new Dochazka_Model_OficialniPruchody(self::$_session->idOsoby, 
+            self::$_session->idCipu, self::$_identity->id, $datum);           
+        $pruchod->novyPruchod($prichod,$odchod);
     }
 
     /**
@@ -619,30 +632,40 @@ class Dochazka_OfficialController extends Zend_Controller_Action
                 $rozsah = $vykazy->zjistiRozsahDochazky();
 
                 // nastavíme časové limitní hodnoty docházky
-                $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-                $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
-                $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
+                $pruchody = new Dochazka_Model_OficialniPruchody(self::$_session->idOsoby,
+                    self::$_session->idCipu, self::$_identity->id);
+                $pruchody->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
+                $pruchody->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']));
 
                 // budeme zaokrouhlovat ranní směnu
-                if (strlen($data['ranniCil']) <> 0) {
-                    $dochazkaOficialni->setCasOd($data['ranniOd']);
-                    $dochazkaOficialni->setCasDo($data['ranniDo']);
-                    $dochazkaOficialni->setCasCil($data['ranniCil']);            
-                    $dochazkaOficialni->zaokrouhliPrichodyDochazky();
+                if (strlen($data['ranniCil']) <> 0)
+                {                    
+                    $hodnoty = array(
+                        'casOd' => $data['ranniOd'],
+                        'casDo' => $data['ranniDo'],
+                        'casCil' => $data['ranniCil']
+                    );
+                    $pruchody->zaokrouhliPrichody($hodnoty);              
                 }
                 // budeme zaokrouhlovat odpolední  směnu
-                if (strlen($data['odpoledniCil']) <> 0) {
-                    $dochazkaOficialni->setCasOd($data['odpoledniOd']);
-                    $dochazkaOficialni->setCasDo($data['odpoledniDo']);
-                    $dochazkaOficialni->setCasCil($data['odpoledniCil']);            
-                    $dochazkaOficialni->zaokrouhliPrichodyDochazky();            
+                if (strlen($data['odpoledniCil']) <> 0) 
+                {
+                    $hodnoty = array(
+                        'casOd' => $data['odpoledniOd'],
+                        'casDo' => $data['odpoledniDo'],
+                        'casCil' => $data['odpoledniCil']
+                    );
+                    $pruchody->zaokrouhliPrichody($hodnoty);                               
                 }
                 // budeme zaokrouhlovat noční směnu
-                if (strlen($data['nocniCil']) <> 0) {
-                    $dochazkaOficialni->setCasOd($data['nocniOd']);
-                    $dochazkaOficialni->setCasDo($data['nocniDo']);
-                    $dochazkaOficialni->setCasCil($data['nocniCil']);            
-                    $dochazkaOficialni->zaokrouhliPrichodyDochazky();
+                if (strlen($data['nocniCil']) <> 0) 
+                {                   
+                    $hodnoty = array(
+                        'casOd' => $data['nocniOd'],
+                        'casDo' => $data['nocniDo'],
+                        'casCil' => $data['nocniCil']
+                    );
+                    $pruchody->zaokrouhliPrichody($hodnoty);                         
                 }        
             
                 // skok zpátky na oficiální docházku
@@ -688,14 +711,17 @@ class Dochazka_OfficialController extends Zend_Controller_Action
             // měsíc a rok oficiální docházky
             $vykazy = new Dochazka_Model_VykazyDochazky( $idVykazu );
             $rozsah = $vykazy->zjistiRozsahDochazky();
+            $denKonec = cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']);
 
-            // nastavíme časové limitní hodnoty docházky
-            $dochazkaOficialni = new Dochazka_Model_DochazkaOficialni();
-            $dochazkaOficialni->setDatumOd($rozsah['rok'].'-'.$rozsah['mesic'].'-01');
-            $dochazkaOficialni->setDatumDo($rozsah['rok'].'-'.$rozsah['mesic'].'-'.cal_days_in_month(CAL_GREGORIAN,$rozsah['mesic'],$rozsah['rok']) );
-            $dochazkaOficialni->setCip(self::$_session->idCipu);
-            $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-                        
+            // vytvoříme instanci oficiální docházky
+            $dochazkaOficialni = new Dochazka_Model_OficialniDochazka(
+                    self::$_session->idOsoby,
+                    self::$_session->idCipu,
+                    self::$_identity->id,
+                    $rozsah['rok'].'-'.$rozsah['mesic'].'-01',
+                    $rozsah['rok'].'-'.$rozsah['mesic'].'-'.$denKonec
+            );                
+            
             $data = $dochazkaOficialni->sumaCasuDochazky();
             
             foreach ($data as $den) {
@@ -709,14 +735,12 @@ class Dochazka_OfficialController extends Zend_Controller_Action
                         // a celková doba pauzy je menší než 0,5 hodiny
                         if ($den['pauza'] < 0.5) {
 
-                            $dochazkaOficialni->setDatumSmeny($den['datum']);
-                            $dochazkaOficialni->setUzivatel(self::$_identity->id);  
-                            $dochazkaOficialni->setOsoba(self::$_session->idOsoby);
-                            $dochazkaOficialni->setCip(self::$_session->idCipu);
-                            $dochazkaOficialni->setTrvani(0.5);
+                            $preruseni = new Dochazka_Model_OficialniPreruseni(
+                                self::$_session->idOsoby, self::$_session->idCipu, 
+                                 self::$_identity->id, $den['datum']);
                             
-                            // doplníme dobu pauzu na 0,5 hodiny     
-                            $dochazkaOficialni->doplnPauzu();
+                            // doplníme dobu pauzu na 0,5 hodiny  
+                            $preruseni->zapisPreruseni(1, 0.5);
                         }                     
                     }                                        
                 }
@@ -769,17 +793,15 @@ class Dochazka_OfficialController extends Zend_Controller_Action
         $this->_helper->getHelper('layout')->disableLayout();
 
         /**** Informační tabulka **********************************************/
-        
-        $datum = $this->getRequest()->getParam('datum');
-        $idOsoby = $this->getRequest()->getParam('osoba');
-        $idCipu = $this->getRequest()->getParam('cip');
-        
-        $dochazka = new Dochazka_Model_DochazkaOficialni();
-        $dochazka->setDatumOd($datum);
-        $dochazka->setDatumDo($datum);
-        $dochazka->setOsoba($idOsoby);
-        $dochazka->setCip($idCipu);
-        
+
+        $dochazka = new Dochazka_Model_OficialniDochazka(
+                $this->getRequest()->getParam('osoba'),
+                $this->getRequest()->getParam('cip'),
+                self::$_identity->id,
+                $this->getRequest()->getParam('datum'),
+                $this->getRequest()->getParam('datum')
+        );            
+
         $data = $dochazka->getAkce();
   
         /**** Změnový formulář ************************************************/
@@ -829,15 +851,15 @@ class Dochazka_OfficialController extends Zend_Controller_Action
     {
         $this->_helper->getHelper('layout')->disableLayout();
         $filter = new Zend_Filter_LocalizedToNormalized();
-        
-        $dochazka = new Dochazka_Model_DochazkaOficialni();
-        $dochazka->setOsoba($this->getRequest()->getParam('osoba'));
-        $dochazka->setCip($this->getRequest()->getParam('cip'));
-        $dochazka->setDatumSmeny($this->getRequest()->getParam('datum'));        
-        $dochazka->setUzivatel(self::$_identity->id);
-        $dochazka->setTrvani($filter->filter($this->getRequest()->getParam('delka')));
-                
-        $dochazka->doplnPauzu();
+      
+        $preruseni = new Dochazka_Model_OficialniPreruseni(
+            $this->getRequest()->getParam('osoba'),
+            $this->getRequest()->getParam('cip'),
+            self::$_identity->id,
+            $this->getRequest()->getParam('datum'));
+
+        // doplníme dobu pauzu na 0,5 hodiny  
+        $preruseni->zapisPreruseni(1, $filter->filter($this->getRequest()->getParam('delka')));        
     }   
     
     /**
@@ -851,9 +873,20 @@ class Dochazka_OfficialController extends Zend_Controller_Action
  
         $priplatky = new Dochazka_Model_OficialniPriplatky(
             self::$_session->idOsoby, self::$_session->idCipu,
-            self::$_identity->id, $datum);
+            self::$_identity->id, $datum);                            
         
-        $this->view->data = json_encode($priplatky->ziskejPriplatky());
+        $data = $priplatky->ziskejPriplatky();
+        
+        // desetinné tečky nahradíme čárkami
+        if (count($data)>0) {         
+            foreach ($data as $index => $radek) {
+                $filter = new Zend_Filter_NormalizedToLocalized(); 
+                $hodnota = $filter->filter($radek['delka']);
+                $data[$index]['delka'] = $hodnota;
+            }
+        }
+        
+        $this->view->data = json_encode($data);
     }
     
     /**
@@ -911,9 +944,9 @@ class Dochazka_OfficialController extends Zend_Controller_Action
             // délku příplatku uložíme do databáze
             $priplatky = new Dochazka_Model_OficialniPriplatky(
                 self::$_session->idOsoby, self::$_session->idCipu,
-                self::$_identity->id, $datum, $idPriplatku, $delka);
-            
-            $priplatky->zapisPriplatek();
+                self::$_identity->id, $datum);
+                        
+            $priplatky->zapisPriplatek($idPriplatku,$delka);
         } 
     }
 }

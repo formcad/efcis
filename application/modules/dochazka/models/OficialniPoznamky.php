@@ -1,44 +1,21 @@
 <?php
 
 /**
- * Informace o poznámkách oficiální docházky
+ * Třída poznámek oficiální docházky
  */
-class Dochazka_Model_OficialniPoznamky extends Dochazka_Model_DochazkaOficialni
-{    
-    /**
-     * Datum směny
-     * @var string
-     */
-    protected $_datumSmeny = null;    
-    
+class Dochazka_Model_OficialniPoznamky extends Dochazka_Model_OficialniAbstract
+{        
     /**
      * Text poznámky
-     * @var string
+     * @var String
      */
     protected $_text = null;
-     
-    /**
-     * Konctruktor třídy
-     * 
-     * @param integer $osoba
-     * @param integer $cip
-     * @param string  $datumSmeny
-     * @param string|null  $text
-     * @param ingeger|null $uzivatel     
-     */
-    function __construct($osoba, $cip, $uzivatel, $datumSmeny, $text = null) 
-    {
-        parent::__construct($osoba, $cip, $uzivatel);
-        
-        $this->setDatumSmeny($datumSmeny);
-        $this->setText($text);            
-    }
- 
+      
     /**
      * Pro kombinaci _osoba, _cip a _datumSmeny získá z oficiální docházky
      * zapsanou poznámku
      * 
-     * @return null|string
+     * @return Null|String
      */
     public function ziskejPoznamku()
     {
@@ -57,24 +34,28 @@ class Dochazka_Model_OficialniPoznamky extends Dochazka_Model_DochazkaOficialni
      * Zápis poznámky _text pro kombinaci _osoba, _cip a _datumSmeny do
      * oficiální docházky
      * 
-     * @return void
+     * @param  String $text Text poznámky
+     * @return Void
      */
-    public function zapisPoznamku()
+    public function zapisPoznamku($text)
     {
+        // umožníme kontrolu parametru
+        $this->setText($text);        
+     
         // už je pro toto datum zapsaná poznámka?
         $existuje = $this->_overPoznamku();
-        
+     
         if ($existuje) {
-            $this->_zmenaPoznamky();
+            $this->_zmenaPoznamky($this->_text);
         } else {
-            $this->_novaPozamka();
+            $this->_novaPozamka($this->_text);
         }
     }
     
     /**
      * Ověření, že pro _datumSmeny, _osoba, _cip existuje zapsaná poznámka
      * 
-     * @rerurn boolean
+     * @rerurn Boolean
      */
     private function _overPoznamku()
     {
@@ -95,16 +76,14 @@ class Dochazka_Model_OficialniPoznamky extends Dochazka_Model_DochazkaOficialni
      * Pro kombinaci _osoba, _cip a _datumuSmeny v databázi změní text poznámky
      * na _text
      * 
-     * @return void
+     * @param String $text Text poznámky
+     * @return Void
      */
-    private function _zmenaPoznamky()
+    private function _zmenaPoznamky($text)
     {
         // null hodnota není prázdný řetězec
-        switch (strlen($this->_text)) {
-            case 0:  $text = null;         break;
-            default: $text = $this->_text; break;
-        }
-        
+        if (strlen($text) == 0) { $text = null; }
+       
         self::$_adapter->update(
             'oficialni_poznamky',
             array(
@@ -123,31 +102,53 @@ class Dochazka_Model_OficialniPoznamky extends Dochazka_Model_DochazkaOficialni
      * Do databáze uloží novou poznámku _text pro kombinaci _osoby, _cip a
      * _datumSmeny
      * 
-     * @return void
+     * @param String $text Text poznámky
+     * @return Void
      */
-    private function _novaPozamka()
+    private function _novaPozamka($text)
     {
         // zapisujeme pouze pokud to má cenu
-        if (strlen($this->_text) > 0) {
+        if (strlen($text) > 0) {
             
             self::$_adapter->insert( 'oficialni_poznamky', array(            
                 'id_osoby' => $this->_osoba,
                 'id_cipu' => $this->_cip,
                 'datum' => $this->_datumSmeny,
-                'text' => $this->_text,
+                'text' => $text,
                 'id_zmenil' => $this->_uzivatel
             ));                
         }
     }
 
-    public function getDatumSmeny() {
-        return $this->_datumSmeny;
+    /**
+     * SQL dotaz vrátí oficiální poznámky docházky mezi nastavenými časovými
+     * hodnotami
+     *
+     * @param  String $od Počáteční datum
+     * @param  String $do Koncové datum
+     * @return Array 
+     */    
+    public function ziskejPoznamkyObdobi($od, $do)
+    {
+        // umožníme kontrolu parametrů
+        $this->setDatumOd($od);
+        $this->setDatumDo($do);           
+        
+        $select = self::$_adapter->select()
+            ->from( array('po' => 'oficialni_poznamky'),
+                    array('id' => 'id_zaznamu', 'text') )
+            ->join( array('k' => 'kalendar'),
+                    'k.datum = po.datum',
+                    array('datum') )
+            ->where( 'k.datum >= ?', $od)
+            ->where( 'k.datum <= ?', $do)            
+            ->where( 'po.id_cipu = ?', $this->_cip )
+            ->where( 'po.id_osoby = ?', $this->_osoba )
+            ->order( array('k.datum') );          
+        
+        return self::$_adapter->fetchAll($select);        
     }
-
-    public function setDatumSmeny($datumSmeny) {
-        $this->_datumSmeny = $datumSmeny;
-    }
-
+    
     public function getText() {
         return $this->_text;
     }

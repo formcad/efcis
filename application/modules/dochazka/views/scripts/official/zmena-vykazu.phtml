@@ -108,7 +108,7 @@ function pauzaEdit(datum,osoba,cip,radek)
                 if (chyba.length === 0) {
 
                     // změníme pauzu
-                    $.ajax({
+                    $.ajax({                                          
                         type: "POST",
                         url: "<?php echo $this->url(array('module'=>'dochazka',
                                                           'controller'=>'official',
@@ -116,6 +116,7 @@ function pauzaEdit(datum,osoba,cip,radek)
                                                           null,true);?>",
                         data: ({datum: datum, osoba: osoba, cip: cip,
                             delka: $('#delkaPauzy').val()}),
+                        async: false,  
                         success: function() {}
                     });
 
@@ -179,7 +180,6 @@ function smazaniPruchodu(id)
                         location.reload();
                     }
                 });
-                $( this ).dialog( "close" );
             },
             "Zrušit": function() {
                 $( this ).dialog( "close" );
@@ -470,7 +470,7 @@ function zmenaPriplatku(datum)
     $("#div-dochazka-officialZmenaPriplatku").dialog({
         width: 600,
         height: 450,
-        modal: true,
+        modal: true,        
         buttons: {
             "Změnit": function() {
 
@@ -481,7 +481,7 @@ function zmenaPriplatku(datum)
                 // nic nebrání provedení změny
                 if (chyba.length === 0) {
                     // změníme příplatek
-                    $.ajax({
+                    $.ajax({                      
                         type: "POST",
                         url: "<?php echo $this->url(array('module'=>'dochazka',
                                                           'controller'=>'official',
@@ -492,8 +492,7 @@ function zmenaPriplatku(datum)
                             datum: datum
                         }),
                         success: function() {                            
-                            // znovu načteme stránku
-                            $( this ).dialog( "close" );
+                            // znovu načteme stránku                        
                             location.reload();
                         }
                     });

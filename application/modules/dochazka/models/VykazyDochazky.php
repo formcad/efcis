@@ -56,6 +56,7 @@ class Dochazka_Model_VykazyDochazky extends Fc_Model_DatabaseAbstract
     function __construct($idDochazky = null, $osoba = null, $cip = null,
         $uzivatel = null, $mesic = null, $rok = null) 
     {
+        // konstruktor Fc_Model_DatabaseAbstract zajistí DB adaptér
         parent::__construct();
         
         $this->setIdDochazky($idDochazky);
